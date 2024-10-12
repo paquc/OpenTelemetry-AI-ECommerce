@@ -1,33 +1,6 @@
-/*
-const severity_info = 'INFO';
-const severity_error = 'ERROR';
-const severity_warning = 'WARNING';
-const severity_debug = 'DEBUG';
-const simulation_trace = 'SIMULATION';
-*/
-
 const logger_name='enduser-service-logger';
 
 const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
-
-/*
-function logEventMessage(message, severity, line) {
-
-    const logger = loggerProvider.getLogger('enduser-service-logger');
-  
-    // emit a log message 
-    logger.emit({
-      severityText: severity,
-      body: message,
-      attributes: { 
-        'log.project': 'ETS-AI-Project',
-        'log.service': 'endUserService',
-        'log.line': line,}
-    });
-  
-    console.log(`${severity} : ${message}`); 
-};
-*/
 
 var app = require('express')(),
     server = require('http').Server(app),

@@ -30,6 +30,9 @@ services:
     environment:
       - VIRTUAL_HOST=local-admin.cotejs.org, ws://local-admin.cotejs.org
       - BALANCE=source
+    volumes:
+      - ./tracing/tracing.js:/src/admin/tracing.js
+      - ./admin/server.js:/src/admin/server.js
     ports:
       - 5000:5000
 

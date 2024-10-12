@@ -1,3 +1,7 @@
+const logger_name='admin-service-logger';
+
+const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
+
 var app = require('express')(),
     bodyParser = require('body-parser'),
     server = require('http').Server(app),
@@ -60,7 +64,9 @@ var purchaseRequester = new cote.Requester({
     namespace: 'purchase'
 });
 
+logEventMessage(logger_name, 'ADMIN service starts listening on port 5001...', severity_info, getLineNumber());
 server.listen(5000);
+logEventMessage(logger_name, 'ADMIN service is listening on port 5001', severity_info, getLineNumber());
 
 new cote.Sockend(io, {
     name: 'admin sockend server'
