@@ -1,19 +1,28 @@
 
 // DOC Node-SDK: https://open-telemetry.github.io/opentelemetry-js/modules/_opentelemetry_sdk_node.html
-
 console.log("TRACING--> Loading traing.js...");
+
+const severity_info = 'INFO';
+const severity_error = 'ERROR';
+const severity_warning = 'WARNING';
+const severity_debug = 'DEBUG';
+const simulation_trace = 'SIMULATION';
 
 const serviceNameProvider = require(__dirname + '/servicename.js');
 
 const { Resource } = require('@opentelemetry/resources');
-
-
+const opentelemetry = require("@opentelemetry/sdk-node");
 const { diag, DiagConsoleLogger, DiagLogLevel, metrics } = require('@opentelemetry/api');
 
-
-const opentelemetry = require("@opentelemetry/sdk-node");
-//const { getNodeAutoInstrumentations, } = require("@opentelemetry/auto-instrumentations-node");
+//////////////////////////////////////////////
+// Traces instrumentations
+//
+//const { getNodeAutoInstrumentations, } = require("@opentelemetry/auto-instrumentations-node");  // Don.t work
 const { HttpInstrumentation, } = require("@opentelemetry/instrumentation-http");
+const { ExpressInstrumentation, } = require("@opentelemetry/instrumentation-express");
+const { SocketIoInstrumentation, } = require("@opentelemetry/instrumentation-socket.io");
+const { NestInstrumentation, } = require("@opentelemetry/instrumentation-nestjs-core");
+const { NetInstrumentation, } = require("@opentelemetry/instrumentation-net");
 
 //////////////////////////////////
 // Logs
@@ -96,7 +105,13 @@ const periodicMeterExporterReader = new PeriodicExportingMetricReader({
 
 const sdk = new opentelemetry.NodeSDK({
     serviceName: serviceNameProvider.serviceName,
-    instrumentations: [new HttpInstrumentation(), ],                // Optional - you can use the metapackage or load each instrumentation individually
+    instrumentations: [
+      new HttpInstrumentation(), 
+      new ExpressInstrumentation(),
+      new SocketIoInstrumentation(),
+      new NestInstrumentation(),  
+      new NetInstrumentation(),
+    ],          
     //instrumentations: [getNodeAutoInstrumentations(), ],    // Optional - you can use the metapackage or load each instrumentation individually
     spanProcessors: [batchSpanProcessor, ],                   // Optional - you can add more span processors
     traceExporter: OTLPTracesExporter,                        // Optional - if omitted, the tracing SDK will be initialized from environment variables
@@ -105,6 +120,22 @@ const sdk = new opentelemetry.NodeSDK({
     logRecordProcessors: [simpleLogsProcessor],               // Optional - LogRecordProcessor array
 });
 
+function logEventMessage(logger_name, message, severity, line) {
+
+  const logger = loggerProvider.getLogger(logger_name);
+
+  // emit a log message 
+  logger.emit({
+    severityText: severity,
+    body: message,
+    attributes: { 
+      'log.project': 'ETS-AI-Project',
+      'log.service': logger_name,
+      'log.line': line,}
+  });
+
+  console.log(`${severity} : ${message}`); 
+};
 
 function getLineNumber() {
   const error = new Error();
@@ -141,7 +172,17 @@ process.on("SIGTERM", () => {
 });
 
 
-module.exports = {loggerProvider, getLineNumber};
+module.exports = 
+{
+  loggerProvider, 
+  getLineNumber,
+  severity_info,
+  severity_error,
+  severity_warning,
+  severity_debug,
+  simulation_trace,
+  logEventMessage,
+};
 
 
 

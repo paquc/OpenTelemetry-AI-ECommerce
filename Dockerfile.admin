@@ -1,0 +1,11 @@
+FROM node:12.7.0
+
+WORKDIR /src
+
+ADD package.json .
+
+RUN npm install
+RUN npm install dotenv
+
+ADD . .
+COPY tracing/  ./admin/

@@ -22,8 +22,11 @@ services:
     restart: on-failure
 
   admin:
-    extends: base
-    command: node admin/server.js
+    #extends: base
+    build:
+      context: .
+      dockerfile: Dockerfile.admin
+    command: node -r ./admin/tracing.js admin/server.js  #node admin/server.js
     environment:
       - VIRTUAL_HOST=local-admin.cotejs.org, ws://local-admin.cotejs.org
       - BALANCE=source
@@ -31,12 +34,10 @@ services:
       - 5000:5000
 
   end-user:
-    # extends: base
     build:
       context: .
       dockerfile: Dockerfile.enduser
     command: node -r ./end-user/tracing.js end-user/server.js 
-    #command: node end-user/server.js 
     environment:
       - VIRTUAL_HOST=local-end-user.cotejs.org, ws://local-end-user.cotejs.org
       - BALANCE=source
