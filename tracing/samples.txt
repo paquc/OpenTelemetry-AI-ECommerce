@@ -1,0 +1,40 @@
+// Create Gauge
+//const meterServiceStatusGauge = meterProvider.getMeter('service-status-meter-gauge');
+
+// Create a gauge metric to monitor the service status
+//const serviceStatusGauge = meterServiceStatusGauge.createObservableGauge('backend-service-observable-status', {
+//  description: 'Tracks the current observable status of the service',
+//});
+
+//let serviceStatus = 0;          // Initial status is running (1)
+//let serviceStatusUpdated = 0;   // Initial change is 0
+
+
+
+// Add a callback to set the value of the gauge based on the service status
+//serviceStatusGauge.addCallback((observableResult) => {
+//  observableResult.observe(heartBeat, {});
+//});
+
+// Function to manually update the service status (mimics gauge behavior)
+//function setServiceStatus(status) {
+//  const change = status - serviceStatus;
+//  serviceStatus = status;
+//  serviceStatusCounter.add(change, {}); // Manually update the counter to reflect the new status
+//}
+
+////////////////////////////////////
+// Example: Manually change the service status every 30 seconds
+//setInterval(() => {
+  // Simulate a random service status change
+//  const newStatus = Math.floor(Math.random() * 3);
+//  setServiceStatus(newStatus);
+//  console.log(`Service status manually updated to: ${newStatus === 0 ? 'Stopped' : newStatus === 1 ? 'Running' : 'Error'}`);
+//}, 2000);
+
+// Simulate service status changes every 30 seconds
+//setInterval(() => {
+// Randomly change the service status for demonstration
+//  serviceStatus = Math.floor(Math.random() * 3); // Randomly assigns 0, 1, or 2
+//  console.log(`Service status updated to: ${serviceStatus === 0 ? 'Stopped' : serviceStatus === 1 ? 'Running' : 'Error'}`);
+//}, 2000);

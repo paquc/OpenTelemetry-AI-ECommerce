@@ -1,7 +1,9 @@
 services:
   base:
-    build: .
-    image: dashersw/cote-workshop
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    #image: dashersw/cote-workshop
     restart: on-failure
     environment:
       - PG=true
