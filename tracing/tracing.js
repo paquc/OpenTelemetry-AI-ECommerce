@@ -12,21 +12,22 @@ const { diag, DiagConsoleLogger, DiagLogLevel, metrics } = require('@opentelemet
 
 
 const opentelemetry = require("@opentelemetry/sdk-node");
-// const { getNodeAutoInstrumentations, } = require("@opentelemetry/auto-instrumentations-node");
+//const { getNodeAutoInstrumentations, } = require("@opentelemetry/auto-instrumentations-node");
+const { HttpInstrumentation, } = require("@opentelemetry/instrumentation-http");
 
-
+//////////////////////////////////
 // Logs
 const { OTLPLogExporter } = require('@opentelemetry/exporter-logs-otlp-http');
 const { LoggerProvider, ConsoleLogRecordExporter, SimpleLogRecordProcessor } = require('@opentelemetry/sdk-logs');
 const { logs, SeverityNumber } = require('@opentelemetry/api-logs');
 
-/*
+
+//////////////////////////////////
 // Traces
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
 const { BatchSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 
-*/
-
+//////////////////////////////////
 // Metrics
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-http');
 const { 
@@ -58,7 +59,7 @@ const OTLPLogsDataExporter = new OTLPLogExporter({
 const simpleLogsProcessor = new SimpleLogRecordProcessor(OTLPLogsDataExporter);
 loggerProvider.addLogRecordProcessor(simpleLogsProcessor);
 
-/*
+
 
 //////////////
 // Traces...
@@ -67,6 +68,7 @@ const OTLPTracesExporter = new OTLPTraceExporter({
     headers: {},    // optional - collection of custom headers to be sent with each request, empty by default
 });
 
+
 // Configure the BatchSpanProcessor with maxQueueSize
 const batchSpanProcessor = new BatchSpanProcessor(OTLPTracesExporter, {
   maxQueueSize: 10420,          // Maximum queue size before spans are dropped
@@ -74,7 +76,7 @@ const batchSpanProcessor = new BatchSpanProcessor(OTLPTracesExporter, {
   scheduledDelayMillis: 5000,   // Delay interval between two consecutive exports
   exportTimeoutMillis: 30000,   // Maximum allowed time to send a batch
 });
-*/
+
 
 /////////////////
 // Metrics...
@@ -94,9 +96,10 @@ const periodicMeterExporterReader = new PeriodicExportingMetricReader({
 
 const sdk = new opentelemetry.NodeSDK({
     serviceName: serviceNameProvider.serviceName,
-    //**instrumentations: [getNodeAutoInstrumentations(), ],      // Optional - you can use the metapackage or load each instrumentation individually
-    //**spanProcessors: [batchSpanProcessor, ],                   // Optional - you can add more span processors
-    //**traceExporter: OTLPTracesExporter,                        // Optional - if omitted, the tracing SDK will be initialized from environment variables
+    instrumentations: [new HttpInstrumentation(), ],                // Optional - you can use the metapackage or load each instrumentation individually
+    //instrumentations: [getNodeAutoInstrumentations(), ],    // Optional - you can use the metapackage or load each instrumentation individually
+    spanProcessors: [batchSpanProcessor, ],                   // Optional - you can add more span processors
+    traceExporter: OTLPTracesExporter,                        // Optional - if omitted, the tracing SDK will be initialized from environment variables
     metricReader: periodicMeterExporterReader,                // Optional - If omitted, the metrics SDK will not be initialized
     autoDetectResources: true,                                // Optional - if omitted, the SDK will not automatically detect resources
     logRecordProcessors: [simpleLogsProcessor],               // Optional - LogRecordProcessor array
