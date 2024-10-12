@@ -25,6 +25,8 @@ const { logs, SeverityNumber } = require('@opentelemetry/api-logs');
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
 const { BatchSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 
+*/
+
 // Metrics
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-http');
 const { 
@@ -33,7 +35,7 @@ const {
   PeriodicExportingMetricReader,
   View,
 } = require('@opentelemetry/sdk-metrics');
-*/
+
 
 /////////////////
 // Logs...
@@ -72,6 +74,7 @@ const batchSpanProcessor = new BatchSpanProcessor(OTLPTracesExporter, {
   scheduledDelayMillis: 5000,   // Delay interval between two consecutive exports
   exportTimeoutMillis: 30000,   // Maximum allowed time to send a batch
 });
+*/
 
 /////////////////
 // Metrics...
@@ -87,14 +90,14 @@ const periodicMeterExporterReader = new PeriodicExportingMetricReader({
 });
 
 // DOC Node-SDK: https://open-telemetry.github.io/opentelemetry-js/modules/_opentelemetry_sdk_node.html
-*/
+
 
 const sdk = new opentelemetry.NodeSDK({
     serviceName: serviceNameProvider.serviceName,
     //**instrumentations: [getNodeAutoInstrumentations(), ],      // Optional - you can use the metapackage or load each instrumentation individually
     //**spanProcessors: [batchSpanProcessor, ],                   // Optional - you can add more span processors
     //**traceExporter: OTLPTracesExporter,                        // Optional - if omitted, the tracing SDK will be initialized from environment variables
-    //**metricReader: periodicMeterExporterReader,                // Optional - If omitted, the metrics SDK will not be initialized
+    metricReader: periodicMeterExporterReader,                // Optional - If omitted, the metrics SDK will not be initialized
     autoDetectResources: true,                                // Optional - if omitted, the SDK will not automatically detect resources
     logRecordProcessors: [simpleLogsProcessor],               // Optional - LogRecordProcessor array
 });
@@ -119,6 +122,8 @@ const heartbeat = require('heartbeat.js');
 const processMemory = require('memory.js');
 const cpu = require('cpu.js');
 
+*/
+
 // You can also use the shutdown method to gracefully shut down the SDK before process shutdown
 // or on some operating system signal.
 const process = require("process");
@@ -131,7 +136,7 @@ process.on("SIGTERM", () => {
     )
     .finally(() => process.exit(0));
 });
-*/
+
 
 module.exports = {loggerProvider, getLineNumber};
 
