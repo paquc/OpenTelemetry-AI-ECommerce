@@ -8,4 +8,4 @@ RUN npm install
 RUN npm install dotenv
 
 ADD . .
-COPY tracing/  ./users/
+COPY tracing/  ./user/

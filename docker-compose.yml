@@ -80,11 +80,11 @@ services:
   product-service:
     build:
       context: .
-      dockerfile: Dockerfile.products
-    command: node -r ./products/tracing.js products/product-service.js
+      dockerfile: Dockerfile.product
+    command: node -r ./product/tracing.js product/product-service.js
     volumes:
-      - ./tracing/tracing.js:/src/products/tracing.js
-      - ./products/product-service.js:/src/products/product-service.js
+      - ./tracing/tracing.js:/src/product/tracing.js
+      - ./product/product-service.js:/src/product/product-service.js
     environment:
       - PG=true
     restart: on-failure
@@ -108,11 +108,11 @@ services:
   user-service:
     build:
       context: .
-      dockerfile: Dockerfile.users
-    command: node -r ./users/tracing.js users/user-service.js
+      dockerfile: Dockerfile.user
+    command: node -r ./user/tracing.js user/user-service.js
     volumes:
-      - ./tracing/tracing.js:/src/users/tracing.js
-      - ./users/user-service.js:/src/users/user-service.js
+      - ./tracing/tracing.js:/src/user/tracing.js
+      - ./user/user-service.js:/src/user/user-service.js
     environment:
       - PG=true
     restart: on-failure
