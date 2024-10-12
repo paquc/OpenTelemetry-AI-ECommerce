@@ -17,7 +17,7 @@ const { diag, DiagConsoleLogger, DiagLogLevel, metrics } = require('@opentelemet
 //////////////////////////////////////////////
 // Traces instrumentations
 //
-//const { getNodeAutoInstrumentations, } = require("@opentelemetry/auto-instrumentations-node");  // Don.t work
+// const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node");  // Don.t work
 const { HttpInstrumentation, } = require("@opentelemetry/instrumentation-http");
 const { ExpressInstrumentation, } = require("@opentelemetry/instrumentation-express");
 const { SocketIoInstrumentation, } = require("@opentelemetry/instrumentation-socket.io");
@@ -69,7 +69,6 @@ const simpleLogsProcessor = new SimpleLogRecordProcessor(OTLPLogsDataExporter);
 loggerProvider.addLogRecordProcessor(simpleLogsProcessor);
 
 
-
 //////////////
 // Traces...
 const OTLPTracesExporter = new OTLPTraceExporter({
@@ -102,15 +101,27 @@ const periodicMeterExporterReader = new PeriodicExportingMetricReader({
 
 // DOC Node-SDK: https://open-telemetry.github.io/opentelemetry-js/modules/_opentelemetry_sdk_node.html
 
+// Configure only the HTTP instrumentation
+/*
+const autoInstrumentations = getNodeAutoInstrumentations({
+  '@opentelemetry/instrumentation-http':        { enabled: true  },
+  // Disable other instrumentations
+  '@opentelemetry/instrumentation-express':     { enabled: false },
+  '@opentelemetry/instrumentation-redis':       { enabled: false },
+  '@opentelemetry/instrumentation-socket.io':   { enabled: false },
+  '@opentelemetry/instrumentation-aws-lambda':  { enabled: false },
+  '@opentelemetry/instrumentation-aws-sdk':     { enabled: false },
+});
+*/
 
 const sdk = new opentelemetry.NodeSDK({
     serviceName: serviceNameProvider.serviceName,
     instrumentations: [
       new HttpInstrumentation(), 
-      //new ExpressInstrumentation(),
-      //new SocketIoInstrumentation(),
-      //new NestInstrumentation(),  
-      //new NetInstrumentation(),
+      new ExpressInstrumentation(),
+      new SocketIoInstrumentation(),
+      new NestInstrumentation(),  
+      new NetInstrumentation(),
     ],          
     //instrumentations: [getNodeAutoInstrumentations(), ],    // Optional - you can use the metapackage or load each instrumentation individually
     spanProcessors: [batchSpanProcessor, ],                   // Optional - you can add more span processors
