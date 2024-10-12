@@ -107,10 +107,10 @@ const sdk = new opentelemetry.NodeSDK({
     serviceName: serviceNameProvider.serviceName,
     instrumentations: [
       new HttpInstrumentation(), 
-      new ExpressInstrumentation(),
-      new SocketIoInstrumentation(),
-      new NestInstrumentation(),  
-      new NetInstrumentation(),
+      //new ExpressInstrumentation(),
+      //new SocketIoInstrumentation(),
+      //new NestInstrumentation(),  
+      //new NetInstrumentation(),
     ],          
     //instrumentations: [getNodeAutoInstrumentations(), ],    // Optional - you can use the metapackage or load each instrumentation individually
     spanProcessors: [batchSpanProcessor, ],                   // Optional - you can add more span processors
