@@ -1,3 +1,6 @@
+const logger_name='users-service-logger';
+const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
+
 var cote = require('cote'),
     models = require('../models');
 
@@ -35,3 +38,5 @@ function updateUsers() {
         userPublisher.publish('update', users);
     });
 }
+
+logEventMessage(logger_name, 'USERS service started', severity_info, getLineNumber());

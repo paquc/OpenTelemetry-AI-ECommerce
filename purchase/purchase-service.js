@@ -1,3 +1,6 @@
+const logger_name='purchase-service-logger';
+const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
+
 var cote = require('cote'),
     models = require('../models');
 
@@ -60,3 +63,5 @@ function updatePurchases() {
         purchasePublisher.publish('update', purchases);
     });
 }
+
+logEventMessage(logger_name, 'PURCHASE service started', severity_info, getLineNumber());

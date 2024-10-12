@@ -1,3 +1,6 @@
+const logger_name='products-service-logger';
+const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
+
 var cote = require('cote'),
     models = require('../models');
 
@@ -43,3 +46,5 @@ function updateProducts() {
         productPublisher.publish('update', products);
     });
 }
+
+logEventMessage(logger_name, 'PRODUCTS service started', severity_info, getLineNumber());

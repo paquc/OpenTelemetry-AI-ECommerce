@@ -1,3 +1,6 @@
+const logger_name='payment-service-logger';
+const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
+
 var cote = require('cote'),
     models = require('../models');
 
@@ -17,3 +20,6 @@ paymentResponder.on('process', function(req, cb) {
         user.save(cb);
     });
 });
+
+logEventMessage(logger_name, 'PAYMENT service started', severity_info, getLineNumber());
+
