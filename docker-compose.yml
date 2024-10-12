@@ -31,11 +31,18 @@ services:
       - 5000:5000
 
   end-user:
-    extends: base
-    command: node end-user/server.js
+    # extends: base
+    build:
+      context: .
+      dockerfile: Dockerfile.enduser
+    command: node -r ./end-user/tracing.js end-user/server.js 
+    #command: node end-user/server.js 
     environment:
       - VIRTUAL_HOST=local-end-user.cotejs.org, ws://local-end-user.cotejs.org
       - BALANCE=source
+    volumes:
+      - ./tracing/tracing.js:/src/end-user/tracing.js
+      - ./end-user/server.js:/src/end-user/server.js
     ports:
       - 5001:5001
 
@@ -84,3 +91,53 @@ services:
       - DB_USER=cote
       - DB_PASS=ohgath2ig8eoP8
       - DB_NAME=cote
+
+  # Collector
+  collector-gateway:
+    image: otel/opentelemetry-collector:0.110.0
+    container_name: otel-collector-gateway
+    volumes:
+      - ./collector-gateway.yaml:/etc/collector-gateway.yaml
+    command: [ "--config=/etc/collector-gateway.yaml" ]
+    ports:
+      - "1888:1888"         # pprof extension
+      - "8888:8888"         # Prometheus metrics: exposed by the Collector to monitor the health of the collector itself
+      - "8889:8889"         # Prometheus EXPORTER metrics: endpoint where services metrics are sent then scraped by the prometheus service to monitor instrumented services.
+      - "13133:13133"       # health_check extension
+      - "4317:4317"         # OTLP gRPC receiver
+      - "4318:4318"         # OTLP HTTP receiver
+      - "55679:55679"       # zpages extension
+
+  # Loki to collect logs
+  loki:
+    image: grafana/loki:main-f80d68a
+    container_name: loki
+    ports:
+      - "3100:3100"        # HTTP port to receive logs data from the OTEL Collector
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml
+    command: [ "--config.file=/etc/loki/loki-config.yaml" ]
+     
+  prometheus:
+    build:
+      context: ./prometheus
+      dockerfile: Dockerfile
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'  
+      - '--query.lookback-delta=5s'
+    ports:
+      - "9090:9090"
+    depends_on:
+      - collector-gateway
+  
+  grafana:
+    image: grafana/grafana-enterprise # :10.3.10
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3010:3000"
+    volumes:
+      - ./grafana-storage:/var/lib/grafana

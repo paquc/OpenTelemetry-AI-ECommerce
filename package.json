@@ -23,6 +23,7 @@
     "@opentelemetry/sdk-node": "^0.53.0",
     "@opentelemetry/sdk-trace-base": "^1.26.0",
     "@opentelemetry/sdk-trace-node": "^1.26.0",
+    "@opentelemetry/semantic-conventions": "^1.27.0",
     "body-parser": "^1.18.3",
     "cote": "0.17.0",
     "express": "^4.16.3",

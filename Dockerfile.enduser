@@ -5,10 +5,10 @@ WORKDIR /src
 ADD package.json .
 
 RUN npm install
+RUN npm install dotenv
 
 ADD . .
-
-COPY tracing/  /src/end-user/
+COPY tracing/  ./end-user/
 
 
 

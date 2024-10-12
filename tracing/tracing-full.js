@@ -1,26 +1,20 @@
 
 // DOC Node-SDK: https://open-telemetry.github.io/opentelemetry-js/modules/_opentelemetry_sdk_node.html
 
-console.log("TRACING--> Loading traing.js...");
-
 const serviceNameProvider = require(__dirname + '/servicename.js');
 
 const { Resource } = require('@opentelemetry/resources');
 
-
 const { diag, DiagConsoleLogger, DiagLogLevel, metrics } = require('@opentelemetry/api');
 
-
 const opentelemetry = require("@opentelemetry/sdk-node");
-// const { getNodeAutoInstrumentations, } = require("@opentelemetry/auto-instrumentations-node");
-
+const { getNodeAutoInstrumentations, } = require("@opentelemetry/auto-instrumentations-node");
 
 // Logs
 const { OTLPLogExporter } = require('@opentelemetry/exporter-logs-otlp-http');
 const { LoggerProvider, ConsoleLogRecordExporter, SimpleLogRecordProcessor } = require('@opentelemetry/sdk-logs');
 const { logs, SeverityNumber } = require('@opentelemetry/api-logs');
 
-/*
 // Traces
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
 const { BatchSpanProcessor } = require('@opentelemetry/sdk-trace-base');
@@ -33,7 +27,6 @@ const {
   PeriodicExportingMetricReader,
   View,
 } = require('@opentelemetry/sdk-metrics');
-*/
 
 /////////////////
 // Logs...
@@ -48,15 +41,12 @@ loggerProvider.addLogRecordProcessor(
 
 logs.setGlobalLoggerProvider(loggerProvider);
 
-
 const OTLPLogsDataExporter = new OTLPLogExporter({
   url: 'http://collector-gateway:4318/v1/logs', // url points to the local gRPC collector gateway configured in docker-compose
   headers: {},    // optional - collection of custom headers to be sent with each request, empty by default
 });
 const simpleLogsProcessor = new SimpleLogRecordProcessor(OTLPLogsDataExporter);
 loggerProvider.addLogRecordProcessor(simpleLogsProcessor);
-
-/*
 
 //////////////
 // Traces...
@@ -87,18 +77,19 @@ const periodicMeterExporterReader = new PeriodicExportingMetricReader({
 });
 
 // DOC Node-SDK: https://open-telemetry.github.io/opentelemetry-js/modules/_opentelemetry_sdk_node.html
-*/
 
 const sdk = new opentelemetry.NodeSDK({
+    //serviceName: "backendService",                            // Required - the name of the service that is being traced  
     serviceName: serviceNameProvider.serviceName,
-    //**instrumentations: [getNodeAutoInstrumentations(), ],      // Optional - you can use the metapackage or load each instrumentation individually
-    //**spanProcessors: [batchSpanProcessor, ],                   // Optional - you can add more span processors
-    //**traceExporter: OTLPTracesExporter,                        // Optional - if omitted, the tracing SDK will be initialized from environment variables
-    //**metricReader: periodicMeterExporterReader,                // Optional - If omitted, the metrics SDK will not be initialized
+    instrumentations: [getNodeAutoInstrumentations(), ],      // Optional - you can use the metapackage or load each instrumentation individually
+    spanProcessors: [batchSpanProcessor, ],                   // Optional - you can add more span processors
+    traceExporter: OTLPTracesExporter,                        // Optional - if omitted, the tracing SDK will be initialized from environment variables
+    metricReader: periodicMeterExporterReader,                // Optional - If omitted, the metrics SDK will not be initialized
     autoDetectResources: true,                                // Optional - if omitted, the SDK will not automatically detect resources
     logRecordProcessors: [simpleLogsProcessor],               // Optional - LogRecordProcessor array
+    //contextManager,                                         // Default: [AsyncHooksContextManager]
+    //resourceDetectors,                                      // Default: []
 });
-
 
 function getLineNumber() {
   const error = new Error();
@@ -111,7 +102,6 @@ function getLineNumber() {
 // START the SDK in a node and start instrumenting
 sdk.start();
 
-/*
 ////////////////////////////////////
 // Monitor service status 
 //  AFTER  SDK is tarted!
@@ -131,10 +121,8 @@ process.on("SIGTERM", () => {
     )
     .finally(() => process.exit(0));
 });
-*/
 
 module.exports = {loggerProvider, getLineNumber};
-
 
 
 // https://www.npmjs.com/package/@opentelemetry/sdk-node
