@@ -18,11 +18,12 @@ const { diag, DiagConsoleLogger, DiagLogLevel, metrics } = require('@opentelemet
 // Traces instrumentations
 //
 // const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node");  // Don.t work
-const { HttpInstrumentation, } = require("@opentelemetry/instrumentation-http");
-const { ExpressInstrumentation, } = require("@opentelemetry/instrumentation-express");
-const { SocketIoInstrumentation, } = require("@opentelemetry/instrumentation-socket.io");
-const { NestInstrumentation, } = require("@opentelemetry/instrumentation-nestjs-core");
-const { NetInstrumentation, } = require("@opentelemetry/instrumentation-net");
+const { HttpInstrumentation } = require("@opentelemetry/instrumentation-http");
+const { ExpressInstrumentation } = require("@opentelemetry/instrumentation-express");
+const { SocketIoInstrumentation } = require("@opentelemetry/instrumentation-socket.io");
+const { NestInstrumentation } = require("@opentelemetry/instrumentation-nestjs-core");
+const { NetInstrumentation } = require("@opentelemetry/instrumentation-net");
+const { GrpcInstrumentation } = require("@opentelemetry/instrumentation-grpc");
 
 //////////////////////////////////
 // Logs
@@ -117,13 +118,14 @@ const autoInstrumentations = getNodeAutoInstrumentations({
 const sdk = new opentelemetry.NodeSDK({
     serviceName: serviceNameProvider.serviceName,
     instrumentations: [
+      //getNodeAutoInstrumentations(),
       new HttpInstrumentation(), 
       new ExpressInstrumentation(),
       new SocketIoInstrumentation(),
       new NestInstrumentation(),  
       new NetInstrumentation(),
+      new GrpcInstrumentation(),
     ],          
-    //instrumentations: [getNodeAutoInstrumentations(), ],    // Optional - you can use the metapackage or load each instrumentation individually
     spanProcessors: [batchSpanProcessor, ],                   // Optional - you can add more span processors
     traceExporter: OTLPTracesExporter,                        // Optional - if omitted, the tracing SDK will be initialized from environment variables
     metricReader: periodicMeterExporterReader,                // Optional - If omitted, the metrics SDK will not be initialized
