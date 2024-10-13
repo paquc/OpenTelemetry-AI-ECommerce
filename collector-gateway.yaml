@@ -28,6 +28,10 @@ exporters:
         Authorization: 3b8f7807-14e2-4733-8253-8f2548fe3f92   # Security TOKEN for Carl
   prometheus:
     endpoint: otel-collector-gateway:8889   # Exports metrics sent by services in Prometheus format ready to scrape by prometheus
+  otlp:
+    endpoint: tempo:4327
+    tls:
+      insecure: true  
 
 extensions:
  health_check:
@@ -50,4 +54,4 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch, resource]
-      exporters: [logging, otlp/aspecto]
+      exporters: [logging, otlp/aspecto, otlp]

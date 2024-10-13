@@ -29,6 +29,5 @@ setInterval(() => {
   if(heartBeat >  5.0) heartBeat =  5.0;
 
   serviceStatusGauge.record(heartBeat);
-  //console.log(`Hearbeat is: ${heartBeat} for ${serviceNameProvider.heartBeatGaugeName}`);
-
+  
 }, 1000);
