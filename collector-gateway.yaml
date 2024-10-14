@@ -18,7 +18,7 @@ processors:
 exporters:
   logging:
     loglevel: debug
-  otlphttp:                        
+  otlphttp/loki:                        
     endpoint: http://loki:3100/otlp
     tls:
       insecure: true
@@ -29,9 +29,10 @@ exporters:
   prometheus:
     endpoint: otel-collector-gateway:8889   # Exports metrics sent by services in Prometheus format ready to scrape by prometheus
   otlp:
-    endpoint: tempo:4327
+    endpoint: http://tempo:32795
     tls:
-      insecure: true  
+      insecure: true
+    
 
 extensions:
  health_check:
@@ -46,12 +47,12 @@ service:
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlphttp]
+      exporters: [otlphttp/loki]  # Add logging to log...
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, prometheus]
+      exporters: [prometheus]  # Add logging to log...
     traces:
       receivers: [otlp]
       processors: [batch, resource]
-      exporters: [logging, otlp/aspecto, otlp]
+      exporters: [otlp/aspecto, otlp] # Add logging to log...
