@@ -49,6 +49,7 @@ services:
     volumes:
       - ./tracing/tracing.js:/src/end-user/tracing.js
       - ./end-user/server.js:/src/end-user/server.js
+      - ./end-user/index.html:/src/end-user/index.html
     restart: on-failure
     ports:
       - 5001:5001

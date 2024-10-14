@@ -1,43 +1,68 @@
 <!DOCTYPE html>
-<html ng-app="end-user">
+<html ng-app="end-user"> <!-- Declares this as an AngularJS application with the module "end-user" -->
 <head>
     <title>End User</title>
+    <!-- Bootstrap CSS for styling -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Bootstrap theme CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+    
+    <!-- AngularJS library from Google CDN (version 1.6.1) -->
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
+    
+    <!-- Socket.IO library for real-time communication -->
     <script src="/socket.io/socket.io.js"></script>
+
+    <!-- AngularJS script defining the main module and controller logic -->
     <script>
+        // Define the AngularJS module called 'end-user'
         angular.module('end-user', []).controller('ProductController', ProductController);
 
-        var productService = io.connect('/product');
-        var purchaseService = io.connect('/purchase');
-        var userService = io.connect('/user');
+        // Create Socket.IO connections to different namespaces (services)
+        var productService = io.connect('/product');  // Connect to the 'product' namespace for product-related communication
+        var purchaseService = io.connect('/purchase');  // Connect to the 'purchase' namespace for purchase-related communication
+        var userService = io.connect('/user');  // Connect to the 'user' namespace for user-related communication
 
+        // Define the controller function 'ProductController', which controls the data and behavior for the view
         function ProductController($scope) {
+            // Create a new user by emitting an event to the 'user' namespace
             userService.emit('create', {}, function(err, data) {
+                // When the server responds, set the user data on the scope so it can be displayed
                 $scope.user = data;
+                // Manually trigger AngularJS to update the view
                 $scope.$digest();
             });
 
+            // Call the 'list' function to load the list of products
             list();
 
+            // Function to request the list of products from the server
             function list() {
+                // Emit a 'list' event to the 'product' namespace to retrieve the list of products
                 productService.emit('list', function(err, data) {
+                    // Once data is received, update the scope with the product list
                     $scope.products = data;
+                    // Trigger AngularJS to update the view
                     $scope.$digest();
                 });
             }
 
+            // Function called when the user attempts to purchase a product
             $scope.purchase = function(id) {
+                // Emit a 'buy' event to the 'purchase' namespace with the user's ID and the product ID
                 purchaseService.emit('buy', { userId: $scope.user.id, productId: id }, function(err, data) {
-                    if (err) return;
+                    if (err) return; // If there's an error, do nothing
 
+                    // After a successful purchase, reload the product list
                     list();
+                    // Update the user's balance and data after the purchase
                     $scope.user = data.user;
                 });
             };
 
+            // Listen for 'update' events from the 'product' namespace to dynamically update the product list when a product changes
             productService.on('update', function(data) {
+                // Update the products on the scope and refresh the view
                 $scope.products = data;
                 $scope.$digest();
             });
@@ -45,19 +70,44 @@
     </script>
 </head>
 <body class="container" ng-controller="ProductController">
-<h2>
-    <span class="label label-default">User #{{user.id}}</span>
-    <span class="label label-success">Balance ${{user.balance}}</span>
-</h2>
+    <!-- Displays user information with labels -->
+    <h2>
+        <!-- User ID label -->
+        <span class="label label-default">User is #{{user.id}}</span>
+        <!-- User balance label -->
+        <span class="label label-success">Balance = ${{user.balance}}</span>
+    </h2>
 
-<h1>Products</h1>
-<div ng-repeat="product in products | orderBy:'-id' track by product.id" class="col-xs-2">
-    <p><strong>{{product.name || 'a' }}</strong></p>
-    <img class="img-thumbnail" ng-src="http://lorempixel.com/100/100/food/{{product.id % 10}}/" alt=""/>
-    <p>{{product.stock}} in stock</p>
-    <button type="button" class="btn btn-sm" ng-class="{'btn-success': user.balance >= product.price}" ng-disabled="user.balance < product.price" ng-click="purchase(product.id)" ng-style="{'visibility': product.stock > 0 ? 'visible' : 'hidden' }">
-        Buy &mdash; ${{product.price}}
-    </button>
+    <!-- Header for the product section -->
+    <h1><u>Products Catalog</u></h1>
+
+    <!-- Loop through the list of products and display them using AngularJS' ng-repeat directive -->
+    <div ng-repeat="product in products | orderBy:'-id' track by product.id" class="col-xs-2">
+        <!-- Display product name, use a default if name is missing -->
+        <p><strong>{{product.name || 'a' }}</strong></p>
+        
+        <!-- Display a random image from lorempixel based on the product's ID -->
+        <img class="img-thumbnail" ng-src="https://picsum.photos/100/100?random={{product.id % 10}}" alt=""/>
+
+        <!-- Display how much stock is left for the product -->
+        <p>{{product.stock}} in stock</p>
+        <button type="button" 
+            class="btn btn-sm" 
+            ng-class="{'btn-success': user.balance >= product.price}" 
+            ng-disabled="user.balance < product.price" 
+            ng-click="purchase(product.id)" 
+            ng-style="{'visibility': product.stock > 0 ? 'visible' : 'hidden' }" > Buy &mdash; ${{product.price}}
+        </button>
 </div>
 </body>
 </html>
+
+<!--
+<button type="button" 
+                class="btn btn-sm" 
+                ng-class="{'btn-success': user.balance >= product.price}"                   Button style is green if the user has enough balance 
+                ng-disabled="user.balance < product.price"                                  Disable the button if the user doesn't have enough balance 
+                ng-click="purchase(product.id)"                                             When clicked, triggers the purchase function 
+                ng-style="{'visibility': product.stock > 0 ? 'visible' : 'hidden' }">       Hide the button if the product is out of stock 
+            Buy &mdash; ${{product.price}}                                                  Button text shows the price
+        </button>-->
