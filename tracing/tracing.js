@@ -18,10 +18,11 @@ const { diag, DiagConsoleLogger, DiagLogLevel, metrics } = require('@opentelemet
 // Traces instrumentations
 //
 // const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node");  // Don.t work
-const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+const { SocketIoInstrumentation } = require("opentelemetry-instrumentation-socket.io");
+//const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 const { HttpInstrumentation } = require("@opentelemetry/instrumentation-http");
 const { ExpressInstrumentation } = require("@opentelemetry/instrumentation-express");
-const { SocketIoInstrumentation } = require("@opentelemetry/instrumentation-socket.io");
+// const { SocketIoInstrumentation } = require("@opentelemetry/instrumentation-socket.io");
 const { NestInstrumentation } = require("@opentelemetry/instrumentation-nestjs-core");
 const { NetInstrumentation } = require("@opentelemetry/instrumentation-net");
 const { GrpcInstrumentation } = require("@opentelemetry/instrumentation-grpc");
@@ -130,6 +131,7 @@ const sdk = new opentelemetry.NodeSDK({
     serviceName: serviceNameProvider.serviceName,
     instrumentations: [
       //getNodeAutoInstrumentations(),
+      new SocketIoInstrumentation(),
       new HttpInstrumentation(), 
       new ExpressInstrumentation(),
       new SocketIoInstrumentation(),
