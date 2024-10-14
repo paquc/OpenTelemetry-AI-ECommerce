@@ -18,6 +18,7 @@ const { diag, DiagConsoleLogger, DiagLogLevel, metrics } = require('@opentelemet
 // Traces instrumentations
 //
 // const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node");  // Don.t work
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 const { HttpInstrumentation } = require("@opentelemetry/instrumentation-http");
 const { ExpressInstrumentation } = require("@opentelemetry/instrumentation-express");
 const { SocketIoInstrumentation } = require("@opentelemetry/instrumentation-socket.io");
