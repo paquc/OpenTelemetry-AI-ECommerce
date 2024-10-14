@@ -31,7 +31,7 @@ const { GrpcInstrumentation } = require("@opentelemetry/instrumentation-grpc");
 const { OTLPLogExporter } = require('@opentelemetry/exporter-logs-otlp-http');
 const { LoggerProvider, ConsoleLogRecordExporter, SimpleLogRecordProcessor } = require('@opentelemetry/sdk-logs');
 const { logs, SeverityNumber } = require('@opentelemetry/api-logs');
-const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
+const { SemanticResourceAttributes, ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
 //////////////////////////////////
 // Traces
@@ -55,8 +55,15 @@ const {
 // For troubleshooting, set the log level to (ALL, DEBUG, ERROR, INFO, NONE, VERBOSE, WARN)
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ERROR);
 
+const logsResource = new Resource({
+  //[ATTR_SERVICE_NAME]: serviceNameProvider.serviceName, 
+  //"service.name": serviceNameProvider.serviceName, 
+  serviceName: serviceNameProvider.serviceName, 
+});
+
 const loggerProvider = new LoggerProvider({
-  //serviceName: serviceNameProvider.serviceName,
+  // serviceName: serviceNameProvider.serviceName,
+  resource: logsResource,
 });
 
 loggerProvider.addLogRecordProcessor(
