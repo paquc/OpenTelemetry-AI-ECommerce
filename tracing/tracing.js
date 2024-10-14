@@ -31,7 +31,7 @@ const { GrpcInstrumentation } = require("@opentelemetry/instrumentation-grpc");
 const { OTLPLogExporter } = require('@opentelemetry/exporter-logs-otlp-http');
 const { LoggerProvider, ConsoleLogRecordExporter, SimpleLogRecordProcessor } = require('@opentelemetry/sdk-logs');
 const { logs, SeverityNumber } = require('@opentelemetry/api-logs');
-
+const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 
 //////////////////////////////////
 // Traces
@@ -55,7 +55,10 @@ const {
 // For troubleshooting, set the log level to (ALL, DEBUG, ERROR, INFO, NONE, VERBOSE, WARN)
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ERROR);
 
-const loggerProvider = new LoggerProvider();
+const loggerProvider = new LoggerProvider({
+  //serviceName: serviceNameProvider.serviceName,
+});
+
 loggerProvider.addLogRecordProcessor(
   new SimpleLogRecordProcessor(new ConsoleLogRecordExporter())
 );
@@ -145,7 +148,8 @@ function logEventMessage(logger_name, message, severity, line) {
     attributes: { 
       'log.project': 'ETS-AI-Project',
       'log.service': logger_name,
-      'log.line': line,}
+      'log.line': line,
+    }
   });
 
   console.log(`${severity} : ${message}`); 
@@ -162,15 +166,12 @@ function getLineNumber() {
 // START the SDK in a node and start instrumenting
 sdk.start();
 
-
 ////////////////////////////////////
 // Monitor service status 
 //  AFTER  SDK is tarted!
 const heartbeat = require(__dirname + '/heartbeat.js');
-//const processMemory = require('memory.js');
-//const cpu = require('cpu.js');
-
-
+//const processMemory = require('/memory.js');
+//const cpu = require('/cpu.js');
 
 // You can also use the shutdown method to gracefully shut down the SDK before process shutdown
 // or on some operating system signal.

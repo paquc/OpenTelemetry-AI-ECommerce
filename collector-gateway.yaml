@@ -17,7 +17,7 @@ processors:
 
 exporters:
   logging:
-    loglevel: debug
+    loglevel: debug # debug, info, warn, error
   otlphttp/loki:                        
     endpoint: http://loki:3100/otlp
     tls:
@@ -47,7 +47,7 @@ service:
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlphttp/loki]  # Add logging to log...
+      exporters: [logging, otlphttp/loki]  # Add logging to log...
     metrics:
       receivers: [otlp]
       processors: [batch]
