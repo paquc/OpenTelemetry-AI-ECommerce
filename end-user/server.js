@@ -1,11 +1,12 @@
 const logger_name='enduser-service-logger';
 
-const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
+// const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
 var app = require('express')(),
     server = require('http').Server(app),
     io = require('socket.io')(server),
-    cote = require('cote');
+    cote = require('cote'),
+    {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
 
 app.get('/', function (req, res) {

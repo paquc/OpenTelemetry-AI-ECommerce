@@ -25,6 +25,7 @@
 
         // Define the controller function 'ProductController', which controls the data and behavior for the view
         function ProductController($scope) {
+            // logEventMessage('admin-service-logger', 'END-USER service controller called', severity_info, getLineNumber());
             // Create a new user by emitting an event to the 'user' namespace
             userService.emit('create', {}, function(err, data) {
                 // When the server responds, set the user data on the scope so it can be displayed
