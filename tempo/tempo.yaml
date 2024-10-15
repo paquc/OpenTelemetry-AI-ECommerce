@@ -21,18 +21,18 @@ query_frontend:
 
 distributor:
   receivers:                           # this configuration will listen on all ports and protocols that tempo is capable of.
-    jaeger:                            # the receives all come from the OpenTelemetry collector.  more configuration information can
-      protocols:                       # be found there: https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver
-        thrift_http:                   #
-        grpc:                          # for a production deployment you should only enable the receivers you need!
-        thrift_binary:
-        thrift_compact:
-    zipkin:
+    #jaeger:                            # the receives all come from the OpenTelemetry collector.  more configuration information can
+    #  protocols:                       # be found there: https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver
+    #    thrift_http:                   #
+    #    grpc:                          # for a production deployment you should only enable the receivers you need!
+    #    thrift_binary:
+    #    thrift_compact:
+    #zipkin:
     otlp:
       protocols:
         http:
         grpc:
-    opencensus:
+    #opencensus:
 
 ingester:
   max_block_duration: 5m               # cut the headblock when this much time passes. this is being set for demo purposes and should probably be left alone normally
@@ -43,9 +43,9 @@ compactor:
 
 metrics_generator:
   registry:
-    external_labels:
-      source: tempo
-      cluster: docker-compose
+      external_labels:
+        source: tempo
+        cluster: docker-compose
   storage:
     path: /var/tempo/generator/wal
     remote_write:
@@ -66,4 +66,5 @@ overrides:
   defaults:
     metrics_generator:
       processors: [service-graphs, span-metrics, local-blocks] # enables metrics generator
-      generate_native_histograms: both
+      generate_native_histograms: classic  ## both
+    

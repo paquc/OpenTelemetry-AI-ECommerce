@@ -173,6 +173,7 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'  
       - '--query.lookback-delta=5s'
+      - '--web.enable-remote-write-receiver'  # Enable remote write receiver
     ports:
       - "9090:9090"
     restart: on-failure
