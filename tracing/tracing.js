@@ -19,13 +19,14 @@ const { diag, DiagConsoleLogger, DiagLogLevel, metrics } = require('@opentelemet
 //
 // const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node");  // Don.t work
 const { SocketIoInstrumentation } = require("opentelemetry-instrumentation-socket.io");
-//const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 const { HttpInstrumentation } = require("@opentelemetry/instrumentation-http");
 const { ExpressInstrumentation } = require("@opentelemetry/instrumentation-express");
 // const { SocketIoInstrumentation } = require("@opentelemetry/instrumentation-socket.io");
 const { NestInstrumentation } = require("@opentelemetry/instrumentation-nestjs-core");
 const { NetInstrumentation } = require("@opentelemetry/instrumentation-net");
 const { GrpcInstrumentation } = require("@opentelemetry/instrumentation-grpc");
+const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
 
 //////////////////////////////////
 // Logs
@@ -37,7 +38,7 @@ const { SemanticResourceAttributes, ATTR_SERVICE_NAME } = require('@opentelemetr
 //////////////////////////////////
 // Traces
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
-const { BatchSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { BatchSpanProcessor, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 
 //////////////////////////////////
 // Metrics
@@ -98,6 +99,14 @@ const batchSpanProcessor = new BatchSpanProcessor(OTLPTracesExporter, {
   exportTimeoutMillis: 30000,   // Maximum allowed time to send a batch
 });
 
+/*
+const nodeTraceProvider = new NodeTracerProvider();
+registerInstrumentations({
+  instrumentations: [new SocketIoInstrumentation()],
+ });
+nodeTraceProvider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+nodeTraceProvider.register();
+*/
 
 /////////////////
 // Metrics...
@@ -134,7 +143,6 @@ const sdk = new opentelemetry.NodeSDK({
       new SocketIoInstrumentation(),
       new HttpInstrumentation(), 
       new ExpressInstrumentation(),
-      new SocketIoInstrumentation(),
       new NestInstrumentation(),  
       new NetInstrumentation(),
       new GrpcInstrumentation(),

@@ -218,14 +218,14 @@ services:
       - init
  
   # Generate fake traces...
-  k6-tracing:
-    image: ghcr.io/grafana/xk6-client-tracing:v0.0.5
-    container_name: k6
-    environment:
-      - ENDPOINT=collector-gateway:4317 # Export to OTEL Collector simulatated traces
-    #restart: always
-    depends_on:
-      - collector-gateway  
+  #k6-tracing:
+  #  image: ghcr.io/grafana/xk6-client-tracing:v0.0.5
+  # container_name: k6
+  #  environment:
+  #   - ENDPOINT=collector-gateway:4317 # Export to OTEL Collector simulatated traces
+  #  #restart: always
+  #  depends_on:
+  #    - collector-gateway  
 
   mimir:
     image: grafana/mimir:2.13.0
