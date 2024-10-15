@@ -192,8 +192,8 @@ sdk.start();
 // Monitor service status 
 //  AFTER  SDK is tarted!
 const heartbeat = require(__dirname + '/heartbeat.js');
-//const processMemory = require('/memory.js');
-//const cpu = require('/cpu.js');
+const processMemory = require(__dirname + '/memory.js');
+const cpu = require(__dirname + '/cpu.js');
 
 // You can also use the shutdown method to gracefully shut down the SDK before process shutdown
 // or on some operating system signal.

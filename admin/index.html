@@ -22,13 +22,17 @@
             }
 
             function listUsers() {
+                // Make an HTTP GET request to '/user' endpoint to fetch user data
                 $http.get('/user').success(function(data) {
+                    // Assign the retrieved data (users) to the AngularJS scope so it can be displayed in the view
                     $scope.users = data;
 
+                    // Loop through each user and process their purchases
                     $scope.users.forEach(function(user) {
+                        // For each user, map their purchases to extract the product IDs
                         user.productIds = user.purchases.map(function(p) {
-                            return p.product_id;
-                        }).join(', ');
+                            return p.product_id; // Extract the 'product_id' from each purchase
+                        }).join(', '); // Join the product IDs into a comma-separated string
                     })
                 });
             }
