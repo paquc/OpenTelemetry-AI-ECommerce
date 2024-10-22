@@ -1,5 +1,18 @@
 services:
   
+  splunk:
+    image: splunk/splunk:9.3
+    container_name: splunk
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_PASSWORD=WL84MySplunk!
+    ports:
+      - "8000:8000"
+      #- "8088:8088"
+      #- "8089:8089"
+      #- "9997:9997"
+    # restart: on-failure
+
   base:
     build:
       context: .
@@ -189,7 +202,7 @@ services:
     volumes:
       - ./grafana-storage:/var/lib/grafana
 
- # Tempo runs as user 10001, and docker compose creates the volume as root.
+  # Tempo runs as user 10001, and docker compose creates the volume as root.
   # As such, we need to chown the volume in order for Tempo to start correctly.
   init:
     image: &tempoImage grafana/tempo:2.6.0
@@ -217,7 +230,57 @@ services:
       - "9411"   # zipkin
     depends_on:
       - init
- 
+   
+  #elasticsearch:
+  #  image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
+  #  container_name: elasticsearch
+  #  environment:
+  #    - discovery.type=single-node
+  #    - ES_JAVA_OPTS=-Xms512m -Xmx512m
+  #  volumes:
+  #    - es_data:/usr/share/elasticsearch/data
+  #  ports:
+  #    - "9200:9200"
+  #    - "9300:9300"
+    #networks:
+    #  - elk
+
+  #logstash:
+  #  image: docker.elastic.co/logstash/logstash:8.15.2
+  #  container_name: logstash
+  #  environment:
+  #    - LS_JAVA_OPTS=-Xms256m -Xmx256m
+  #  volumes:
+  #    - ./logstash/config:/usr/share/logstash/config
+  #    - ./logstash/pipeline:/usr/share/logstash/pipeline
+  #  ports:
+  #    - "5044:5044"
+  #  depends_on:
+  #    - elasticsearch
+    #networks:
+    #  - elk
+
+  #kibana:
+  #  image: docker.elastic.co/kibana/kibana:8.15.2
+  #  container_name: kibana
+  #  environment:
+  #    - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+  #  ports:
+  #    - "5601:5601"
+  #  depends_on:
+  #    - elasticsearch
+    #networks:
+    #  - elk
+    
+  #mimir:
+  #  image: grafana/mimir:2.13.0
+  #  container_name: mimir
+  # command: ["-ingester.native-histograms-ingestion-enabled=true", "-config.file=/etc/mimir.yaml"]
+  #  ports:
+  #    - "9009:9009"
+  #  volumes:
+  #    - "./mimir/mimir.yaml:/etc/mimir.yaml"  
+
   # Generate fake traces...
   #k6-tracing:
   #  image: ghcr.io/grafana/xk6-client-tracing:v0.0.5
@@ -228,11 +291,10 @@ services:
   #  depends_on:
   #    - collector-gateway  
 
-  mimir:
-    image: grafana/mimir:2.13.0
-    container_name: mimir
-    command: ["-ingester.native-histograms-ingestion-enabled=true", "-config.file=/etc/mimir.yaml"]
-    ports:
-      - "9009:9009"
-    volumes:
-      - "./mimir/mimir.yaml:/etc/mimir.yaml"  
+#volumes:
+#  es_data:
+#    driver: local
+
+#networks:
+#  elk:
+#    driver: bridge
