@@ -13,6 +13,15 @@ services:
       #- "9997:9997"
     # restart: on-failure
 
+  # docker run --name logparser -it -v logparser:/logparser logpai/logparser:py3 bash
+  logparser:
+    image: logpai/logparser:py3
+    container_name: logparser
+    volumes:
+      - ./logparser:/logparser_local
+    command: 
+      - "bash"
+        
   base:
     build:
       context: .
