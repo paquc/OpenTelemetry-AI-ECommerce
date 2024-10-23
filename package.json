@@ -7,6 +7,7 @@
     "@opentelemetry/api-events": "^0.53.0",
     "@opentelemetry/api-logs": "^0.53.0",
     "@opentelemetry/auto-instrumentations-node": "^0.50.1",
+    "@opentelemetry/core": "^1.26.0",
     "@opentelemetry/exporter-logs-otlp-http": "^0.53.0",
     "@opentelemetry/exporter-metrics-otlp-http": "^0.53.0",
     "@opentelemetry/exporter-prometheus": "^0.53.0",
@@ -18,12 +19,11 @@
     "@opentelemetry/sdk-node": "^0.53.0",
     "@opentelemetry/sdk-trace-base": "^1.26.0",
     "@opentelemetry/sdk-trace-node": "^1.26.0",
-    "@opentelemetry/core": "^1.26.0",
     "@opentelemetry/semantic-conventions": "^1.27.0",
-    "opentelemetry-instrumentation-socket.io": "^0.34.0",
     "body-parser": "^1.18.3",
     "cote": "0.17.0",
     "express": "^4.16.3",
+    "opentelemetry-instrumentation-socket.io": "^0.34.0",
     "orm": "^5.0.2",
     "pg": "^7.4.3",
     "redbird": "^0.7.0",
@@ -34,6 +34,7 @@
     "test": "ava --verbose --timeout=60000"
   },
   "devDependencies": {
-    "ava": "^0.20.0"
+    "ava": "^0.20.0",
+    "@types/k6": "^0.54.1"
   }
 }
