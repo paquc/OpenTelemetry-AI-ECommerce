@@ -12,16 +12,7 @@ services:
       #- "8089:8089"
       #- "9997:9997"
     # restart: on-failure
-
-  # docker run --name logparser -it -v logparser:/logparser logpai/logparser:py3 bash
-  logparser:
-    image: logpai/logparser:py3
-    container_name: logparser
-    volumes:
-      - ./logparser:/logparser_local
-    command: 
-      - "bash"
-        
+         
   base:
     build:
       context: .
@@ -240,6 +231,16 @@ services:
     depends_on:
       - init
    
+  # docker run --name logparser -it -v logparser:/logparser logpai/logparser:py3 bash
+  # docker run --name logparser -it -v logparser:/logparser logparser_py3_8:1.0 bash
+  #logparser:
+  #  image: logpai/logparser:py3
+  #  container_name: logparser
+  #  volumes:
+  #    - ./logparser:/logparser_local
+  #  command: 
+  #    - "bash"
+
   #elasticsearch:
   #  image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
   #  container_name: elasticsearch
