@@ -233,13 +233,16 @@ services:
    
   # docker run --name logparser -it -v logparser:/logparser logpai/logparser:py3 bash
   # docker run --name logparser -it -v logparser:/logparser logparser_py3_8:1.0 bash
-  #logparser:
-  #  image: logpai/logparser:py3
-  #  container_name: logparser
-  #  volumes:
-  #    - ./logparser:/logparser_local
-  #  command: 
-  #    - "bash"
+  logparser:
+    build:
+      context: ./logparser
+      dockerfile: Dockerfile
+    container_name: logparser_py38
+    volumes:
+      - logparserpy38:/logparser
+    stdin_open: true        # Keep STDIN open for interaction
+    tty: true               # Allocate a pseudo-TTY
+    command: /bin/bash      # Start the container with Bash
 
   #elasticsearch:
   #  image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
@@ -301,7 +304,9 @@ services:
   #  depends_on:
   #    - collector-gateway  
 
-#volumes:
+volumes:
+  logparserpy38:
+
 #  es_data:
 #    driver: local
 
