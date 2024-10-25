@@ -104,3 +104,7 @@ docker-compose up
 ```
 
 This will build necessary local images and then launch a cluster of services. If you edit your `/etc/hosts` file to accomodate the given domain names, you can interact with the application via your browser.
+
+## Running logparser in bash console
+
+- `docker exec -it logparser_py38  bash`
