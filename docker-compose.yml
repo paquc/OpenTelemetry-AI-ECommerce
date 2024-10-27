@@ -238,6 +238,10 @@ services:
       context: ./logparser
       dockerfile: Dockerfile
     container_name: logparser_py38
+    deploy:
+      resources:
+        reservations:
+          memory: 64g  
     volumes:
       - logparserpy38:/logparser
     stdin_open: true        # Keep STDIN open for interaction
