@@ -5,9 +5,9 @@ services:
     container_name: splunk
     environment:
       - SPLUNK_START_ARGS=--accept-license
-      - SPLUNK_PASSWORD=WL84MySplunk!
+      - SPLUNK_PASSWORD=WL84MySplunk!       # admnin / WL84MySplunk!
     ports:
-      - "8000:8000"
+      - "8001:8000"
       #- "8088:8088"
       #- "8089:8089"
       #- "9997:9997"
@@ -233,20 +233,20 @@ services:
    
   # docker run --name logparser -it -v logparser:/logparser logpai/logparser:py3 bash
   # docker run --name logparser -it -v logparser:/logparser logparser_py3_8:1.0 bash
-  logparser:
-    build:
-      context: ./logparser
-      dockerfile: Dockerfile
-    container_name: logparser_py38
-    deploy:
-      resources:
-        reservations:
-          memory: 64g  
-    volumes:
-      - logparserpy38:/logparser
-    stdin_open: true        # Keep STDIN open for interaction
-    tty: true               # Allocate a pseudo-TTY
-    command: /bin/bash      # Start the container with Bash
+  # logparser:
+  #   build:
+  #     context: ./logparser
+  #     dockerfile: Dockerfile
+  #   container_name: logparser_py38
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         memory: 64g  
+  #   volumes:
+  #     - logparserpy38:/logparser
+  #   stdin_open: true        # Keep STDIN open for interaction
+  #   tty: true               # Allocate a pseudo-TTY
+  #   command: /bin/bash      # Start the container with Bash
 
   #elasticsearch:
   #  image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
@@ -308,8 +308,8 @@ services:
   #  depends_on:
   #    - collector-gateway  
 
-volumes:
-  logparserpy38:
+# volumes:
+#   logparserpy38:
 
 #  es_data:
 #    driver: local
