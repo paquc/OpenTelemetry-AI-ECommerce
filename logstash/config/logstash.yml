@@ -1,0 +1,38 @@
+# Sample logstash.yml file for Logstash version 8.15.2
+# This configuration file allows you to customize the behavior of Logstash.
+
+# Settings for path configuration
+#path.data: /var/lib/logstash
+
+# Configuration for log and error files
+#path.logs: /var/log/logstash
+
+# Pipeline configuration
+pipeline.ordered: auto
+
+# Pipeline settings (number of workers and batch size)
+pipeline.workers: 2
+pipeline.batch.size: 125
+pipeline.batch.delay: 50
+
+# HTTP API settings for monitoring and managing Logstash
+api.http.host: "0.0.0.0"
+api.http.port: 9600-9700
+
+# Settings for managing multiple pipelines (if needed)
+config.reload.automatic: true
+config.reload.interval: 3s
+
+# Enabling monitoring with xpack
+xpack.monitoring.enabled: true
+xpack.monitoring.elasticsearch.hosts: ["http://elasticsearch:9200"]
+
+# Settings for queue management
+queue.type: persisted
+queue.max_bytes: 1024mb
+
+# Settings for logging
+log.level: info
+
+# Path settings for plugins
+path.plugins: []

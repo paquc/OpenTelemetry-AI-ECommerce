@@ -223,14 +223,83 @@ services:
       - ./tempo/tempo.yaml:/etc/tempo.yaml
       - ./tempo-data:/var/tempo
     ports:
-      - "14268"  # jaeger ingest
-      - "3200"   # tempo
-      - "4317"  # otlp grpc
-      - "4318"  # otlp http
-      - "9411"   # zipkin
+      - "14268"   # jaeger ingest
+      - "3200"    # tempo
+      - "4317"    # otlp grpc
+      - "4318"    # otlp http
+      - "9411"    # zipkin
     depends_on:
       - init
-   
+    
+  # docker exec -it elasticsearch /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
+  # docker exec -it elasticsearch /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana  
+  # export ELASTIC_PASSWORD="lZ*4J8_EQZOplAkb+=Fe"
+  # docker cp elasticsearch:/usr/share/elasticsearch/config/certs/http_ca.crt .
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
+    container_name: elasticsearch
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms256m -Xmx256m
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    deploy:
+      resources:
+        reservations:
+          memory: 1GB  
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.15.2
+    container_name: logstash
+    # restart: always
+    environment:
+      - LS_JAVA_OPTS=-Xms256m -Xmx256m
+    volumes:
+      - ./logstash/config:/usr/share/logstash/config
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+    command: logstash -f /usr/share/logstash/pipeline/logstash.conf
+    ports:
+      - "9600:9600"
+      - "9700:9700"
+      #- "5044:5044"
+    depends_on:
+      - elasticsearch
+    
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.15.2
+    container_name: kibana
+    restart: always
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    
+    
+  #mimir:
+  #  image: grafana/mimir:2.13.0
+  #  container_name: mimir
+  # command: ["-ingester.native-histograms-ingestion-enabled=true", "-config.file=/etc/mimir.yaml"]
+  #  ports:
+  #    - "9009:9009"
+  #  volumes:
+  #    - "./mimir/mimir.yaml:/etc/mimir.yaml"  
+
+  # Generate fake traces...
+  # k6-tracing:
+  #   image: ghcr.io/grafana/xk6-client-tracing:v0.0.5
+  #   container_name: k6
+  #   environment:
+  #     - ENDPOINT=collector-gateway:4317 # Export to OTEL Collector simulatated traces
+  #   #restart: always
+  #   depends_on:
+  #     - collector-gateway  
+
   # docker run --name logparser -it -v logparser:/logparser logpai/logparser:py3 bash
   # docker run --name logparser -it -v logparser:/logparser logparser_py3_8:1.0 bash
   # logparser:
@@ -248,67 +317,11 @@ services:
   #   tty: true               # Allocate a pseudo-TTY
   #   command: /bin/bash      # Start the container with Bash
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-    volumes:
-      - es_data:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    
-
-  logstash:
-    image: docker.elastic.co/logstash/logstash:8.15.2
-    container_name: logstash
-    environment:
-      - LS_JAVA_OPTS=-Xms256m -Xmx256m
-    volumes:
-      - ./logstash/config:/usr/share/logstash/config
-      - ./logstash/pipeline:/usr/share/logstash/pipeline
-    ports:
-      - "5044:5044"
-    depends_on:
-      - elasticsearch
-    
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.15.2
-    container_name: kibana
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-    
-    
-  #mimir:
-  #  image: grafana/mimir:2.13.0
-  #  container_name: mimir
-  # command: ["-ingester.native-histograms-ingestion-enabled=true", "-config.file=/etc/mimir.yaml"]
-  #  ports:
-  #    - "9009:9009"
-  #  volumes:
-  #    - "./mimir/mimir.yaml:/etc/mimir.yaml"  
-
-  # Generate fake traces...
-  #k6-tracing:
-  #  image: ghcr.io/grafana/xk6-client-tracing:v0.0.5
-  # container_name: k6
-  #  environment:
-  #   - ENDPOINT=collector-gateway:4317 # Export to OTEL Collector simulatated traces
-  #  #restart: always
-  #  depends_on:
-  #    - collector-gateway  
-
 volumes:
   es_data:
     driver: local
   #logparserpy38:
 
-#networks:
+# networks:
 #  elk:
 #    driver: bridge
