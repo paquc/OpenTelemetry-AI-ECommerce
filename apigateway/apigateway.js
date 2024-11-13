@@ -11,6 +11,9 @@ const DESTINATION_URL = process.env.DESTINATION_URL || 'http://goalshumanityserv
 const http = require('http');
 const PORT = process.env.PORT || 9000;
 
+// io = require('socket.io')
+const cote = require('cote')
+
 const tracing = require('./tracing');
 const errors = require('./errors.js');
 
@@ -20,6 +23,11 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 app.use(express.json());
+
+var userRequester = new cote.Requester({
+  name: 'admin user requester',
+  namespace: 'user'
+});
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -91,13 +99,22 @@ app.get('/', (req, res) => {
   logEventMessage(`api gateway running ${PORT}`, severity_trace);
 });
 
-app.get('/pingbridgeserver', async (req, res) => {
-  console.log(req.rawHeaders);
-  logEventMessage(req.rawHeaders, severity_debug);
-  
-  await pingserver();
-  res.status(200).json({ message: 'goalsbridgeserver container present' }); 
+app.get('/usersslist', function(req, res) {
+  userRequester.send({type: 'list'}, function(err, users) {
+      logEventMessage('Fetched users list successfully', severity_info);
+      // Print with JSON.stringify
+      console.log(JSON.stringify(users, null, 2));
+      res.send(users);
+  });
 });
+
+// app.get('/pingbridgeserver', async (req, res) => {
+//   console.log(req.rawHeaders);
+//   logEventMessage(req.rawHeaders, severity_debug);
+  
+//   await pingserver();
+//   res.status(200).json({ message: 'goalsbridgeserver container present' }); 
+// });
 
 errors.errorsCounter.add(0);
 

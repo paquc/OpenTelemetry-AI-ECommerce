@@ -17,8 +17,8 @@ export const options = {
 // };
 
 export default function () {
-  // Send a request to the APIGateway on port 9000
-  const res = http.get('http://localhost:9000/');
-  check(res, { 'response is running...': (r) => r.body.includes('running...') });
+  const res = http.get('http://localhost:9000/usersslist');
+  
+  //check(res, { 'response is running...': (r) => r.body.includes('running...') });
   sleep(1);
 }

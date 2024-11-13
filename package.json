@@ -34,7 +34,7 @@
     "test": "ava --verbose --timeout=60000"
   },
   "devDependencies": {
-    "ava": "^0.20.0",
-    "@types/k6": "^0.54.1"
+    "@types/k6": "^0.54.1",
+    "ava": "^0.20.0"
   }
 }
