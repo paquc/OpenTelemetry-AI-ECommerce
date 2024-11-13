@@ -27,15 +27,15 @@ function sleep(ms) {
 
 function logEventMessage(message, severity) {
 
-  const logger = tracing.loggerProvider.getLogger('bridge-service-logger');
+  const logger = tracing.loggerProvider.getLogger('apigateway-service-logger');
 
   // emit a log message 
   logger.emit({
     severityText: severity,
     body: message,
     attributes: { 
-      'log.project': 'ETS-TP1',
-      'log.service': 'goalsbridgeserver'}
+      'log.project': 'ETS-Project',
+      'log.service': 'apigateway'}
   });
 
   console.log(`${severity} : ${message}`); 
