@@ -233,6 +233,7 @@ services:
    
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    container_name: setup_elk
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
     user: "0"
@@ -297,6 +298,7 @@ services:
       setup:
         condition: service_healthy
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    container_name: es01
     labels:
       co.elastic.logs/module: elasticsearch
     volumes:
@@ -341,6 +343,7 @@ services:
       es01:
         condition: service_healthy
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    container_name: kibana
     labels:
       co.elastic.logs/module: kibana
     volumes:
@@ -382,6 +385,7 @@ services:
       kibana:
         condition: service_healthy
     image: docker.elastic.co/beats/metricbeat:${STACK_VERSION}
+    container_name: metricbeat01
     user: root
     volumes:
       - certs:/usr/share/metricbeat/certs
@@ -410,6 +414,7 @@ services:
       es01:
         condition: service_healthy
     image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
+    container_name: filebeat01
     user: root
     volumes:
       - certs:/usr/share/filebeat/certs
@@ -435,6 +440,7 @@ services:
       kibana:
         condition: service_healthy
     image: docker.elastic.co/logstash/logstash:${STACK_VERSION}
+    container_name: logstash01
     labels:
       co.elastic.logs/module: logstash
     user: root
@@ -456,6 +462,7 @@ services:
       es01:
         condition: service_healthy
     image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION}
+    container_name: fleet-server
     volumes:
       - certs:/certs
       - fleetserverdata:/usr/share/elastic-agent
