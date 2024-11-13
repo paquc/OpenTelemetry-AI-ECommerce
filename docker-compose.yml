@@ -1,5 +1,23 @@
 services:
         
+  influxdb:
+    image: influxdb:1.8
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=k6
+
+  k6:
+    image: grafana/k6:0.55.0
+    container_name: k6  
+    ports:
+      - "6565:6565"
+    environment:
+      - K6_OUT=influxdb=http://influxdb:8086/k6
+    volumes:
+      - ./examples:/scripts
+
   splunk:
     image: splunk/splunk:9.3
     container_name: splunk
