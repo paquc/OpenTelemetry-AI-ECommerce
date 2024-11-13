@@ -7,6 +7,8 @@ services:
     volumes:
       - ./apigateway/apigateway.js:/app/apigateway.js
       - ./apigateway/.env:/app/.env
+      - ./logstash_ingest_data/:/usr/share/logstash/ingest_data/
+      - ./filebeat_ingest_data/:/usr/share/filebeat/ingest_data/
     container_name: apigateway
     ports:
       - "9000:9000"

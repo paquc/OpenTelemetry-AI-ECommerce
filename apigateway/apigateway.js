@@ -14,6 +14,10 @@ const PORT = process.env.PORT || 9000;
 // io = require('socket.io')
 const cote = require('cote')
 
+const winston = require('winston');
+const { format } = winston;
+const { combine, timestamp, printf, colorize, align } = winston.format;
+
 const tracing = require('./tracing');
 const errors = require('./errors.js');
 
@@ -21,8 +25,15 @@ require('dotenv').config();
 
 //Wrap your application Code
 const express = require('express');
+const fs = require('fs');
 const app = express();
 app.use(express.json());
+
+// Define a custom format for CSV output
+const csvFormat = format.printf(({ level, message, timestamp }) => {
+  // Structure the log message as CSV, e.g., "timestamp, level, message"
+  return `${timestamp},${level},${message}`;
+});
 
 var userRequester = new cote.Requester({
   name: 'admin user requester',
@@ -99,12 +110,22 @@ app.get('/', (req, res) => {
   logEventMessage(`api gateway running ${PORT}`, severity_trace);
 });
 
-app.get('/usersslist', function(req, res) {
+app.get('/userslist', function(req, res) {
   userRequester.send({type: 'list'}, function(err, users) {
-      logEventMessage('Fetched users list successfully', severity_info);
-      // Print with JSON.stringify
-      console.log(JSON.stringify(users, null, 2));
-      res.send(users);
+      if(err) {
+        const msg = `apigateway,/userlist,${err}`;
+        logger.log('error', msg);
+        res.status(500).send('Error fetching users list');
+        return;
+      }
+      else {
+        logEventMessage('Fetched users list successfully', severity_info);
+        const msg = `apigateway,/userlist,Users list fetched successfully from user-service`;
+        logger.log('info', msg);
+        // logger.log('verbose', JSON.stringify(users, null, 2))
+        // console.log(JSON.stringify(users, null, 2));
+        res.status(200).send(users);
+      }
   });
 });
 
@@ -120,4 +141,25 @@ errors.errorsCounter.add(0);
 
 // START listening...
 app.listen(PORT);
-logEventMessage(`api gateway running on ${PORT}`, severity_trace);
+
+const logFilePath = '/usr/share/logstash/ingest_data/apigateway.csv';
+
+const logger = winston.createLogger({
+  level: 'debug',
+  //format: winston.format.json(),
+  format: format.combine(
+    timestamp({
+      format: 'YYYY-MM-DD hh:mm:ss.SSS',
+    }),
+    csvFormat           // Apply the CSV formatting
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({
+      filename: logFilePath,
+    }),
+    // new LogtailTransport(logtail),
+  ],
+});
+
+logEventMessage(`API Gateway running... on ${PORT}`, severity_trace);
