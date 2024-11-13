@@ -1,5 +1,16 @@
 services:
-        
+
+  apigateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.apigateway
+    volumes:
+      - ./apigateway/apigateway.js:/app/apigateway.js
+      - ./apigateway/.env:/app/.env
+    container_name: apigateway
+    ports:
+      - "9000:9000"
+
   influxdb:
     image: influxdb:1.8
     container_name: influxdb

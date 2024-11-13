@@ -1,0 +1,19 @@
+FROM node:20.11.0
+
+# Change folder inside the container
+WORKDIR /app
+
+# Copy package.json to the container to be used by npm install
+COPY apigateway/package.json .
+
+# Install dependencies before copying the rest of the files to take advantage of Docker's cache
+RUN npm install
+RUN npm install dotenv
+
+COPY apigateway/  .
+COPY tracing/  .
+
+EXPOSE 80
+
+CMD ["npm", "start"]        
+
