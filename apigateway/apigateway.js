@@ -9,6 +9,9 @@ const simulation_trace = 'SIMULATION';
 
 const SOURCE_SERVICE = 'apigateway';
 const API_ENDPOINT = '/userslist';
+const ERROR_NONE = 'OK';
+const ERROR_DELAY = 'SVC_USER_REQ_DELAY';
+const ERROR_FAIL = 'SVC_USER_REQ_FAIL';
 
 const DESTINATION_URL = process.env.DESTINATION_URL || 'http://goalshumanityserver:9001/pinghumanityserver';
 const http = require('http');
@@ -114,27 +117,29 @@ app.get('/', (req, res) => {
   logEventMessage(`api gateway running ${PORT}`, severity_trace);
 });
 
+
 app.get('/userslist', function(req, res) {
   const startTime = Date.now();
   userRequester.send({type: 'list'}, function(err, users) {
       const endTime = Date.now();
       const duration = endTime - startTime;
       if(err) {
-        const msg = `${SOURCE_SERVICE},${API_ENDPOINT},Error fetching users list from user-service: code ${err}`;
+        const msg = `${ERROR_FAIL},${SOURCE_SERVICE},${API_ENDPOINT},Error fetching users list from user-service: code ${err}`;
         logger.error(msg);
         res.status(500).send('Error fetching users list');
       }
       else {
-        if (duration > 500) {
-          const slowMsg = `${SOURCE_SERVICE},${API_ENDPOINT},Fetching users list took longer than expected (max=500ms): ${duration} ms`;
+        if (duration < 300) {
+          const msg = `${ERROR_NONE},${SOURCE_SERVICE},${API_ENDPOINT},Users list fetched successfully from user-service in ${duration} ms`;
+          logger.info(msg);
+        } else if (duration >= 300 && duration < 500) {
+          const slowMsg = `${ERROR_DELAY},${SOURCE_SERVICE},${API_ENDPOINT},Fetching users list took longer than expected (max=300ms): ${duration} ms`;
           logger.warn(slowMsg);
-        } else if (duration > 1000) {
-          const slowMsg = `${SOURCE_SERVICE},${API_ENDPOINT},Fetching users list took too much time according the customer SLA (max=1000ms): ${duration} ms`;
+        } else if (duration >= 500) {
+          const slowMsg = `${ERROR_DELAY},${SOURCE_SERVICE},${API_ENDPOINT},Fetching users list took too much time according the customer SLA (max=500ms): ${duration} ms`;
           logger.error(slowMsg);
         }
         else {
-          const msg = `${SOURCE_SERVICE},${API_ENDPOINT},Users list fetched successfully from user-service in ${duration} ms`;
-          logger.info(msg);
         }
         res.status(200).send(users);
       }
