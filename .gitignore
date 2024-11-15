@@ -6,3 +6,4 @@ grafana-storage/
 tempo-data/
 logstash_ingest_data/AI-ECommerce-Output.csv
 logstash_ingest_data/system_unified_log.csv
+training_data/
