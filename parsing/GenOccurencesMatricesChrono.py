@@ -130,7 +130,8 @@ def GenMatrices():
 
             # Get the prediction window
             window_box_sequence_tail_time_epoch = window_box_sequence_data[1]
-            prediction_box_data = find_event(df_logs, window_box_sequence_tail_time_epoch, prediction_window_epoch, 'future')
+            # prediction_box_data = find_event(df_logs, window_box_sequence_tail_time_epoch, prediction_window_epoch, 'future')
+            prediction_box_data = find_event(df_logs, window_box_sequence_tail_time_epoch - prediction_window_epoch, prediction_window_epoch, 'future')
             if prediction_box_data is None:
                 print("No more events to process (prediction_box_data). Exiting...")
                 break
