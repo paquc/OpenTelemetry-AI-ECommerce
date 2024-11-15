@@ -1,6 +1,6 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
-
+import { randomIntBetween } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
 
 const testDuration = __ENV.TEST_DURATION;
 const numberOfUsers = __ENV.NUMBER_OF_USERS;
@@ -69,6 +69,8 @@ if (testType === 5) {
 
 export { options };
 
+
+
 // Function that will call the /userslist endpoint and check if the response contains the expected number of users
 function listUsers(numberOfUsers, print) {
   const res = http.get('http://localhost:9000/userslist');
@@ -76,8 +78,10 @@ function listUsers(numberOfUsers, print) {
   if (print)
     console.log(users);
   check(res, { [`contains ${numberOfUsers} users`]: (r) => JSON.parse(r.body).length === numberOfUsers });
-  sleep(1);
+  sleep(randomIntBetween(0, 1));
 }
+
+
 
 export default function () {
   listUsers(6, false);

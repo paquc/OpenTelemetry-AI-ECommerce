@@ -2,7 +2,7 @@ import sys
 import pandas as pd
 import numpy as np
 import pickle
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
@@ -21,7 +21,7 @@ if len(sys.argv) > 5:
     train_LR = int(sys.argv[1])
     train_RF = int(sys.argv[2])
     suffix = sys.argv[3]
-    node_name = sys.argv[4]
+    service_name = sys.argv[4]
     window_size = int(sys.argv[5])
     prediction_window = int(sys.argv[6])
     sliding_window = int(sys.argv[7])
@@ -34,15 +34,12 @@ else:
     print("Usage: Train.py <data_set_id>")
     sys.exit(1)
 
-file_suffix = f"{suffix}_{node_name}_{window_size}_{prediction_window}_{sliding_window}"    
+file_suffix = f"{suffix}_{service_name}_{window_size}_{prediction_window}_{sliding_window}"    
 
 # Charger la matrice d'occurrence
-input_file_path = f"./Thunderbird_Brain_results/VAPI_alarm_occurences_matrix_{file_suffix}_chrono_dedup.csv"
-full_data = pd.read_csv(input_file_path)
-#data = pd.read_csv(f"./Thunderbird_Brain_results/VAPI_alarm_occurences_matrix_preprocessed_5min.csv")
-#data = pd.read_csv('./BGL_Brain_results/KERNDTLB_alarm_occurences_matrix_V1_part1_dedup.csv')  # for testing only!
+input_file_path = f"./output/alarm_occurences_matrix_{file_suffix}_chrono_dedup.csv"
 
-#n_data_set_samples = 5000   # len(data)
+full_data = pd.read_csv(input_file_path)
 
 # Evaluation function
 def get_model_evaluation(y_test, y_pred, model_name, log_file, estimators, randomize_val, model = None, X_train = None, RF = True):
@@ -146,14 +143,14 @@ def get_model_evaluation(y_test, y_pred, model_name, log_file, estimators, rando
         log_file.write("Caracteristiques les plus importantes:\n")
         log_file.write(feature_importance_df.to_string(index=False) + "\n")
 
-        # Visualiser les caractéristiques les plus importantes
-        plt.figure(figsize=(10, 6))
-        plt.barh(feature_importance_df['Feature'], feature_importance_df['Importance'], color='skyblue')
-        plt.xlabel('Importance')
-        plt.ylabel('Feature (Event)')
-        plt.title('Importance des Caractéristiques pour la Détection d’Anomalies')
-        plt.gca().invert_yaxis()
-        #plt.show()
+        # # Visualiser les caractéristiques les plus importantes
+        # plt.figure(figsize=(10, 6))
+        # plt.barh(feature_importance_df['Feature'], feature_importance_df['Importance'], color='skyblue')
+        # plt.xlabel('Importance')
+        # plt.ylabel('Feature (Event)')
+        # plt.title('Importance des Caractéristiques pour la Détection d’Anomalies')
+        # plt.gca().invert_yaxis()
+        # #plt.show()
 
     log_file.write("------------------------------------\n\n")
 
@@ -163,7 +160,10 @@ print("Start of script")
 
 sampling_data_desc = f'{train_data_size}_{test_data_size}_{val_data_size}'
 
-with open(f"./Thunderbird_Brain_results/New/Thu_VAPI_Training_Set_RF_{sampling_data_desc}_{file_suffix}_Output.log", "w") as RF_log_file, open(f"./Thunderbird_Brain_results/New/Thu_VAPI_Training_Set_LR_{sampling_data_desc}_{file_suffix}_Output.log", "w") as LR_log_file:
+RF_output_file = f"./training/training_RF_{sampling_data_desc}_{file_suffix}_Output.log"
+LR_output_file = f"./training/training_LR_{sampling_data_desc}_{file_suffix}_Output.log"
+
+with open(RF_output_file, "w") as RF_log_file, open(LR_output_file, "w") as LR_log_file:
     for bs_index in range(n_bootstrap_samples):
 
         RF_log_file.write(f"Train data size: {train_data_size}, Validation size: {val_data_size}, Test size: {test_data_size}\n\n")

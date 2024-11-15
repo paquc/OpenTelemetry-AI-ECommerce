@@ -19,7 +19,7 @@ input_dir = '../logstash_ingest_data/'  # Path to the directory containing the l
 output_dir = '../training_data/BrainOutpout/'  # Output directory for the parsed results
 
 # log_format = '<AlertFlagLabel> <EpochTime> <Date> <Noeud> <Month> <Day> <Hour> <Content>'
-log_format = '<DateTime>,<Severity>,<ErrorType>,<Service>,<EndPoint>,<DataVal1>,<DataVal2>,<Content>'
+log_format = '<DateTime>,<Severity>,<EpochTime>,<ErrorType>,<Service>,<EndPoint>,<DataVal1>,<DataVal2>,<Content>'
 
 # Regular expression list for optional preprocessing (default: [])
 regex = []

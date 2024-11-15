@@ -2,12 +2,13 @@ import pandas as pd
 from collections import Counter
 import fileinput
 import sys
+import os
 
 # Node=an690 for 20M-10-30
 # Node=dn30 for 10M
 
 if len(sys.argv) >= 5:
-    node_name = sys.argv[1]
+    service_name = sys.argv[1]
     suffix = sys.argv[2]
     time_window_epoch = int(sys.argv[3])
     prediction_window_epoch = int(sys.argv[4])
@@ -17,8 +18,14 @@ else:
     sys.exit(1)
 
 
-logs_file = f"./Thunderbird_Brain_results/Thunderbird_{suffix}.log_structured.csv"
 
+def delete_file(file_path):
+    # Delete the file output_sequences_file
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print(f"File {file_path} deleted successfully.")
+    else:
+        print(f"File {file_path} does not exist.")
 
 def remove_duplicates(file_path, output_path=None):
     # Load the file
@@ -87,6 +94,8 @@ def print_alarm_types(df_logs, suffix, node_name):
 
 def GenMatrices():
 
+    logs_file = f"../training_data/BrainOutpout/AI-ECommerce-Output.csv_structured.csv"  
+
     # Load the log data from the CSV file
     print(f"Processing log file: {logs_file}")
     df_logs = pd.read_csv(logs_file)
@@ -96,13 +105,14 @@ def GenMatrices():
 
     
     # Open the output file in write mode
-    with open(f"./Thunderbird_Brain_results/VAPI_alarm_sequences_{suffix}_{node_name}_{time_window_epoch}_{prediction_window_epoch}_{moving_window_epoch}_chrono.csv", "w") as sequences_output_file:
+    output_sequences_file = f"./output/alarm_sequences_{suffix}_{service_name}_{time_window_epoch}_{prediction_window_epoch}_{moving_window_epoch}_chrono.csv"
+    with open(output_sequences_file, "w") as sequences_output_file:
 
         print(f"Generating sequences of events within {time_window_epoch} seconds for each entry...")
         sequences_output_file.write("EventSequence,IsAlarm\n")
        
-        print_alarm_types(df_logs, suffix, node_name)
-        #sys.exit(0)
+        # print_alarm_types(df_logs, suffix, node_name)
+        # sys.exit(0)
         
         aggregated_alarms_TH = 2
         search_counter = 0
@@ -129,30 +139,30 @@ def GenMatrices():
             #print(prediction_df.head(10))
             #print(f"Prediction box start time: {window_box_sequence_tail_time_epoch + 1}, tail time: {prediction_box_data[1]}, Total time: {prediction_df.iloc[-1]['EpochTime'] - window_box_sequence_tail_time_epoch}")
 
-            # Filter the prediction DataFrame to keep only rows where 'AlertFlagLabel' is 'VAPI' for node 'bn257'
-            prediction_VAPI_node_df = prediction_df.loc[(prediction_df['AlertFlagLabel'] == 'VAPI') & (prediction_df['Noeud'] == node_name)]
-            #print(f"Number of VAPI alarms for node {node_name} in prediction box: {prediction_VAPI_node_df.shape[0]}")
+            # Filter the prediction DataFrame to keep only rows where 'Severity' is 'warn' for the desired service
+            prediction_warn_service_df = prediction_df.loc[(prediction_df['Severity'] == 'warn') & (prediction_df['Service'] == service_name)]
+            #print(f"Number of warnings alarms for node {service_name} in prediction box: {prediction_warn_service_df.shape[0]}")
 
             # Count the number of alarms in the prediction window (shape() returns a tuple of (num_rows, num_columns))
-            num_VAPI_node_alarms = prediction_VAPI_node_df.shape[0]
+            num_warns_service_alarms = prediction_warn_service_df.shape[0]
 
-            # There is an alram if the number of alarms is greater than the threshold
-            if num_VAPI_node_alarms >= aggregated_alarms_TH:
+            # There is an alarm if the number of warnings is greater than the threshold
+            if num_warns_service_alarms >= aggregated_alarms_TH:
                 is_alarm = 1
-                print(f"ALARM: Alarms detected: {num_VAPI_node_alarms} alarms.")
+                print(f"ALARM: Alarms detected: {num_warns_service_alarms} alarms.")
                 search_counter = 0
             else:
                 is_alarm = 0
                 if search_counter == 0:
-                    print(f"NO ALARM: alarms detected: {num_VAPI_node_alarms} alarms. Searching...")
+                    print(f"NO ALARM: alarms detected: {num_warns_service_alarms} alarms. Searching...")
                 search_counter += 1
                 print(f"ALARMS searching --> {search_counter}..... ")
                 if search_counter > 10:
                     search_counter = 0
 
-            # Filter out all events corresponfig to node 'node_name' in window box for sequence
+            # Filter out all events corresponfig to service in window box for sequence
             window_box_sequences_events_df = window_box_sequence_data[0]
-            window_box_sequences_node_events_df = window_box_sequences_events_df.loc[window_box_sequences_events_df['Noeud'] == node_name]   
+            window_box_sequences_node_events_df = window_box_sequences_events_df.loc[window_box_sequences_events_df['Service'] == service_name]   
 
             # Generate a sequence of EventIds within the sequence window box
             sequence_events = ','.join(window_box_sequences_node_events_df['EventId'].tolist())
@@ -172,17 +182,22 @@ def GenMatrices():
             window_box_sequence_start_time_epoch = df_logs_data[1]
             
         
-        # sys.exit(0)
+        print(f"Output file: {output_sequences_file}")
+        #sys.exit(0)
+
+
+    output_sequences_file_dedup = output_sequences_file.replace(".csv", "_dedup.csv")
 
     # Remove diplicates from the sequences
     print("Sequences generated successfully!")
-    remove_duplicates(f"./Thunderbird_Brain_results/VAPI_alarm_sequences_{suffix}_{node_name}_{time_window_epoch}_{prediction_window_epoch}_{moving_window_epoch}_chrono.csv", f"./Thunderbird_Brain_results/VAPI_alarm_sequences_{suffix}_{node_name}_{time_window_epoch}_{prediction_window_epoch}_{moving_window_epoch}_chrono_dedup.csv")
+    remove_duplicates(output_sequences_file, output_sequences_file_dedup)
+    delete_file(output_sequences_file)
     print("Deduplicated sequences saved successfully!")
+
+    #sys.exit(0)
     
     # Charger le fichier de séquences d'événements générées précédemment
-    # Ce fichier contient les séquences d'événements et leurs étiquettes (indicateur d'alarme)
-    sequences_file = f"./Thunderbird_Brain_results/VAPI_alarm_sequences_{suffix}_{node_name}_{time_window_epoch}_{prediction_window_epoch}_{moving_window_epoch}_chrono_dedup.csv"
-    df_sequences = pd.read_csv(sequences_file, header=0)
+    df_sequences = pd.read_csv(output_sequences_file_dedup, header=0)
 
     #********************************************************************************************************************
     # Identifier tous les événements uniques à travers toutes les séquences d'événements
@@ -200,7 +215,7 @@ def GenMatrices():
 
     #********************************************************************************************************************
     # Écrire les données de la matrice d'occurrences ligne par ligne dans le fichier CSV
-    matrix_output_file_path = f"./Thunderbird_Brain_results/VAPI_alarm_occurences_matrix_{suffix}_{node_name}_{time_window_epoch}_{prediction_window_epoch}_{moving_window_epoch}_chrono.csv"
+    matrix_output_file_path = f"./output/alarm_occurences_matrix_{suffix}_{service_name}_{time_window_epoch}_{prediction_window_epoch}_{moving_window_epoch}_chrono.csv"
 
     # Ouvrir le fichier de sortie en mode écriture
     with open(matrix_output_file_path, 'w') as matrix_output_file:
@@ -225,9 +240,10 @@ def GenMatrices():
 
     print(f"Occurrence matrix generated successfully at {matrix_output_file_path}!")
     remove_duplicates(matrix_output_file_path, matrix_output_file_path.replace(".csv", "_dedup.csv"))
+    delete_file(matrix_output_file_path)
     print(f"Deduplicated occurrence matrix saved successfully at {matrix_output_file_path.replace('.csv', '_dedup.csv')}")
 
 
-
 GenMatrices()
-print("COMPLETED - Thunderbird matrices CHRONO generated successfully!")
+
+print("COMPLETED - Matrices CHRONO generated successfully!")
