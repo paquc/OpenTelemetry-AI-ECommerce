@@ -124,19 +124,19 @@ app.get('/userslist', function(req, res) {
       const endTime = Date.now();
       const duration = endTime - startTime;
       if(err) {
-        const msg = `${ERROR_FAIL},${SOURCE_SERVICE},${API_ENDPOINT},Error fetching users list from user-service: code ${err}`;
+        const msg = `${ERROR_FAIL},${SOURCE_SERVICE},${API_ENDPOINT},${err},,Error fetching users list from user-service: code ${err}`;
         logger.error(msg);
         res.status(500).send('Error fetching users list');
       }
       else {
         if (duration < 300) {
-          const msg = `${ERROR_NONE},${SOURCE_SERVICE},${API_ENDPOINT},Users list fetched successfully from user-service in ${duration} ms`;
+          const msg = `${ERROR_NONE},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Users list fetched successfully from user-service in ${duration} ms`;
           logger.info(msg);
         } else if (duration >= 300 && duration < 500) {
-          const slowMsg = `${ERROR_DELAY},${SOURCE_SERVICE},${API_ENDPOINT},Fetching users list took longer than expected (max=300ms): ${duration} ms`;
+          const slowMsg = `${ERROR_DELAY},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Fetching users list took longer than expected (max=300ms): ${duration} ms`;
           logger.warn(slowMsg);
         } else if (duration >= 500) {
-          const slowMsg = `${ERROR_DELAY},${SOURCE_SERVICE},${API_ENDPOINT},Fetching users list took too much time according the customer SLA (max=500ms): ${duration} ms`;
+          const slowMsg = `${ERROR_DELAY},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Fetching users list took too much time according the customer SLA (max=500ms): ${duration} ms`;
           logger.error(slowMsg);
         }
         else {
