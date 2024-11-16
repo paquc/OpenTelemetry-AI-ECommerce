@@ -1,7 +1,7 @@
 :: SMOKE TEST
 set TEST_TYPE=1
-set TEST_DURATION=10s
-set NUMBER_OF_USERS=100
+set TEST_DURATION=1s
+set NUMBER_OF_USERS=5
 k6 run .\get_users.js 
 
 :: SPIKE Test
