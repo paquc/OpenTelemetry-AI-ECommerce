@@ -1,0 +1,13 @@
+regex==2022.3.2
+numpy
+pandas
+scipy
+scikit-learn
+tqdm
+nltk
+deap
+openai
+tiktoken
+uvicorn[standard]==0.32.0
+gunicorn==23.0.0
+fastapi[all]==0.115.4

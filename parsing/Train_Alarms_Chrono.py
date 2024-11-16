@@ -25,16 +25,17 @@ if len(sys.argv) > 5:
     window_size = int(sys.argv[5])
     prediction_window = int(sys.argv[6])
     sliding_window = int(sys.argv[7])
-    use_bootstrap = int(sys.argv[8])
-    n_bootstrap_samples = int(sys.argv[9])
-    train_data_size = int(sys.argv[10])
-    test_data_size = int(sys.argv[11])
-    val_data_size = int(sys.argv[12])
+    prediction_window_offset_epoch = int(sys.argv[8])
+    use_bootstrap = int(sys.argv[9])
+    n_bootstrap_samples = int(sys.argv[10])
+    train_data_size = int(sys.argv[11])
+    test_data_size = int(sys.argv[12])
+    val_data_size = int(sys.argv[13])
 else:
     print("Usage: Train.py <data_set_id>")
     sys.exit(1)
 
-file_suffix = f"{suffix}_{service_name}_{window_size}_{prediction_window}_{sliding_window}"    
+file_suffix = f"{suffix}_{service_name}_{window_size}_{prediction_window}_{sliding_window}_{prediction_window_offset_epoch}"    
 
 # Charger la matrice d'occurrence
 input_file_path = f"./output/alarm_occurences_matrix_{file_suffix}_chrono_dedup.csv"

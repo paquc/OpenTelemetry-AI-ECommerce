@@ -105,9 +105,10 @@ def GenMatrices():
     print(f"Last epoch time: {df_logs.iloc[-1]['EpochTime']}")
     #sys.exit(0)
 
+    file_suffix = f"{suffix}_{service_name}_{time_window_epoch}_{prediction_window_epoch}_{moving_window_epoch}_{prediction_window_offset_epoch}"
     
     # Open the output file in write mode
-    output_sequences_file = f"./output/alarm_sequences_{suffix}_{service_name}_{time_window_epoch}_{prediction_window_epoch}_{moving_window_epoch}_chrono.csv"
+    output_sequences_file = f"./output/alarm_sequences_{file_suffix}_chrono.csv"
     with open(output_sequences_file, "w") as sequences_output_file:
 
         print(f"Generating sequences of events within {time_window_epoch} seconds for each entry...")
@@ -218,7 +219,7 @@ def GenMatrices():
 
     #********************************************************************************************************************
     # Écrire les données de la matrice d'occurrences ligne par ligne dans le fichier CSV
-    matrix_output_file_path = f"./output/alarm_occurences_matrix_{suffix}_{service_name}_{time_window_epoch}_{prediction_window_epoch}_{moving_window_epoch}_chrono.csv"
+    matrix_output_file_path = f"./output/alarm_occurences_matrix_{file_suffix}_chrono.csv"
 
     # Ouvrir le fichier de sortie en mode écriture
     with open(matrix_output_file_path, 'w') as matrix_output_file:
