@@ -7,12 +7,13 @@ import os
 # Node=an690 for 20M-10-30
 # Node=dn30 for 10M
 
-if len(sys.argv) >= 5:
+if len(sys.argv) >= 6:
     service_name = sys.argv[1]
     suffix = sys.argv[2]
     time_window_epoch = int(sys.argv[3])
     prediction_window_epoch = int(sys.argv[4])
     moving_window_epoch = int(sys.argv[5])
+    prediction_window_offset_epoch = int(sys.argv[6])
 else:
     print("Usage: script time_wnd_hours")
     sys.exit(1)
@@ -54,6 +55,7 @@ def find_event(df_logs, window_box_start_time_epoch, window_box_time_width_epoch
 
     # Filter the DataFrame to include only rows from start until the specified time interval
     sequence_df = df_logs[(df_logs['EpochTime'] >= window_box_start_time_epoch) & (df_logs['EpochTime'] <= end_epoch_time)]
+    print(f"Sequence start time: {window_box_start_time_epoch}, tail time: {end_epoch_time}, Nb rows: {sequence_df.shape[0]}")
     if sequence_df.empty:
         return None
 
@@ -131,47 +133,47 @@ def GenMatrices():
             # Get the prediction window
             window_box_sequence_tail_time_epoch = window_box_sequence_data[1]
             # prediction_box_data = find_event(df_logs, window_box_sequence_tail_time_epoch, prediction_window_epoch, 'future')
-            prediction_box_data = find_event(df_logs, window_box_sequence_tail_time_epoch - prediction_window_epoch, prediction_window_epoch, 'future')
-            if prediction_box_data is None:
-                print("No more events to process (prediction_box_data). Exiting...")
-                break
+            # prediction_box_data = find_event(df_logs, window_box_sequence_tail_time_epoch - prediction_window_epoch, prediction_window_epoch, 'future')
+            prediction_box_data = find_event(df_logs, window_box_sequence_tail_time_epoch + prediction_window_offset_epoch, prediction_window_epoch, 'future')
+            print(f"Prediction box start time: {window_box_sequence_tail_time_epoch + prediction_window_offset_epoch}, tail time: {prediction_window_epoch}")
 
-            prediction_df = prediction_box_data[0]
-            #print(prediction_df.head(10))
-            #print(f"Prediction box start time: {window_box_sequence_tail_time_epoch + 1}, tail time: {prediction_box_data[1]}, Total time: {prediction_df.iloc[-1]['EpochTime'] - window_box_sequence_tail_time_epoch}")
+            if prediction_box_data:
+                prediction_df = prediction_box_data[0]
+                #print(prediction_df.head(10))
+                #print(f"Prediction box start time: {window_box_sequence_tail_time_epoch + 1}, tail time: {prediction_box_data[1]}, Total time: {prediction_df.iloc[-1]['EpochTime'] - window_box_sequence_tail_time_epoch}")
 
-            # Filter the prediction DataFrame to keep only rows where 'Severity' is 'warn' for the desired service
-            prediction_warn_service_df = prediction_df.loc[(prediction_df['Severity'] == 'warn') & (prediction_df['Service'] == service_name)]
-            #print(f"Number of warnings alarms for node {service_name} in prediction box: {prediction_warn_service_df.shape[0]}")
+                # Filter the prediction DataFrame to keep only rows where 'Severity' is 'warn' for the desired service
+                prediction_warn_service_df = prediction_df.loc[(prediction_df['Severity'] == 'warn') & (prediction_df['Service'] == service_name)]
+                #print(f"Number of warnings alarms for node {service_name} in prediction box: {prediction_warn_service_df.shape[0]}")
 
-            # Count the number of alarms in the prediction window (shape() returns a tuple of (num_rows, num_columns))
-            num_warns_service_alarms = prediction_warn_service_df.shape[0]
+                # Count the number of alarms in the prediction window (shape() returns a tuple of (num_rows, num_columns))
+                num_warns_service_alarms = prediction_warn_service_df.shape[0]
 
-            # There is an alarm if the number of warnings is greater than the threshold
-            if num_warns_service_alarms >= aggregated_alarms_TH:
-                is_alarm = 1
-                print(f"ALARM: Alarms detected: {num_warns_service_alarms} alarms.")
-                search_counter = 0
-            else:
-                is_alarm = 0
-                if search_counter == 0:
-                    print(f"NO ALARM: alarms detected: {num_warns_service_alarms} alarms. Searching...")
-                search_counter += 1
-                print(f"ALARMS searching --> {search_counter}..... ")
-                if search_counter > 10:
+                # There is an alarm if the number of warnings is greater than the threshold
+                if num_warns_service_alarms >= aggregated_alarms_TH:
+                    is_alarm = 1
+                    print(f"ALARM: Alarms detected: {num_warns_service_alarms} alarms.")
                     search_counter = 0
+                else:
+                    is_alarm = 0
+                    if search_counter == 0:
+                        print(f"NO ALARM: alarms detected: {num_warns_service_alarms} alarms. Searching...")
+                    search_counter += 1
+                    print(f"ALARMS searching --> {search_counter}..... ")
+                    if search_counter > 10:
+                        search_counter = 0
 
-            # Filter out all events corresponfig to service in window box for sequence
-            window_box_sequences_events_df = window_box_sequence_data[0]
-            window_box_sequences_node_events_df = window_box_sequences_events_df.loc[window_box_sequences_events_df['Service'] == service_name]   
+                # Filter out all events corresponfig to service in window box for sequence
+                window_box_sequences_events_df = window_box_sequence_data[0]
+                window_box_sequences_node_events_df = window_box_sequences_events_df.loc[window_box_sequences_events_df['Service'] == service_name]   
 
-            # Generate a sequence of EventIds within the sequence window box
-            sequence_events = ','.join(window_box_sequences_node_events_df['EventId'].tolist())
+                # Generate a sequence of EventIds within the sequence window box
+                sequence_events = ','.join(window_box_sequences_node_events_df['EventId'].tolist())
 
-            # Check if the sequence is not empty and generate the sequence
-            if sequence_events:
-                # Write the sequence and label to the file (*** ensure to insert "" around the sequence ***)
-                sequences_output_file.write(f'"{sequence_events}",{is_alarm}\n')
+                # Check if the sequence is not empty and generate the sequence
+                if sequence_events:
+                    # Write the sequence and label to the file (*** ensure to insert "" around the sequence ***)
+                    sequences_output_file.write(f'"{sequence_events}",{is_alarm}\n')
 
             # Get info for NEXT window box
             df_logs_data = find_next_start(df_logs, window_box_sequence_start_time_epoch, moving_window_epoch, 'future')
