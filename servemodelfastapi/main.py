@@ -10,6 +10,11 @@ class Item(BaseModel):
     name: str
     count: int = 0
 
+class LogEntry(BaseModel):
+    DateTime: str
+    Severity: str
+
+logentries = []
 
 @app.get("/addlog")
 def addlog():
@@ -20,6 +25,16 @@ def addlog():
     file_path = os.path.join(data_folder, "eventslog.csv")
     open(file_path, "a")
     return {"log": "created"}
+
+
+# log_format = '<DateTime>,<Severity>,<EpochTime>,<ErrorType>,<Service>,<EndPoint>,<DataVal1>,<DataVal2>,<Content>'
+@app.post("/addentry")
+def addlogentry(date: str , sever: str, epoch: str, error_type: str, service: str, endpoint: str, data1: str, data2: str, message: str):
+    logentries.append(LogEntry(DateTime=date, Severity=sever))
+    file_path = os.path.join("data", "eventslog.csv")
+    with open(file_path, "a") as file:
+        file.write(f"{date},{sever},{epoch},{error_type},{service},{endpoint},{data1},{data2},{message}\n")
+    return {"DateTime": date, "Severity": sever}
 
 
 items = []
