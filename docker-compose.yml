@@ -11,12 +11,9 @@ services:
       resources:
         reservations:
           memory: 64g  
-    # volumes:
-      # - logparserpy38:/logparser
-    # stdin_open: true        # Keep STDIN open for interaction
-    # tty: true               # Allocate a pseudo-TTY
-    # command: uvicorn main:app --reload --host servemodel_fast_api --port 8088
-    # command: /bin/bash      # Start the container with Bash
+    volumes:
+      - ./servemodelfastapi/main.py:/main.py
+      - ./servemodelfastapi/data/:/data/
 
   apigateway:
     build:

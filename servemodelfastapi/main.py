@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+import os
 
 app = FastAPI()
 
@@ -8,6 +9,18 @@ app = FastAPI()
 class Item(BaseModel):
     name: str
     count: int = 0
+
+
+@app.get("/addlog")
+def addlog():
+    data_folder = "data"
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+
+    file_path = os.path.join(data_folder, "eventslog.csv")
+    open(file_path, "a")
+    return {"log": "created"}
+
 
 items = []
 
