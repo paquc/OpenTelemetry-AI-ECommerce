@@ -3,6 +3,7 @@ FROM python:3.9-slim
 
 ADD requirements.txt .
 ADD *.py .
+ADD *.csv .
 
 RUN pip3 install -r requirements.txt
 

@@ -16,6 +16,7 @@ services:
       - ./servemodelfastapi/BrainParse.py:/BrainParse.py
       - ./servemodelfastapi/GenOccurencesMatricesChrono.py:/GenOccurencesMatricesChrono.py
       - ./servemodelfastapi/predict.py:/predict.py
+      - ./servemodelfastapi/Drain3Parse.py:/Drain3Parse.py
       - ./servemodelfastapi/data/:/data/
 
   apigateway:

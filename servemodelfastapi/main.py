@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import subprocess
 import time
+import Drain3Parse
 
 app = FastAPI()
 
@@ -39,7 +40,6 @@ def addlog():
 # log_format = '<DateTime>,<Severity>,<EpochTime>,<ErrorType>,<Service>,<EndPoint>,<DataVal1>,<DataVal2>,<Content>'
 @app.post("/addentry")
 def addlogentry(date: str , sever: str, epoch: str, error_type: str, service: str, endpoint: str, data1: str, data2: str, message: str):
-    # logentries.append(LogEntry(DateTime=date, Severity=sever))
     file_path = os.path.join("data", "eventslog.csv")
     # Add new entry in log events for the predictions
     with open(file_path, "a") as file:
@@ -52,6 +52,14 @@ def addlogentry(date: str , sever: str, epoch: str, error_type: str, service: st
         return {"Error": "Events log eventslog.csv not found"}
     
     return {"Status": "Success"}
+
+
+@app.get("/Drain3ParseLearn")
+def Drain3Learn():
+    Drain3Parse.Drain3ParseLearn()
+    return {"Drain3": "Done."}
+
+
 
 @app.get("/brain")
 def brainparse():
