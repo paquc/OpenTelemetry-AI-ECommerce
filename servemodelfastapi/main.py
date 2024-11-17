@@ -5,6 +5,8 @@ import pandas as pd
 import subprocess
 import time
 import Drain3Parse
+import GenOccurencesMatricesChrono as gm
+
 
 app = FastAPI()
 
@@ -59,6 +61,11 @@ def Drain3Learn():
     Drain3Parse.Drain3ParseLearn()
     return {"Drain3": "Done."}
 
+
+@app.get("/GenMatrix")
+def GenMatrix():
+    gm.GenMatrices("apigateway", "apigateway", 1000, 5000, 10, -250)
+    return {"Gen matrices": "Done."}
 
 
 @app.get("/brain")

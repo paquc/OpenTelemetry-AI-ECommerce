@@ -7,19 +7,6 @@ import os
 # Node=an690 for 20M-10-30
 # Node=dn30 for 10M
 
-if len(sys.argv) >= 6:
-    service_name = sys.argv[1]
-    suffix = sys.argv[2]
-    time_window_epoch = int(sys.argv[3])
-    prediction_window_epoch = int(sys.argv[4])
-    moving_window_epoch = int(sys.argv[5])
-    prediction_window_offset_epoch = int(sys.argv[6])
-else:
-    print("Usage: script time_wnd_hours")
-    sys.exit(1)
-
-
-
 def delete_file(file_path):
     # Delete the file output_sequences_file
     if os.path.exists(file_path):
@@ -94,9 +81,9 @@ def print_alarm_types(df_logs, suffix, node_name):
             alarm_tpes_output_file.write(f"\n\n")
 
 
-def GenMatrices():
+def GenMatrices(service_name, suffix, time_window_epoch, prediction_window_epoch, moving_window_epoch, prediction_window_offset_epoch):
 
-    logs_file = f"../training_data/BrainOutpout/AI-ECommerce-Output.csv_structured.csv"  
+    logs_file = f"./data/AI-ECommerce-Learn_structured.csv"  
 
     # Load the log data from the CSV file
     print(f"Processing log file: {logs_file}")
@@ -108,7 +95,7 @@ def GenMatrices():
     file_suffix = f"{suffix}_{service_name}_{time_window_epoch}_{prediction_window_epoch}_{moving_window_epoch}_{prediction_window_offset_epoch}"
     
     # Open the output file in write mode
-    output_sequences_file = f"./output/alarm_sequences_{file_suffix}_chrono.csv"
+    output_sequences_file = f"./data/alarm_sequences_{file_suffix}_chrono.csv"
     with open(output_sequences_file, "w") as sequences_output_file:
 
         print(f"Generating sequences of events within {time_window_epoch} seconds for each entry...")
@@ -219,7 +206,7 @@ def GenMatrices():
 
     #********************************************************************************************************************
     # Écrire les données de la matrice d'occurrences ligne par ligne dans le fichier CSV
-    matrix_output_file_path = f"./output/alarm_occurences_matrix_{file_suffix}_chrono.csv"
+    matrix_output_file_path = f"./data/alarm_occurences_matrix_{file_suffix}_chrono.csv"
 
     # Ouvrir le fichier de sortie en mode écriture
     with open(matrix_output_file_path, 'w') as matrix_output_file:
@@ -248,6 +235,3 @@ def GenMatrices():
     print(f"Deduplicated occurrence matrix saved successfully at {matrix_output_file_path.replace('.csv', '_dedup.csv')}")
 
 
-GenMatrices()
-
-print("COMPLETED - Matrices CHRONO generated successfully!")
