@@ -6,6 +6,7 @@ import subprocess
 import time
 import Drain3Parse
 import GenOccurencesMatricesChrono as gm
+import TrainAlarmsChrono as train
 
 
 app = FastAPI()
@@ -64,62 +65,68 @@ def Drain3Learn():
 
 @app.get("/GenMatrix")
 def GenMatrix():
-    gm.GenMatrices("apigateway", "apigateway", 1000, 5000, 10, -250)
+    gm.GenMatrices("apigateway", "warns", 1000, 500, 10, -250)
     return {"Gen matrices": "Done."}
 
 
-@app.get("/brain")
-def brainparse():
-    data_folder = "data"
-    if not os.path.exists(data_folder):
-        return {"log": "missing"}
-    file_path = os.path.join(data_folder, "eventslog.csv")
-    if not os.path.exists(file_path):
-        return {"log": "missing"}
-    with open(file_path, "a") as file:
-        subprocess.run(["python", "BrainParse.py eventslog.csv"], check=True)
-    return {"log": "created"}
+@app.get("/TrainModels")
+def TrainModels():
+    train.TrainModels(1, 1, "warns", "apigateway", 1000, 500, 10, -250, 0, 1, 70, 30, 0)
+    return {"Train models": "Done."}
+
+
+# @app.get("/brain")
+# def brainparse():
+#     data_folder = "data"
+#     if not os.path.exists(data_folder):
+#         return {"log": "missing"}
+#     file_path = os.path.join(data_folder, "eventslog.csv")
+#     if not os.path.exists(file_path):
+#         return {"log": "missing"}
+#     with open(file_path, "a") as file:
+#         subprocess.run(["python", "BrainParse.py eventslog.csv"], check=True)
+#     return {"log": "created"}
 
 
 # /////////////////////////////////////////////////////////////////////////
 
-class Item(BaseModel):
-    name: str
-    count: int = 0
+# class Item(BaseModel):
+#     name: str
+#     count: int = 0
 
-items = []
+# items = []
 
-items.append(Item(name="apple", count=1))
-items.append(Item(name="orange", count=2))
+# items.append(Item(name="apple", count=1))
+# items.append(Item(name="orange", count=2))
 
-# Usage:
-# curl -X GET 'http://127.0.0.1:8088/'
-@app.get("/")
-def root():
-    return {"Hello": "World"}
-
-
-# Usage:
-# curl -X POST "http://127.0.0.1:8088/additem?itemname=pink&nb=20"
-@app.post("/additem")
-def create_item(itemname: str, nb: int):
-    items.append(Item(name=itemname, count=nb))
-    return {"name": itemname, "count": nb}
+# # Usage:
+# # curl -X GET 'http://127.0.0.1:8088/'
+# @app.get("/")
+# def root():
+#     return {"Hello": "World"}
 
 
-# Usage:
-# curl -X GET 'http://127.0.0.1:8088/items'
-@app.get("/items", response_model=list[Item])
-def list_items(limit: int = 10):
-    return items[0:limit]
+# # Usage:
+# # curl -X POST "http://127.0.0.1:8088/additem?itemname=pink&nb=20"
+# @app.post("/additem")
+# def create_item(itemname: str, nb: int):
+#     items.append(Item(name=itemname, count=nb))
+#     return {"name": itemname, "count": nb}
 
 
-# Usage:
-# curl -X GET http://127.0.0.1:8088/items/3
-@app.get("/items/{item_id}", response_model=Item)
-def get_item(item_id: int) -> Item:
-    if item_id < len(items):
-        return items[item_id]
-    else:
-        raise HTTPException(status_code=404, detail=f"Item {item_id} not found")
+# # Usage:
+# # curl -X GET 'http://127.0.0.1:8088/items'
+# @app.get("/items", response_model=list[Item])
+# def list_items(limit: int = 10):
+#     return items[0:limit]
+
+
+# # Usage:
+# # curl -X GET http://127.0.0.1:8088/items/3
+# @app.get("/items/{item_id}", response_model=Item)
+# def get_item(item_id: int) -> Item:
+#     if item_id < len(items):
+#         return items[item_id]
+#     else:
+#         raise HTTPException(status_code=404, detail=f"Item {item_id} not found")
 

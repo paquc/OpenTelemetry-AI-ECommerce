@@ -17,6 +17,7 @@ services:
       - ./servemodelfastapi/GenOccurencesMatricesChrono.py:/GenOccurencesMatricesChrono.py
       - ./servemodelfastapi/predict.py:/predict.py
       - ./servemodelfastapi/Drain3Parse.py:/Drain3Parse.py
+      - ./servemodelfastapi/TrainAlarmsChrono.py:/TrainAlarmsChrono.py
       - ./servemodelfastapi/data/:/data/
 
   apigateway:
