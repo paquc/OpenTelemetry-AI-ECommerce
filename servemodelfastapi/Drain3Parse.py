@@ -48,7 +48,7 @@ def ParseNewEvent(log_entry):
     global newEvent
 
     # log_entry = "2024-11-15 07:22:10.883,info,1731698530883,OK,apigateway,/userslist,11,,Users list fetched successfully from user-service in 11 ms"
-    print(log_entry)
+    # print(log_entry)
     match = log_pattern.match(log_entry)
     if match:
         log_content = match.group("Content")  # Extract the Content field
@@ -63,13 +63,17 @@ def ParseNewEvent(log_entry):
 
         newItemsCounter += 1
 
-        if newItemsCounter == 10:
+        if newItemsCounter == 100:
             newEvent = pd.DataFrame({
                 'E1': [E1_list],       # Info
                 'E2': [E2_list],       # Warnings
                 'E3': [E3_list]        # Errors
             })
             
+            print("********************************************************")
+            print(newEvent)
+            print("********************************************************")
+
             newDataFrame = newEvent.copy()
             
             newItemsCounter = 0

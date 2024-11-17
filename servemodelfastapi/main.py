@@ -49,9 +49,14 @@ def addlogentry(date: str , sever: str, epoch: str, error_type: str, service: st
     log_entry = date + "," + sever + "," + epoch + "," + error_type + "," + service + "," + endpoint + "," + data1 + "," + data2 + "," + message
     data = Drain3Parse.ParseNewEvent(log_entry)
     if data is not None:
-        predict.RF_Prediction(data)
+        prediction = predict.RF_Prediction(data)
+        if prediction:
+            file_path = os.path.join('data', "alarms.log")
+            with open(file_path, "a") as file:
+                file.write(f"Alarm: " + log_entry + "\n")
+            return {"Alarm": "True"}
          
-    return {"Status": "Success"}
+    return {"Alarm": "False"}
 
 
 @app.get("/Drain3ParseLearn")

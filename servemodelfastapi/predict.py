@@ -35,19 +35,18 @@ def test_RF_Predictions():
 
 def RF_Prediction(data):
     # Load the model
-    print(data)
+    # print(data)
     with open('./data/random_forest_model_warns_apigateway_0.pkl', 'rb') as file:
         model = pickle.load(file)
-
         # Predict
         predictions = model.predict(data)
-        print('****************************************************************************************')
-        print('Random Forest Predictions:')
-        print(predictions)
-        print('****************************************************************************************')
+        if predictions[0] == 1:
+            print("********************************************************")
+            print("Alarm: True")
+            print("********************************************************")
+            return True
 
-    return {"Predictions": predictions}
-
+    return False
 
 
     # # Load the data

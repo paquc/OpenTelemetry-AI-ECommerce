@@ -78,7 +78,7 @@ function listUsers(numberOfUsers, print) {
   if (print)
     console.log(users);
   check(res, { [`contains ${numberOfUsers} users`]: (r) => JSON.parse(r.body).length === numberOfUsers });
-  sleep(randomIntBetween(1, 2));
+  sleep(randomIntBetween(0, 1));
 }
 
 
