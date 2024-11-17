@@ -1,41 +1,76 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import os
+import pandas as pd
+import subprocess
+import time
 
 app = FastAPI()
 
 # uvicorn main:app --reload --host:127.0.0.1 --port:8088
 
-class Item(BaseModel):
-    name: str
-    count: int = 0
+# class LogEntry(BaseModel):
+#     DateTime: str
+#     Severity: str
 
-class LogEntry(BaseModel):
-    DateTime: str
-    Severity: str
+# logentries = []
 
-logentries = []
+def AddHeader():
+    file_path = os.path.join("data", "eventslog.csv")
+    with open(file_path, "a") as file:
+        file.write("DateTime,Severity,EpochTime,ErrorType,Service,EndPoint,DataVal1,DataVal2,Content\n")
+    return {"log": "created"}
+
 
 @app.get("/addlog")
 def addlog():
     data_folder = "data"
     if not os.path.exists(data_folder):
         os.makedirs(data_folder)
-
     file_path = os.path.join(data_folder, "eventslog.csv")
-    open(file_path, "a")
+    if os.path.exists(file_path):
+        return {"log": "already exists"}
+    with open(file_path, "a") as file:
+        file.write("DateTime,Severity,EpochTime,ErrorType,Service,EndPoint,DataVal1,DataVal2,Content\n")
+        #time.sleep(2)
     return {"log": "created"}
 
 
 # log_format = '<DateTime>,<Severity>,<EpochTime>,<ErrorType>,<Service>,<EndPoint>,<DataVal1>,<DataVal2>,<Content>'
 @app.post("/addentry")
 def addlogentry(date: str , sever: str, epoch: str, error_type: str, service: str, endpoint: str, data1: str, data2: str, message: str):
-    logentries.append(LogEntry(DateTime=date, Severity=sever))
+    # logentries.append(LogEntry(DateTime=date, Severity=sever))
     file_path = os.path.join("data", "eventslog.csv")
+    # Add new entry in log events for the predictions
     with open(file_path, "a") as file:
         file.write(f"{date},{sever},{epoch},{error_type},{service},{endpoint},{data1},{data2},{message}\n")
-    return {"DateTime": date, "Severity": sever}
+    
+    if os.path.exists(file_path):
+        df = pd.read_csv(file_path)
+      
+    else:
+        return {"Error": "Events log eventslog.csv not found"}
+    
+    return {"Status": "Success"}
 
+@app.get("/brain")
+def brainparse():
+    data_folder = "data"
+    if not os.path.exists(data_folder):
+        return {"log": "missing"}
+    file_path = os.path.join(data_folder, "eventslog.csv")
+    if not os.path.exists(file_path):
+        return {"log": "missing"}
+    with open(file_path, "a") as file:
+        subprocess.run(["python", "BrainParse.py eventslog.csv"], check=True)
+    return {"log": "created"}
+
+
+# /////////////////////////////////////////////////////////////////////////
+
+class Item(BaseModel):
+    name: str
+    count: int = 0
 
 items = []
 

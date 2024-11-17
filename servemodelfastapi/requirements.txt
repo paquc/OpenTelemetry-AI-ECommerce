@@ -11,3 +11,4 @@ tiktoken
 uvicorn[standard]==0.32.0
 gunicorn==23.0.0
 fastapi[all]==0.115.4
+drain3

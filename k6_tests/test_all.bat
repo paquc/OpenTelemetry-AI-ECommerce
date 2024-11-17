@@ -1,6 +1,6 @@
 :: SMOKE TEST
 set TEST_TYPE=1
-set TEST_DURATION=1s
+set TEST_DURATION=3s
 set NUMBER_OF_USERS=5
 k6 run .\get_users.js 
 

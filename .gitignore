@@ -11,3 +11,6 @@ Brain/
 logparser/
 parsing/output/
 parsing/training/
+*.pyc
+servemodelfastapi/data/
+*.bin

@@ -2,8 +2,7 @@
 FROM python:3.9-slim
 
 ADD requirements.txt .
-ADD setup.py .
-# ADD main.py .
+ADD *.py .
 
 RUN pip3 install -r requirements.txt
 

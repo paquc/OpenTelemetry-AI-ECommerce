@@ -13,6 +13,9 @@ services:
           memory: 64g  
     volumes:
       - ./servemodelfastapi/main.py:/main.py
+      - ./servemodelfastapi/BrainParse.py:/BrainParse.py
+      - ./servemodelfastapi/GenOccurencesMatricesChrono.py:/GenOccurencesMatricesChrono.py
+      - ./servemodelfastapi/predict.py:/predict.py
       - ./servemodelfastapi/data/:/data/
 
   apigateway:
