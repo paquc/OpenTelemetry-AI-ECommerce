@@ -24,6 +24,70 @@ log_pattern = re.compile(
         r"(?P<Content>.*)"                                    # Message: Log message
     )
 
+# 1. New log entry comes-in: 2024-11-15 07:22:10.883,info,1731698530883,OK,apigateway,/userslist,11,,Users list fetched successfully from user-service in 11 ms
+# 2. Add log message to Drain3 parser: 0,2024-11-15 07:22:10.883,info,1731698530883,OK,apigateway,/userslist,11,,Users list fetched successfully from user-service in 11 ms,E1,Users list fetched successfully from user-service in <*> ms
+
+ # Create a pandas DataFrame
+newEvent = pd.DataFrame({
+    'E1': [],       # Info
+    'E2': [],       # Warnings
+    'E3': []        # Errors
+})
+# newEvent = newEvent.append({'E1': 100, 'E2': None, 'E3': None}, ignore_index=True)
+
+newItemsCounter = 0
+E1_list = 0
+E2_list = 0
+E3_list = 0
+
+def ParseNewEvent(log_entry):
+    global E1_list
+    global E2_list
+    global E3_list
+    global newItemsCounter
+    global newEvent
+
+    # log_entry = "2024-11-15 07:22:10.883,info,1731698530883,OK,apigateway,/userslist,11,,Users list fetched successfully from user-service in 11 ms"
+    print(log_entry)
+    match = log_pattern.match(log_entry)
+    if match:
+        log_content = match.group("Content")  # Extract the Content field
+        result = drain_parser.add_log_message(log_content)  # Add the log message to the Drain3 parser to continue training while receiving new log entries
+        result = drain_parser.match(log_content)
+        if result.cluster_id == 1:
+            E1_list += 1
+        if result.cluster_id == 2:
+            E2_list += 1
+        if result.cluster_id == 3:
+            E3_list += 1
+
+        newItemsCounter += 1
+
+        if newItemsCounter == 10:
+            newEvent = pd.DataFrame({
+                'E1': [E1_list],       # Info
+                'E2': [E2_list],       # Warnings
+                'E3': [E3_list]        # Errors
+            })
+            
+            newDataFrame = newEvent.copy()
+            
+            newItemsCounter = 0
+            E1_list = 0
+            E2_list = 0
+            E3_list = 0
+
+            newEvent = pd.DataFrame({
+                'E1': [],       # Info
+                'E2': [],       # Warnings
+                'E3': []        # Errors
+            })
+
+            return newDataFrame
+
+    return None
+
+
 
 def Drain3ParseLearn():
 

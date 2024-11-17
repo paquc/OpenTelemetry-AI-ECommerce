@@ -249,7 +249,7 @@ def TrainModels(train_LR, train_RF, suffix, service_name, window_size, predictio
 
 
                 # Assume `model` is your trained model
-                with open(f'random_forest_model_{suffix}_{service_name}_{bs_index}.pkl', 'wb') as file:
+                with open(f'./data/random_forest_model_{suffix}_{service_name}_{bs_index}.pkl', 'wb') as file:
                     pickle.dump(model, file)
 
 
@@ -271,7 +271,7 @@ def TrainModels(train_LR, train_RF, suffix, service_name, window_size, predictio
                 get_model_evaluation(y_train, y_train_pred, f'Linear Regression Classifier - TRAIN DATA', LR_log_file, -1, randomize_val, model, X_train, False)
 
                 # Assume `model` is your trained model
-                with open(f'linear_regression_model_{suffix}_{service_name}_{bs_index}.pkl', 'wb') as file:
+                with open(f'./data/linear_regression_model_{suffix}_{service_name}_{bs_index}.pkl', 'wb') as file:
                     pickle.dump(model, file)
 
         print(f"RF log file: {RF_log_file.name}")

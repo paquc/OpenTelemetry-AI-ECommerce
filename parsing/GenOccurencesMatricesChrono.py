@@ -7,17 +7,17 @@ import os
 # Node=an690 for 20M-10-30
 # Node=dn30 for 10M
 
-if len(sys.argv) >= 6:
+if len(sys.argv) >= 7:
     service_name = sys.argv[1]
     suffix = sys.argv[2]
     time_window_epoch = int(sys.argv[3])
     prediction_window_epoch = int(sys.argv[4])
     moving_window_epoch = int(sys.argv[5])
     prediction_window_offset_epoch = int(sys.argv[6])
+    aggregated_alarms_TH = int(sys.argv[7])
 else:
     print("Usage: script time_wnd_hours")
     sys.exit(1)
-
 
 
 def delete_file(file_path):
@@ -27,6 +27,7 @@ def delete_file(file_path):
         print(f"File {file_path} deleted successfully.")
     else:
         print(f"File {file_path} does not exist.")
+
 
 def remove_duplicates(file_path, output_path=None):
     # Load the file
@@ -117,7 +118,6 @@ def GenMatrices():
         # print_alarm_types(df_logs, suffix, node_name)
         # sys.exit(0)
         
-        aggregated_alarms_TH = 2
         search_counter = 0
         
         window_box_sequence_start_time_epoch = df_logs.iloc[0]['EpochTime']

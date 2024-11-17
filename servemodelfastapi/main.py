@@ -7,6 +7,7 @@ import time
 import Drain3Parse
 import GenOccurencesMatricesChrono as gm
 import TrainAlarmsChrono as train
+import predict
 
 
 app = FastAPI()
@@ -43,17 +44,13 @@ def addlog():
 # log_format = '<DateTime>,<Severity>,<EpochTime>,<ErrorType>,<Service>,<EndPoint>,<DataVal1>,<DataVal2>,<Content>'
 @app.post("/addentry")
 def addlogentry(date: str , sever: str, epoch: str, error_type: str, service: str, endpoint: str, data1: str, data2: str, message: str):
-    file_path = os.path.join("data", "eventslog.csv")
-    # Add new entry in log events for the predictions
-    with open(file_path, "a") as file:
-        file.write(f"{date},{sever},{epoch},{error_type},{service},{endpoint},{data1},{data2},{message}\n")
     
-    if os.path.exists(file_path):
-        df = pd.read_csv(file_path)
-      
-    else:
-        return {"Error": "Events log eventslog.csv not found"}
-    
+    # log_entry = "2024-11-15 07:22:10.883,info,1731698530883,OK,apigateway,/userslist,11,,Users list fetched successfully from user-service in 11 ms"
+    log_entry = date + "," + sever + "," + epoch + "," + error_type + "," + service + "," + endpoint + "," + data1 + "," + data2 + "," + message
+    data = Drain3Parse.ParseNewEvent(log_entry)
+    if data is not None:
+        predict.RF_Prediction(data)
+         
     return {"Status": "Success"}
 
 
@@ -65,15 +62,20 @@ def Drain3Learn():
 
 @app.get("/GenMatrix")
 def GenMatrix():
-    gm.GenMatrices("apigateway", "warns", 1000, 500, 10, -250)
+    gm.GenMatrices("apigateway", "warns", 500, 500, 10, -500, 10)
     return {"Gen matrices": "Done."}
 
 
 @app.get("/TrainModels")
 def TrainModels():
-    train.TrainModels(1, 1, "warns", "apigateway", 1000, 500, 10, -250, 0, 1, 70, 30, 0)
+    train.TrainModels(1, 1, "warns", "apigateway", 500, 500, 10, -500, 0, 1, 70, 30, 0)
     return {"Train models": "Done."}
 
+
+@app.get("/Predict")
+def Predict():
+    predict.test_RF_Predictions()
+    return {"Predict": "Done."}
 
 # @app.get("/brain")
 # def brainparse():

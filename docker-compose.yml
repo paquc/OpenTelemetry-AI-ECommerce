@@ -18,6 +18,7 @@ services:
       - ./servemodelfastapi/predict.py:/predict.py
       - ./servemodelfastapi/Drain3Parse.py:/Drain3Parse.py
       - ./servemodelfastapi/TrainAlarmsChrono.py:/TrainAlarmsChrono.py
+      - ./servemodelfastapi/AI-ECommerce-Learn.csv:/AI-ECommerce-Learn.csv
       - ./servemodelfastapi/data/:/data/
 
   apigateway:

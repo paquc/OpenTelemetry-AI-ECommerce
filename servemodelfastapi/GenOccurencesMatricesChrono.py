@@ -81,7 +81,7 @@ def print_alarm_types(df_logs, suffix, node_name):
             alarm_tpes_output_file.write(f"\n\n")
 
 
-def GenMatrices(service_name, suffix, time_window_epoch, prediction_window_epoch, moving_window_epoch, prediction_window_offset_epoch):
+def GenMatrices(service_name, suffix, time_window_epoch, prediction_window_epoch, moving_window_epoch, prediction_window_offset_epoch, aggregated_alarms_TH):
 
     logs_file = f"./data/AI-ECommerce-Learn_structured.csv"  
 
@@ -104,7 +104,6 @@ def GenMatrices(service_name, suffix, time_window_epoch, prediction_window_epoch
         # print_alarm_types(df_logs, suffix, node_name)
         # sys.exit(0)
         
-        aggregated_alarms_TH = 2
         search_counter = 0
         
         window_box_sequence_start_time_epoch = df_logs.iloc[0]['EpochTime']

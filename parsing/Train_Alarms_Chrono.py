@@ -235,8 +235,8 @@ with open(RF_output_file, "w") as RF_log_file, open(LR_output_file, "w") as LR_l
 
 
             # Assume `model` is your trained model
-            #with open(f'random_forest_model_{suffix}_{node_name}_{bs_index}.pkl', 'wb') as file:
-            #    pickle.dump(model, file)
+            with open(f'./training/random_forest_model_{suffix}_{service_name}_{bs_index}.pkl', 'wb') as file:
+                pickle.dump(model, file)
 
 
         if train_LR == 1:
@@ -256,11 +256,9 @@ with open(RF_output_file, "w") as RF_log_file, open(LR_output_file, "w") as LR_l
             y_train_pred = model.predict(X_train)
             get_model_evaluation(y_train, y_train_pred, f'Linear Regression Classifier - TRAIN DATA', LR_log_file, -1, randomize_val, model, X_train, False)
 
-            
-
             # Assume `model` is your trained model
-            #with open(f'linear_regression_model_{suffix}_{node_name}_{bs_index}.pkl', 'wb') as file:
-            #    pickle.dump(model, file)
+            with open(f'./training/linear_regression_model_{suffix}_{service_name}_{bs_index}.pkl', 'wb') as file:
+                pickle.dump(model, file)
 
 
 
