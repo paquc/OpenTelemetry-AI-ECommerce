@@ -5,11 +5,6 @@ import re
 import pandas as pd
 from drain3.file_persistence import FilePersistence
 
-persistence = FilePersistence("./data/drain3_state.bin")
-config = TemplateMinerConfig()
-
-# Step 1: Train Drain model on training log data
-drain_parser = TemplateMiner(persistence, config=config)
 
 log_pattern = re.compile(
         r"(?P<Date>\d{4}-\d{2}-\d{2})\s"                      # Date: yyyy-mm-dd
@@ -46,6 +41,12 @@ def ParseNewEvent(log_entry):
     global E3_list
     global newItemsCounter
     global newEvent
+
+    config = TemplateMinerConfig()
+
+    # Step 1: Train Drain model on training log data
+    persistence = FilePersistence("./data/drain3_state.bin")
+    drain_parser = TemplateMiner(persistence, config=config)
 
     # log_entry = "2024-11-15 07:22:10.883,info,1731698530883,OK,apigateway,/userslist,11,,Users list fetched successfully from user-service in 11 ms"
     # print(log_entry)
@@ -87,6 +88,7 @@ def ParseNewEvent(log_entry):
                 'E3': []        # Errors
             })
 
+            # newDataFrame = newDataFrame.drop(columns=['E1'])
             return newDataFrame
 
     return None
@@ -95,8 +97,14 @@ def ParseNewEvent(log_entry):
 
 def Drain3ParseLearn():
 
+    config = TemplateMinerConfig()
+
+    # Step 1: Train Drain model on training log data
+    persistence = FilePersistence("./data/drain3_state.bin")
+    drain_parser = TemplateMiner(persistence, config=config)
+
     # Train Drain3
-    with open('AI-ECommerce-Learn.csv', 'r') as log_file:
+    with open('AI-ECommerce-Output.csv', 'r') as log_file:
         for line in log_file:
             # Remove any leading/trailing whitespace from the line
             line = line.strip()
@@ -108,7 +116,7 @@ def Drain3ParseLearn():
     log_data = []
 
     # Parse the log file and extract the log fields in inference mode
-    with open('AI-ECommerce-Learn.csv', 'r') as log_file:
+    with open('AI-ECommerce-Output.csv', 'r') as log_file:
         for log in log_file:
             match = log_pattern.match(log)
             if match:

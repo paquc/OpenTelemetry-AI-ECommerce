@@ -59,24 +59,27 @@ def addlogentry(date: str , sever: str, epoch: str, error_type: str, service: st
     return {"Alarm": "False"}
 
 
+# curl -X GET 'http://127.0.0.1:8088/Drain3ParseLearn'
 @app.get("/Drain3ParseLearn")
 def Drain3Learn():
     Drain3Parse.Drain3ParseLearn()
     return {"Drain3": "Done."}
 
 
+# curl -X GET 'http://127.0.0.1:8088/GenMatrix'
 @app.get("/GenMatrix")
 def GenMatrix():
     gm.GenMatrices("apigateway", "warns", 500, 500, 10, -500, 10)
     return {"Gen matrices": "Done."}
 
 
+# curl -X GET 'http://127.0.0.1:8088/TrainModels'
 @app.get("/TrainModels")
 def TrainModels():
     train.TrainModels(1, 1, "warns", "apigateway", 500, 500, 10, -500, 0, 1, 70, 30, 0)
     return {"Train models": "Done."}
 
-
+# curl -X GET 'http://127.0.0.1:8088/Predict'
 @app.get("/Predict")
 def Predict():
     predict.test_RF_Predictions()

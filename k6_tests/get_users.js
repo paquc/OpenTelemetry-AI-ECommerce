@@ -39,7 +39,7 @@ if (testType === 3) {
       stages: [
         { duration: rampUpPeriod, target: rampTarget },   // fast ramp-up to a high point
         // No plateau
-        { duration: '1m', target: 0 },      // quick ramp-down to 0 users
+        { duration: '5s', target: 0 },      // quick ramp-down to 0 users
       ],
     };
 }
@@ -78,7 +78,7 @@ function listUsers(numberOfUsers, print) {
   if (print)
     console.log(users);
   check(res, { [`contains ${numberOfUsers} users`]: (r) => JSON.parse(r.body).length === numberOfUsers });
-  sleep(randomIntBetween(0, 1));
+  // sleep(randomIntBetween(0, 1));
 }
 
 

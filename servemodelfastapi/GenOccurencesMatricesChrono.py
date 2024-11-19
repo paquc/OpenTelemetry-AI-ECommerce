@@ -131,13 +131,15 @@ def GenMatrices(service_name, suffix, time_window_epoch, prediction_window_epoch
 
                 # Filter the prediction DataFrame to keep only rows where 'Severity' is 'warn' for the desired service
                 prediction_warn_service_df = prediction_df.loc[(prediction_df['Severity'] == 'warn') & (prediction_df['Service'] == service_name)]
+                prediction_errors_service_df = prediction_df.loc[(prediction_df['Severity'] == 'error') & (prediction_df['Service'] == service_name)]
                 #print(f"Number of warnings alarms for node {service_name} in prediction box: {prediction_warn_service_df.shape[0]}")
 
                 # Count the number of alarms in the prediction window (shape() returns a tuple of (num_rows, num_columns))
                 num_warns_service_alarms = prediction_warn_service_df.shape[0]
+                num_errors_service_alarms = prediction_errors_service_df.shape[0]
 
                 # There is an alarm if the number of warnings is greater than the threshold
-                if num_warns_service_alarms >= aggregated_alarms_TH:
+                if num_warns_service_alarms >= aggregated_alarms_TH or num_errors_service_alarms >= 1:
                     is_alarm = 1
                     print(f"ALARM: Alarms detected: {num_warns_service_alarms} alarms.")
                     search_counter = 0
@@ -153,6 +155,8 @@ def GenMatrices(service_name, suffix, time_window_epoch, prediction_window_epoch
                 # Filter out all events corresponfig to service in window box for sequence
                 window_box_sequences_events_df = window_box_sequence_data[0]
                 window_box_sequences_node_events_df = window_box_sequences_events_df.loc[window_box_sequences_events_df['Service'] == service_name]   
+                # Drop rows where 'Severity' is 'info'
+                # window_box_sequences_node_events_df = window_box_sequences_node_events_df[window_box_sequences_node_events_df['Severity'] != 'info']
 
                 # Generate a sequence of EventIds within the sequence window box
                 sequence_events = ','.join(window_box_sequences_node_events_df['EventId'].tolist())
