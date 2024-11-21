@@ -3,6 +3,7 @@ import { check, sleep } from 'k6';
 import { randomIntBetween } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
 
 const testDuration = __ENV.TEST_DURATION;
+const sleep_duration = __ENV.TEST_SLEEP_DURATION;
 const numberOfUsers = __ENV.NUMBER_OF_USERS;
 const testType = parseInt(__ENV.TEST_TYPE, 10);
 
@@ -78,7 +79,7 @@ function listUsers(numberOfUsers, print) {
   if (print)
     console.log(users);
   check(res, { [`contains ${numberOfUsers} users`]: (r) => JSON.parse(r.body).length === numberOfUsers });
-  // sleep(randomIntBetween(0, 1));
+  sleep(randomIntBetween(0, sleep_duration));
 }
 
 

@@ -17,6 +17,10 @@ def split_and_aggregate_by_cluster(df, time_interval, error_threshold, anomaly_c
     print(f"Cluster counts: {cluster_counts.shape}")
     print(cluster_counts)
 
+    cluster_counts_tmp = cluster_counts.copy()
+    cluster_counts_tmp.reset_index(inplace=True)
+    cluster_counts_tmp.to_csv(f"./data/cluster_counts.csv")
+
     # Initialize an empty column for the anomaly label
     cluster_counts['IsAlarm'] = '0'
 

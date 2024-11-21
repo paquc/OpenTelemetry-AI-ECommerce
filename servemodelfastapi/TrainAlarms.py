@@ -153,9 +153,11 @@ def get_model_evaluation(y_test, y_pred, model_name, log_file, estimators, rando
 def TrainModels(train_LR, train_RF, use_bootstrap, n_bootstrap_samples, train_data_size, test_data_size, val_data_size):
 
     # Charger la matrice d'occurrence
-    # input_file_path = f"./data/occurences_matrix_preprocessed.csv"
-    input_file_path = f"./data/alarm_occurences_matrix_final.csv"
+    input_file_path = f"./data/occurences_matrix_preprocessed.csv"
+    # input_file_path = f"./data/alarm_occurences_matrix_final.csv"
 
+    print(f"Loading data from: {input_file_path}")
+    
     full_data = pd.read_csv(input_file_path)
 
     sampling_data_desc = f'{train_data_size}_{test_data_size}_{val_data_size}'
