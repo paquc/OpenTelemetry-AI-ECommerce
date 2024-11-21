@@ -81,7 +81,7 @@ def print_alarm_types(df_logs, suffix, node_name):
             alarm_tpes_output_file.write(f"\n\n")
 
 
-def GenMatrices(service_name, suffix, time_window_epoch, prediction_window_epoch, moving_window_epoch, prediction_window_offset_epoch, aggregated_alarms_TH):
+def GenMatrices(service_name, suffix, time_window_epoch, prediction_window_epoch, moving_window_epoch, prediction_window_offset_epoch, aggregated_alarms_TH, alarm_clusters):
 
     logs_file = f"./data/AI-ECommerce-Learn_structured.csv"  
 
@@ -95,7 +95,7 @@ def GenMatrices(service_name, suffix, time_window_epoch, prediction_window_epoch
     file_suffix = f"{suffix}_{service_name}_{time_window_epoch}_{prediction_window_epoch}_{moving_window_epoch}_{prediction_window_offset_epoch}"
     
     # Open the output file in write mode
-    output_sequences_file = f"./data/alarm_sequences_{file_suffix}_chrono.csv"
+    output_sequences_file = f"./data/alarm_sequences.csv"
     with open(output_sequences_file, "w") as sequences_output_file:
 
         print(f"Generating sequences of events within {time_window_epoch} seconds for each entry...")
@@ -209,7 +209,7 @@ def GenMatrices(service_name, suffix, time_window_epoch, prediction_window_epoch
 
     #********************************************************************************************************************
     # Écrire les données de la matrice d'occurrences ligne par ligne dans le fichier CSV
-    matrix_output_file_path = f"./data/alarm_occurences_matrix_{file_suffix}_chrono.csv"
+    matrix_output_file_path = f"./data/alarm_occurences_matrix.csv"
 
     # Ouvrir le fichier de sortie en mode écriture
     with open(matrix_output_file_path, 'w') as matrix_output_file:
@@ -236,5 +236,12 @@ def GenMatrices(service_name, suffix, time_window_epoch, prediction_window_epoch
     remove_duplicates(matrix_output_file_path, matrix_output_file_path.replace(".csv", "_dedup.csv"))
     delete_file(matrix_output_file_path)
     print(f"Deduplicated occurrence matrix saved successfully at {matrix_output_file_path.replace('.csv', '_dedup.csv')}")
+
+    matrix = pd.read_csv(f"./data/alarm_occurences_matrix_dedup.csv", header=0)
+    if alarm_clusters:
+        matrix.drop(columns=alarm_clusters, inplace=True)
+        matrix.to_csv(f"./data/alarm_occurences_matrix_final.csv", index=False)
+
+
 
 

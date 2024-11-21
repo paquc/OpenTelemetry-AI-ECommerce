@@ -67,50 +67,6 @@ function logEventMessage(message, severity) {
   console.log(`${severity} : ${message}`); 
 };
 
-// async function pingserver() {
-//   // This logs a message to the console every time the function runs, indicating that a 'ping' is being sent
-//   logEventMessage('PINNING goalshumanityservice', severity_trace);
-//   logEventMessage(DESTINATION_URL, severity_trace);
-  
-//   logEventMessage(`LATENCE_SIMULATOR is set to ${process.env.LATENCE_SIMULATOR}`, simulation_trace);
-//   if(process.env.LATENCE_SIMULATOR === 'ON')
-//   {
-//     logEventMessage('LATENCE_SIMULATOR is set to ON', simulation_trace);
-//     await sleep(process.env.LATENCE_SIMULATOR_DELAY);  // Simulation delay
-//   }
-
-//   try{
-//     // An HTTP GET request is made to the destination URL (DESTINATION_URL)
-//     http.get(DESTINATION_URL, (resp) => {
-//         let data = '';
-
-//         // When data is received from the HTTP response, this event handler is called.
-//         // The 'data' event is triggered multiple times if the response is large, and 
-//         // each chunk is appended to the 'data' variable.
-//         resp.on('data', (chunk) => {
-//             data += chunk;
-//         });
-
-//         // The 'end' event is triggered when all the data has been received (the response is complete).
-//         // This logs the full response content to the console once it's fully retrieved.
-//         resp.on('end', () => {
-//             console.log(`recv: ${data}`);
-//         });
-
-//         // The 'error' event is triggered if there is an issue during the HTTP request, such as network errors.
-//         // This logs the error message to the console.
-//         resp.on('error', (err) => {
-//             errors.errorsCounter.add(1);
-//             console.log('Error: ' + err.message);
-//         });
-//     }); 
-//   }
-//   catch (err) {
-//     errors.errorsCounter.add(1);
-//     logEventMessage('ERROR sending ping request to goalshumanityserver', severity_error);
-//     logEventMessage(err, severity_error);
-//   }
-// }
 
 app.get('/', (req, res) => {
   res.send('running...');
@@ -123,8 +79,11 @@ app.get('/userslist', function(req, res) {
   userRequester.send({type: 'list'}, function(err, users) {
       const endTime = Date.now();
       const duration = endTime - startTime;
-
       const currentTimeUnix = Date.now();
+
+      // 
+      const min_value = 200;
+      const max_value = 300;
 
       if(err) {
         const msg = `${currentTimeUnix},${ERROR_FAIL},${SOURCE_SERVICE},${API_ENDPOINT},${err},,Error fetching users list from user-service: code ${err}`;
@@ -132,13 +91,13 @@ app.get('/userslist', function(req, res) {
         res.status(500).send('Error fetching users list');
       }
       else {
-        if (duration < 300) {
+        if (duration < min_value) {
           const msg = `${currentTimeUnix},${ERROR_NONE},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Users list fetched successfully from user-service in ${duration} ms`;
           logger.info(msg);
-        } else if (duration >= 300 && duration < 500) {
+        } else if (duration >= min_value && duration < max_value) {
           const slowMsg = `${currentTimeUnix},${ERROR_DELAY},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Fetching users list took longer than expected (max=300ms): ${duration} ms`;
           logger.warn(slowMsg);
-        } else if (duration >= 500) {
+        } else if (duration >= max_value) {
           const slowMsg = `${currentTimeUnix},${ERROR_DELAY},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Fetching users list took too much time according the customer SLA (max=500ms): ${duration} ms`;
           logger.error(slowMsg);
         }
@@ -148,16 +107,6 @@ app.get('/userslist', function(req, res) {
       }
   });
 });
-
-// app.get('/pingbridgeserver', async (req, res) => {
-//   console.log(req.rawHeaders);
-//   logEventMessage(req.rawHeaders, severity_debug);
-  
-//   await pingserver();
-//   res.status(200).json({ message: 'goalsbridgeserver container present' }); 
-// });
-// logger.log('verbose', JSON.stringify(users, null, 2))
-// console.log(JSON.stringify(users, null, 2));
 
 errors.errorsCounter.add(0);
 

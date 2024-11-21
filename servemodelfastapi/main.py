@@ -6,7 +6,7 @@ import subprocess
 import time
 import Drain3Parse
 import GenOccurencesMatricesChrono as gm
-import TrainAlarmsChrono as train
+import TrainAlarms as train
 import PreprocessData as gmV2
 import predict
 
@@ -45,9 +45,9 @@ def addlog():
 # log_format = '<DateTime>,<Severity>,<EpochTime>,<ErrorType>,<Service>,<EndPoint>,<DataVal1>,<DataVal2>,<Content>'
 @app.post("/addentry")
 def addlogentry(date: str , sever: str, epoch: str, error_type: str, service: str, endpoint: str, data1: str, data2: str, message: str):
-    # log_entry = "2024-11-15 07:22:10.883,info,1731698530883,OK,apigateway,/userslist,11,,Users list fetched successfully from user-service in 11 ms"
     log_entry = date + "," + sever + "," + epoch + "," + error_type + "," + service + "," + endpoint + "," + data1 + "," + data2 + "," + message
-    data = Drain3Parse.ParseNewEvent(log_entry)
+    alarm_clusters = ['E3']
+    data = Drain3Parse.ParseNewEvent(log_entry, alarm_clusters)
     if data is not None:
         prediction = predict.RF_Prediction(data)
         if prediction:
@@ -69,21 +69,22 @@ def Drain3Learn():
 # curl -X GET 'http://127.0.0.1:8088/GenMatrix'
 @app.get("/GenMatrix")
 def GenMatrix():
-    gm.GenMatrices("apigateway", "warns", 500, 500, 10, -500, 10)
+    alarm_clusters = ['E3']
+    gm.GenMatrices("apigateway", "warns", 500, 500, 10, -500, 10, alarm_clusters)
     return {"Gen matrices": "Done."}
 
 
 # curl -X GET 'http://127.0.0.1:8088/GenMatrix'
 @app.get("/GenMatrixV2")
 def GenMatrixV2():
-    gmV2.GenMatricesV2('5min', 10)
+    gmV2.GenMatricesV2('2S', 10)
     return {"Gen matrices V2": "Done."}
 
 
 # curl -X GET 'http://127.0.0.1:8088/TrainModels'
 @app.get("/TrainModels")
 def TrainModels():
-    train.TrainModels(1, 1, "warns", "apigateway", 500, 500, 10, -500, 0, 1, 70, 30, 0)
+    train.TrainModels(1, 1, 0, 1, 70, 30, 0)
     return {"Train models": "Done."}
 
 

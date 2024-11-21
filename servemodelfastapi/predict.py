@@ -16,14 +16,13 @@ from sklearn.utils import resample
 
 def test_RF_Predictions():
     # Load the model
-    with open('./data/random_forest_model_warns_apigateway_0.pkl', 'rb') as file:
+    with open('./data/random_forest_model_0.pkl', 'rb') as file:
         model = pickle.load(file)
 
         # Create a pandas DataFrame
         data = pd.DataFrame({
             'E1': [100, 98, 94, 28, 200, 22, 0, 500],       # Info
             'E2': [0, 0, 0, 153, 200, 19, 0, 25],           # Warnings
-            'E3': [0, 0, 0, 0, 0, 832, 2, 0]                # Errors
         })
 
         # Predict
@@ -36,7 +35,7 @@ def test_RF_Predictions():
 def RF_Prediction(data):
     # Load the model
     # print(data)
-    with open('./data/random_forest_model_warns_apigateway_0.pkl', 'rb') as file:
+    with open('./data/random_forest_model_0.pkl', 'rb') as file:
         model = pickle.load(file)
         # Predict
         predictions = model.predict(data)
@@ -49,15 +48,4 @@ def RF_Prediction(data):
     return False
 
 
-    # # Load the data
-    # data = pd.read_csv('data/eventslog.csv')
-    # # Prepare the data
-    # data['DateTime'] = pd.to_datetime(data['DateTime'])
-    # data['EpochTime'] = pd.to_datetime(data['EpochTime'])
-    # data['ErrorType'] = pd.to_datetime(data['ErrorType'])
-    # data['Service'] = pd.to_datetime(data['Service'])
-    # data['EndPoint'] = pd.to_datetime(data['EndPoint'])
-    # data['DataVal1'] = pd.to_datetime(data['DataVal1'])
-    # data['DataVal2'] = pd.to_datetime(data['DataVal2'])
-    # data['Content'] = pd.to_datetime(data['Content'])
     

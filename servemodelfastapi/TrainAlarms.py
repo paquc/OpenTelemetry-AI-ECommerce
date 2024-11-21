@@ -150,33 +150,18 @@ def get_model_evaluation(y_test, y_pred, model_name, log_file, estimators, rando
     log_file.write("------------------------------------\n\n")
 
 
-#   train_LR = int(sys.argv[1])
-#     train_RF = int(sys.argv[2])
-#     suffix = sys.argv[3]
-#     service_name = sys.argv[4]
-#     window_size = int(sys.argv[5])
-#     prediction_window = int(sys.argv[6])
-#     sliding_window = int(sys.argv[7])
-#     prediction_window_offset_epoch = int(sys.argv[8])
-#     use_bootstrap = int(sys.argv[9])
-#     n_bootstrap_samples = int(sys.argv[10])
-#     train_data_size = int(sys.argv[11])
-#     test_data_size = int(sys.argv[12])
-#     val_data_size = int(sys.argv[13])
-
-def TrainModels(train_LR, train_RF, suffix, service_name, window_size, prediction_window, sliding_window, prediction_window_offset_epoch, use_bootstrap, n_bootstrap_samples, train_data_size, test_data_size, val_data_size):
-
-    file_suffix = f"{suffix}_{service_name}_{window_size}_{prediction_window}_{sliding_window}_{prediction_window_offset_epoch}"    
+def TrainModels(train_LR, train_RF, use_bootstrap, n_bootstrap_samples, train_data_size, test_data_size, val_data_size):
 
     # Charger la matrice d'occurrence
-    input_file_path = f"./data/alarm_occurences_matrix_{file_suffix}_chrono_dedup.csv"
+    # input_file_path = f"./data/occurences_matrix_preprocessed.csv"
+    input_file_path = f"./data/alarm_occurences_matrix_final.csv"
 
     full_data = pd.read_csv(input_file_path)
 
     sampling_data_desc = f'{train_data_size}_{test_data_size}_{val_data_size}'
 
-    RF_output_file = f"./data/training_RF_{sampling_data_desc}_{file_suffix}_Output.log"
-    LR_output_file = f"./data/training_LR_{sampling_data_desc}_{file_suffix}_Output.log"
+    RF_output_file = f"./data/training_RF_{sampling_data_desc}_Output.log"
+    LR_output_file = f"./data/training_LR_{sampling_data_desc}_Output.log"
 
     with open(RF_output_file, "w") as RF_log_file, open(LR_output_file, "w") as LR_log_file:
         for bs_index in range(n_bootstrap_samples):
@@ -249,7 +234,7 @@ def TrainModels(train_LR, train_RF, suffix, service_name, window_size, predictio
 
 
                 # Assume `model` is your trained model
-                with open(f'./data/random_forest_model_{suffix}_{service_name}_{bs_index}.pkl', 'wb') as file:
+                with open(f'./data/random_forest_model_{bs_index}.pkl', 'wb') as file:
                     pickle.dump(model, file)
 
 
@@ -271,7 +256,7 @@ def TrainModels(train_LR, train_RF, suffix, service_name, window_size, predictio
                 get_model_evaluation(y_train, y_train_pred, f'Linear Regression Classifier - TRAIN DATA', LR_log_file, -1, randomize_val, model, X_train, False)
 
                 # Assume `model` is your trained model
-                with open(f'./data/linear_regression_model_{suffix}_{service_name}_{bs_index}.pkl', 'wb') as file:
+                with open(f'./data/linear_regression_model_{bs_index}.pkl', 'wb') as file:
                     pickle.dump(model, file)
 
         print(f"RF log file: {RF_log_file.name}")

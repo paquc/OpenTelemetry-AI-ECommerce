@@ -35,7 +35,7 @@ E1_list = 0
 E2_list = 0
 E3_list = 0
 
-def ParseNewEvent(log_entry):
+def ParseNewEvent(log_entry, alarm_clusters):
     global E1_list
     global E2_list
     global E3_list
@@ -64,7 +64,7 @@ def ParseNewEvent(log_entry):
 
         newItemsCounter += 1
 
-        if newItemsCounter == 100:
+        if newItemsCounter == 500:
             newEvent = pd.DataFrame({
                 'E1': [E1_list],       # Info
                 'E2': [E2_list],       # Warnings
@@ -89,6 +89,10 @@ def ParseNewEvent(log_entry):
             })
 
             # newDataFrame = newDataFrame.drop(columns=['E1'])
+            if alarm_clusters:
+                newDataFrame.drop(columns=alarm_clusters, inplace=True)
+                print(newDataFrame)
+
             return newDataFrame
 
     return None

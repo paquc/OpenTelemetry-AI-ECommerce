@@ -3,16 +3,17 @@ import sys
 
 # ******************************************
 # Function to split DataFrame based on time intervals and aggregate by Cluster ID counts
-def split_and_aggregate_by_cluster(df, time_interval, error_threshold, anomaly_clusters):
+def split_and_aggregate_by_cluster(df, time_interval, error_threshold, anomaly_clusters, alarm_clusters):
     
     # Convert 'FullDateTime' to a usable datetime format for pandas
     df['FullDateTime'] = pd.to_datetime(df['DateTime'], format='%Y-%m-%d %H:%M:%S.%f')
 
     # Set 'Datetime' as index for time-based resampling
     df.set_index('FullDateTime', inplace=True)
+    print(df.head())
 
     # Resample based on time intervals and count occurrences of each Cluster ID
-    cluster_counts = df.groupby([pd.Grouper(freq = time_interval), 'EventId']).size().unstack(fill_value=0)
+    cluster_counts = df.groupby([pd.Grouper(freq=time_interval), 'EventId']).size().unstack(fill_value=0)
     print(f"Cluster counts: {cluster_counts.shape}")
     print(cluster_counts)
 
@@ -34,9 +35,9 @@ def split_and_aggregate_by_cluster(df, time_interval, error_threshold, anomaly_c
     # ******************************************
     # IMPORTANT!!!!!!!!!
     # Drop the columns corresponding to the Cluster IDs in anomaly_clusters
-    if anomaly_clusters:
-        print("Dropping columns: ", anomaly_clusters)
-        cluster_counts.drop(columns=anomaly_clusters, inplace=True)
+    if alarm_clusters:
+        print("Dropping columns: ", alarm_clusters)
+        cluster_counts.drop(columns=alarm_clusters, inplace=True)
     # ******************************************
    
     return cluster_counts
@@ -53,11 +54,12 @@ def GenMatricesV2(time_interval, error_threshold):
 
     # Define the anomaly conditions (specific clusters or thresholds)
     anomaly_clusters = ['E2']
+    alarm_clusters = ['E3']
 
     # error_threshold = 3  # If the sum of occurrences of these clusters in a chunk exceeds this, label as anomaly
 
     # Split and aggregate the DataFrame into chunks based on the specified time interval
-    result_df = split_and_aggregate_by_cluster(df, time_interval, error_threshold, anomaly_clusters)
+    result_df = split_and_aggregate_by_cluster(df, time_interval, error_threshold, anomaly_clusters, alarm_clusters)
 
     # Reset the index to flatten the DataFrame, with time intervals as rows
     result_df.reset_index(inplace=True)
