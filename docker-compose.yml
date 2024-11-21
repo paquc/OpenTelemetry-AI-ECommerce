@@ -18,6 +18,7 @@ services:
       - ./servemodelfastapi/predict.py:/predict.py
       - ./servemodelfastapi/Drain3Parse.py:/Drain3Parse.py
       - ./servemodelfastapi/TrainAlarmsChrono.py:/TrainAlarmsChrono.py
+      - ./servemodelfastapi/PreprocessData.py:/PreprocessData.py
       - ./servemodelfastapi/data/:/data/
       - ./logstash_ingest_data/AI-ECommerce-Output.csv:/AI-ECommerce-Output.csv
 
