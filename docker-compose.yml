@@ -166,9 +166,11 @@ services:
     volumes:
       - ./tracing/tracing.js:/src/purchase/tracing.js
       - ./purchase/purchase-service.js:/src/purchase/purchase-service.js
+      - ./logstash_ingest_data/:/usr/share/logstash/ingest_data/
+      - ./winstonlogger.js:/src/winstonlogger.js
     environment:
       - PG=true
-    restart: on-failure
+    # restart: on-failure
     depends_on:
       - db
 

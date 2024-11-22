@@ -28,7 +28,9 @@
     "pg": "^7.4.3",
     "redbird": "^0.7.0",
     "socket.io": "^2.1.1",
-    "sqlite3": "^4.0.1"
+    "sqlite3": "^4.0.1",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "scripts": {
     "test": "ava --verbose --timeout=60000"

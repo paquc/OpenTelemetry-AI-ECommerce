@@ -14,3 +14,4 @@ parsing/training/
 *.pyc
 servemodelfastapi/data/
 *.bin
+logstash_ingest_data/AI-ECommerce-Purchase.csv

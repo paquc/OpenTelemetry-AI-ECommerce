@@ -9,3 +9,7 @@ RUN npm install dotenv
 
 ADD . .
 COPY tracing/  ./purchase/
+
+
+
+

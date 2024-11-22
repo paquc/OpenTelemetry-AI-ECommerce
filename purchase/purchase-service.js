@@ -1,5 +1,17 @@
+require('dotenv').config();
+
 const logger_name='purchase-service-logger';
 const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
+
+const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-Purchase.csv';
+
+const {createLogger} = require('../winstonlogger.js');
+
+const SOURCE_SERVICE = 'purchase-service';
+const API_ENDPOINT = '/userslist';
+const ERROR_NONE = 'OK';
+const ERROR_DELAY = 'SVC_USER_REQ_DELAY';
+const ERROR_FAIL = 'SVC_USER_REQ_FAIL';
 
 var cote = require('cote'),
     models = require('../models');
@@ -54,8 +66,14 @@ purchaseResponder.on('buy', function(req, cb) {
 });
 
 purchaseResponder.on('list', function(req, cb) {
+    const startTime = Date.now();
     var query = req.query || {};
     models.Purchase.find(query, cb);
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+    const currentTimeUnix = Date.now();
+    const msg = `${currentTimeUnix},${ERROR_NONE},${SOURCE_SERVICE},'list',${duration},,Purchases list fetched successfully from postgres database in ${duration} ms`;
+    wlogger.info(msg);
 });
 
 function updatePurchases() {
@@ -63,5 +81,10 @@ function updatePurchases() {
         purchasePublisher.publish('update', purchases);
     });
 }
+
+wlogger = createLogger(logFilePath);
+
+const msg = Date.now() + `,${ERROR_NONE},${SOURCE_SERVICE},,,,PURCHASE service started with success`;
+wlogger.info(msg);
 
 logEventMessage(logger_name, 'PURCHASE service started', severity_info, getLineNumber());
