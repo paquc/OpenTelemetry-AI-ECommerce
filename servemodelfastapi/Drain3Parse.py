@@ -108,7 +108,7 @@ def Drain3ParseLearn():
     drain_parser = TemplateMiner(persistence, config=config)
 
     # Train Drain3
-    with open('AI-ECommerce-Output.csv', 'r') as log_file:
+    with open('AI-ECommerce-APIGateway.csv', 'r') as log_file:
         for line in log_file:
             # Remove any leading/trailing whitespace from the line
             line = line.strip()
@@ -120,7 +120,7 @@ def Drain3ParseLearn():
     log_data = []
 
     # Parse the log file and extract the log fields in inference mode
-    with open('AI-ECommerce-Output.csv', 'r') as log_file:
+    with open('AI-ECommerce-APIGateway.csv', 'r') as log_file:
         for log in log_file:
             match = log_pattern.match(log)
             if match:

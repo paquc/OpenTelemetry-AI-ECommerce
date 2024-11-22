@@ -5,7 +5,7 @@ const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tr
 
 const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-Purchase.csv';
 
-const {createLogger} = require('../winstonlogger.js');
+const {createLogger, createMessage} = require('../winstonlogger.js');
 
 const SOURCE_SERVICE = 'purchase-service';
 const API_ENDPOINT = '/userslist';
@@ -83,8 +83,6 @@ function updatePurchases() {
 }
 
 wlogger = createLogger(logFilePath);
-
-const msg = Date.now() + `,${ERROR_NONE},${SOURCE_SERVICE},,,,PURCHASE service started with success`;
-wlogger.info(msg);
+wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', 'PURCHASE service started with success'));
 
 logEventMessage(logger_name, 'PURCHASE service started', severity_info, getLineNumber());

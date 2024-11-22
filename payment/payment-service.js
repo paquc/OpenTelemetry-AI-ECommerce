@@ -1,6 +1,16 @@
 const logger_name='payment-service-logger';
 const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
+const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-Payment.csv';
+
+const {createLogger, createMessage} = require('../winstonlogger.js');
+
+const SOURCE_SERVICE = 'payment-service';
+const API_ENDPOINT = '/userslist';
+const ERROR_NONE = 'OK';
+const ERROR_DELAY = 'SVC_USER_REQ_DELAY';
+const ERROR_FAIL = 'SVC_USER_REQ_FAIL';
+
 var cote = require('cote'),
     models = require('../models');
 
@@ -20,6 +30,9 @@ paymentResponder.on('process', function(req, cb) {
         user.save(cb);
     });
 });
+
+wlogger = createLogger(logFilePath);
+wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', 'PAYMENT service started with success'));
 
 logEventMessage(logger_name, 'PAYMENT service started', severity_info, getLineNumber());
 

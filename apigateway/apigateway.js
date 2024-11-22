@@ -113,7 +113,7 @@ errors.errorsCounter.add(0);
 // START listening...
 app.listen(PORT);
 
-const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-Output.csv';
+const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-APIGateway.csv';
 
 const fileRotateTransport = new winston.transports.DailyRotateFile({
   filename: 'combined-%DATE%.log',

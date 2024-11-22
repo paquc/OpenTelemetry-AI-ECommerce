@@ -4,7 +4,7 @@ node_modules
 db.sqlite
 grafana-storage/
 tempo-data/
-logstash_ingest_data/AI-ECommerce-Output.csv
+logstash_ingest_data/AI-ECommerce-APIGateway.csv
 logstash_ingest_data/system_unified_log.csv
 training_data/
 Brain/
@@ -15,3 +15,6 @@ parsing/training/
 servemodelfastapi/data/
 *.bin
 logstash_ingest_data/AI-ECommerce-Purchase.csv
+logstash_ingest_data/AI-ECommerce-Payment.csv
+logstash_ingest_data/AI-ECommerce-Product.csv
+logstash_ingest_data/AI-ECommerce-User.csv

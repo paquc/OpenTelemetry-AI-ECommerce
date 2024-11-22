@@ -20,7 +20,7 @@ services:
       - ./servemodelfastapi/TrainAlarms.py:/TrainAlarms.py
       - ./servemodelfastapi/PreprocessData.py:/PreprocessData.py
       - ./servemodelfastapi/data/:/data/
-      - ./logstash_ingest_data/AI-ECommerce-Output.csv:/AI-ECommerce-Output.csv
+      - ./logstash_ingest_data/AI-ECommerce-APIGateway.csv:/AI-ECommerce-APIGateway.csv
 
   apigateway:
     build:
@@ -138,6 +138,8 @@ services:
     volumes:
       - ./tracing/tracing.js:/src/payment/tracing.js
       - ./payment/payment-service.js:/src/payment/payment-service.js
+      - ./logstash_ingest_data/:/usr/share/logstash/ingest_data/
+      - ./winstonlogger.js:/src/winstonlogger.js
     environment:
       - PG=true
     restart: on-failure
@@ -152,6 +154,8 @@ services:
     volumes:
       - ./tracing/tracing.js:/src/product/tracing.js
       - ./product/product-service.js:/src/product/product-service.js
+      - ./logstash_ingest_data/:/usr/share/logstash/ingest_data/
+      - ./winstonlogger.js:/src/winstonlogger.js
     environment:
       - PG=true
     restart: on-failure
@@ -182,6 +186,8 @@ services:
     volumes:
       - ./tracing/tracing.js:/src/user/tracing.js
       - ./user/user-service.js:/src/user/user-service.js
+      - ./logstash_ingest_data/:/usr/share/logstash/ingest_data/
+      - ./winstonlogger.js:/src/winstonlogger.js
     environment:
       - PG=true
     restart: on-failure
