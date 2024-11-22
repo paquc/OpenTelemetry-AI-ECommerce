@@ -11,7 +11,7 @@ processors:
     timeout: 1s
   resource:
     attributes:
-      - key: ETS.goal
+      - key: ETS.Project
         value: "Data"
         action: insert
 
@@ -22,10 +22,10 @@ exporters:
     endpoint: http://loki:3100/otlp
     tls:
       insecure: true
-  otlp/aspecto:
-      endpoint: otelcol.aspecto.io:4317
-      headers:
-        Authorization: 3b8f7807-14e2-4733-8253-8f2548fe3f92   # Security TOKEN for Carl
+  # otlp/aspecto:
+  #     endpoint: otelcol.aspecto.io:4317
+  #     headers:
+  #       Authorization: 3b8f7807-14e2-4733-8253-8f2548fe3f92   # Security TOKEN for Carl
   prometheus:
     endpoint: otel-collector-gateway:8889   # Exports metrics sent by services in Prometheus format ready to scrape by prometheus
   otlp/tempo:
@@ -47,12 +47,12 @@ service:
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlphttp/loki]  # Add logging to log...
+      exporters: [logging, otlphttp/loki]  
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [prometheus]  # Add logging to log...
+      exporters: [prometheus]  
     traces:
       receivers: [otlp]
       processors: [batch, resource]
-      exporters: [otlp/aspecto, otlp/tempo] # Add logging to log...
+      exporters: [otlp/tempo]

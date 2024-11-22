@@ -6,7 +6,6 @@ const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-Payment.csv';
 const {createLogger, createMessage} = require('../winstonlogger.js');
 
 const SOURCE_SERVICE = 'payment-service';
-const API_ENDPOINT = '/userslist';
 const ERROR_NONE = 'OK';
 const ERROR_DELAY = 'SVC_USER_REQ_DELAY';
 const ERROR_FAIL = 'SVC_USER_REQ_FAIL';
@@ -22,12 +21,16 @@ var paymentResponder = new cote.Responder({
 paymentResponder.on('*', console.log);
 
 paymentResponder.on('process', function(req, cb) {
+    const startTime = Date.now();
+
     models.User.get(req.userId, function(err, user) {
-        if (user.balance < req.price) return cb(true);
-
+        if (user.balance < req.price) 
+            return cb(true);
         user.balance -= req.price;
-
         user.save(cb);
+        const endTime = Date.now();
+        const duration = endTime - startTime;
+        wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'process', duration, '', `Payment processed successfully for user ID=${req.userId} in ${duration} ms`));
     });
 });
 

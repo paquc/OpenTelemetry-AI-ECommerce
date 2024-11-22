@@ -67,13 +67,15 @@ purchaseResponder.on('buy', function(req, cb) {
 
 purchaseResponder.on('list', function(req, cb) {
     const startTime = Date.now();
+    
+    // Execute the query to the DB
     var query = req.query || {};
     models.Purchase.find(query, cb);
+
     const endTime = Date.now();
     const duration = endTime - startTime;
-    const currentTimeUnix = Date.now();
-    const msg = `${currentTimeUnix},${ERROR_NONE},${SOURCE_SERVICE},'list',${duration},,Purchases list fetched successfully from postgres database in ${duration} ms`;
-    wlogger.info(msg);
+    
+    wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'list', duration, '', `Purchases list fetched successfully from postgres database in ${duration} ms`));
 });
 
 function updatePurchases() {
