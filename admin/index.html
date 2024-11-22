@@ -60,14 +60,22 @@
             purchaseService.on('update', listPurchases);
         }
     </script>
+<style>
+    body {
+        background-image: url('https://picsum.photos/5');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+</style>
 </head>
 <body class="container" ng-controller="ProductController">
-<h1>Products</h1>
+<h1>ADMINISTRATION Module</h1>
 
 <h2>Add new product</h2>
 
 <form ng-submit="create()">
-    <table class="table table-striped">
+    <table class="table table-hover">
         <thead>
         <tr>
             <th>Name</th>
@@ -90,7 +98,7 @@
 </form>
 
 <h2>List all products</h2>
-<table class="table table-striped">
+<table class="table table-hover">
     <thead>
     <tr>
         <th>#</th>
@@ -113,8 +121,8 @@
     </tbody>
 </table>
 
-<h1>Users</h1>
-<table class="table table-striped">
+<h2>Users</h2>
+<table class="table table-hover">
     <thead>
     <tr>
         <th>#</th>
@@ -131,8 +139,8 @@
     </tbody>
 </table>
 
-<h1>Purchases</h1>
-<table class="table table-striped">
+<h2>Purchases</h2>
+<table class="table table-hover">
     <thead>
     <tr>
         <th>#</th>
