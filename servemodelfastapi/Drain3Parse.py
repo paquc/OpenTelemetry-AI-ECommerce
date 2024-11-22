@@ -101,6 +101,12 @@ def ParseNewEvent(log_entry, alarm_clusters):
 
 def Drain3ParseLearn():
 
+    input_file = 'Unified_log.csv'
+    # input_file = 'AI-ECommerce-APIGateway.csv'
+
+    print("Training Drain3 model on log data...")
+    print("Reading log data from file: ", input_file)
+    
     config = TemplateMinerConfig()
 
     # Step 1: Train Drain model on training log data
@@ -108,7 +114,7 @@ def Drain3ParseLearn():
     drain_parser = TemplateMiner(persistence, config=config)
 
     # Train Drain3
-    with open('AI-ECommerce-APIGateway.csv', 'r') as log_file:
+    with open(input_file, 'r') as log_file:
         for line in log_file:
             # Remove any leading/trailing whitespace from the line
             line = line.strip()
@@ -120,7 +126,7 @@ def Drain3ParseLearn():
     log_data = []
 
     # Parse the log file and extract the log fields in inference mode
-    with open('AI-ECommerce-APIGateway.csv', 'r') as log_file:
+    with open(input_file, 'r') as log_file:
         for log in log_file:
             match = log_pattern.match(log)
             if match:

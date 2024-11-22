@@ -21,6 +21,7 @@ services:
       - ./servemodelfastapi/PreprocessData.py:/PreprocessData.py
       - ./servemodelfastapi/data/:/data/
       - ./logstash_ingest_data/AI-ECommerce-APIGateway.csv:/AI-ECommerce-APIGateway.csv
+      - ./logstash_ingest_data/Unified_log.csv:/Unified_log.csv
 
   apigateway:
     build:
