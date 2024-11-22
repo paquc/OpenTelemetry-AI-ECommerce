@@ -6,7 +6,6 @@ const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-User.csv';
 const {createLogger, createMessage} = require('../winstonlogger.js');
 
 const SOURCE_SERVICE = 'user-service';
-const API_ENDPOINT = '/userslist';
 const ERROR_NONE = 'OK';
 const ERROR_DELAY = 'SVC_USER_REQ_DELAY';
 const ERROR_FAIL = 'SVC_USER_REQ_FAIL';
@@ -33,7 +32,11 @@ userResponder.on('*', console.log);
 userResponder.on('create', 
     function(req, cb) {
         logEventMessage(logger_name, 'USER service called - create - Create new user in BD', severity_info, getLineNumber());
+        const startTime = Date.now();
         models.User.create({}, cb);
+        const endTime = Date.now();
+        const duration = endTime - startTime;
+        wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'create', duration, '', `New user created successfully in ${duration} ms`));
         updateUsers();
     }
 );

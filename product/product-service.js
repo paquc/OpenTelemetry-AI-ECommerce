@@ -6,7 +6,6 @@ const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-Product.csv';
 const {createLogger, createMessage} = require('../winstonlogger.js');
 
 const SOURCE_SERVICE = 'product-service';
-const API_ENDPOINT = '/userslist';
 const ERROR_NONE = 'OK';
 const ERROR_DELAY = 'SVC_USER_REQ_DELAY';
 const ERROR_FAIL = 'SVC_USER_REQ_FAIL';
@@ -42,10 +41,14 @@ productResponder.on('create', function(req, cb) {
 });
 
 productResponder.on('delete', function(req, cb) {
+    const startTime = Date.now();
     models.Product.get(req.id, function(err, product) {
         product.remove(function(err, product) {
-            cb(err, product);
+            const endTime = Date.now();
+            const duration = endTime - startTime;
+            wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'delete', duration, '', `Product deleted successfully for product ID=${req.id} in ${duration} ms`));
 
+            cb(err, product);
             updateProducts();
         });
     });
