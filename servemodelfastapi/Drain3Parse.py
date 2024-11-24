@@ -93,7 +93,7 @@ def ParseNewEvent(log_entry, alarm_clusters):
 
         newItemsCounter += 1
 
-        if newItemsCounter == 100:
+        if newItemsCounter == 50:
             newEvent = pd.DataFrame({
                 'E1': [E1_list],       # Info
                 'E2': [E2_list],       # Info
