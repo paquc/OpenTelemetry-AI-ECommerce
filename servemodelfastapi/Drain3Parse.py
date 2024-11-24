@@ -6,18 +6,18 @@ import pandas as pd
 from drain3.file_persistence import FilePersistence
 
 
-# log_pattern = re.compile(
-#         r"(?P<Date>\d{4}-\d{2}-\d{2})\s"                      # Date: yyyy-mm-dd
-#         r"(?P<Time>\d{2}:\d{2}:\d{2}\.\d{3}),"                # Time: hh:mm:ss.sss
-#         r"(?P<Level>\w+),"                                    # Level: info, error, etc.
-#         r"(?P<EpochTime>\d+),"                                # Epoch Time: Unix timestamp in milliseconds
-#         r"(?P<Status>\w+),"                                   # Status: OK, ERROR, etc.
-#         r"(?P<Component>[^\s,]+),"                            # Component: Component name (e.g., apigateway)
-#         r"(?P<Endpoint>[^,]*),"                               # Endpoint: URL or API endpoint (e.g., /userslist)
-#         r"(?P<DataVal1>\d*),"                                 # Duration: Numeric value (e.g., response time)
-#         r"(?P<DataVal2>[^,]*),"                               # Extra Field: Optional extra field (empty in this example)
-#         r"(?P<Content>.*)"                                    # Message: Log message
-#     )
+log_pattern_real_time = re.compile(
+        r"(?P<Date>\d{4}-\d{2}-\d{2})\s"                      # Date: yyyy-mm-dd
+        r"(?P<Time>\d{2}:\d{2}:\d{2}\.\d{3}),"                # Time: hh:mm:ss.sss
+        r"(?P<Level>\w+),"                                    # Level: info, error, etc.
+        r"(?P<EpochTime>\d+),"                                # Epoch Time: Unix timestamp in milliseconds
+        r"(?P<Status>\w+),"                                   # Status: OK, ERROR, etc.
+        r"(?P<Component>[^\s,]+),"                            # Component: Component name (e.g., apigateway)
+        r"(?P<Endpoint>[^,]*),"                               # Endpoint: URL or API endpoint (e.g., /userslist)
+        r"(?P<DataVal1>\d*),"                                 # Duration: Numeric value (e.g., response time)
+        r"(?P<DataVal2>[^,]*),"                               # Extra Field: Optional extra field (empty in this example)
+        r"(?P<Content>.*)"                                    # Message: Log message
+    )
 
 log_pattern = re.compile(
     r"(?P<FirstTimestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z)\s"  # ISO 8601 Timestamp with nanoseconds
@@ -40,20 +40,28 @@ log_pattern = re.compile(
  # Create a pandas DataFrame
 newEvent = pd.DataFrame({
     'E1': [],       # Info
-    'E2': [],       # Warnings
-    'E3': []        # Errors
+    'E2': [],        
+    'E3': [],         
+    'E4': [],         
+    'E5': [],         
+    'E6': []         
 })
-# newEvent = newEvent.append({'E1': 100, 'E2': None, 'E3': None}, ignore_index=True)
 
 newItemsCounter = 0
 E1_list = 0
 E2_list = 0
 E3_list = 0
+E4_list = 0
+E5_list = 0
+E6_list = 0
 
 def ParseNewEvent(log_entry, alarm_clusters):
     global E1_list
     global E2_list
     global E3_list
+    global E4_list
+    global E5_list
+    global E6_list
     global newItemsCounter
     global newEvent
 
@@ -65,7 +73,7 @@ def ParseNewEvent(log_entry, alarm_clusters):
 
     # log_entry = "2024-11-15 07:22:10.883,info,1731698530883,OK,apigateway,/userslist,11,,Users list fetched successfully from user-service in 11 ms"
     # print(log_entry)
-    match = log_pattern.match(log_entry)
+    match = log_pattern_real_time.match(log_entry)
     if match:
         log_content = match.group("Content")  # Extract the Content field
         result = drain_parser.add_log_message(log_content)  # Add the log message to the Drain3 parser to continue training while receiving new log entries
@@ -76,14 +84,23 @@ def ParseNewEvent(log_entry, alarm_clusters):
             E2_list += 1
         if result.cluster_id == 3:
             E3_list += 1
+        if result.cluster_id == 4:
+            E4_list += 1
+        if result.cluster_id == 5:
+            E5_list += 1
+        if result.cluster_id == 6:
+            E6_list += 1
 
         newItemsCounter += 1
 
-        if newItemsCounter == 500:
+        if newItemsCounter == 100:
             newEvent = pd.DataFrame({
                 'E1': [E1_list],       # Info
-                'E2': [E2_list],       # Warnings
-                'E3': [E3_list]        # Errors
+                'E2': [E2_list],       # Info
+                'E3': [E3_list], 
+                'E4': [E4_list], 
+                'E5': [E5_list], 
+                'E6': [E6_list], 
             })
             
             print("********************************************************")
@@ -96,11 +113,17 @@ def ParseNewEvent(log_entry, alarm_clusters):
             E1_list = 0
             E2_list = 0
             E3_list = 0
+            E4_list = 0
+            E5_list = 0
+            E6_list = 0
 
             newEvent = pd.DataFrame({
                 'E1': [],       # Info
                 'E2': [],       # Warnings
-                'E3': []        # Errors
+                'E3': [],        # Errors
+                'E4': [],        # Errors
+                'E5': [],        # Errors
+                'E6': []        # Errors
             })
 
             # newDataFrame = newDataFrame.drop(columns=['E1'])

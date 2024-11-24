@@ -154,7 +154,6 @@ def TrainModels(train_LR, train_RF, use_bootstrap, n_bootstrap_samples, train_da
 
     # Charger la matrice d'occurrence
     input_file_path = f"./data/occurences_matrix_preprocessed.csv"
-    # input_file_path = f"./data/alarm_occurences_matrix_final.csv"
 
     print(f"Loading data from: {input_file_path}")
     
@@ -224,6 +223,8 @@ def TrainModels(train_LR, train_RF, use_bootstrap, n_bootstrap_samples, train_da
                 model = RandomForestClassifier(n_estimators=estimators, random_state=randomize_val)         # class_weight='balanced', n_estimators=(bs_index+1)*2, warm_start=False, random_state=(bs_index+1)*10)
                 model.fit(X_train, y_train)
 
+                print(X_train.head())
+
                 y_test_pred = model.predict(X_test)
                 get_model_evaluation(y_test, y_test_pred, f'Random Forest Classifier - TEST DATA - {bs_index}', RF_log_file, estimators, randomize_val, model, X_train, True)
 
@@ -240,29 +241,29 @@ def TrainModels(train_LR, train_RF, use_bootstrap, n_bootstrap_samples, train_da
                     pickle.dump(model, file)
 
 
-            if train_LR == 1:
-                LR_log_file.write(f"Data sample {bs_index} - Start index: {start_index}, End index: {end_index}, Chunk size: {data_chunk.shape[0]}\n\n")
-                # Model de regression lineaire
-                # randomize_val= (bs_index+1)*10
-                model = LogisticRegression(random_state=randomize_val)      # random_state=(bs_index+1)*10, solver='liblinear')
-                model.fit(X_train, y_train)
+            # if train_LR == 1:
+            #     LR_log_file.write(f"Data sample {bs_index} - Start index: {start_index}, End index: {end_index}, Chunk size: {data_chunk.shape[0]}\n\n")
+            #     # Model de regression lineaire
+            #     # randomize_val= (bs_index+1)*10
+            #     model = LogisticRegression(random_state=randomize_val)      # random_state=(bs_index+1)*10, solver='liblinear')
+            #     model.fit(X_train, y_train)
 
-                y_test_pred = model.predict(X_test)
-                get_model_evaluation(y_test, y_test_pred, f'Linear Regression Classifier - TEST DATA', LR_log_file, -1, randomize_val, model, X_train, False)
+            #     y_test_pred = model.predict(X_test)
+            #     get_model_evaluation(y_test, y_test_pred, f'Linear Regression Classifier - TEST DATA', LR_log_file, -1, randomize_val, model, X_train, False)
 
-                if val_size > 0:
-                    y_val_pred = model.predict(X_val)
-                    get_model_evaluation(y_val, y_val_pred, f'Linear Regression Classifier - VALIDATION DATA', LR_log_file, -1, randomize_val, model, X_train, False)
+            #     if val_size > 0:
+            #         y_val_pred = model.predict(X_val)
+            #         get_model_evaluation(y_val, y_val_pred, f'Linear Regression Classifier - VALIDATION DATA', LR_log_file, -1, randomize_val, model, X_train, False)
 
-                y_train_pred = model.predict(X_train)
-                get_model_evaluation(y_train, y_train_pred, f'Linear Regression Classifier - TRAIN DATA', LR_log_file, -1, randomize_val, model, X_train, False)
+            #     y_train_pred = model.predict(X_train)
+            #     get_model_evaluation(y_train, y_train_pred, f'Linear Regression Classifier - TRAIN DATA', LR_log_file, -1, randomize_val, model, X_train, False)
 
-                # Assume `model` is your trained model
-                with open(f'./data/linear_regression_model_{bs_index}.pkl', 'wb') as file:
-                    pickle.dump(model, file)
+            #     # Assume `model` is your trained model
+            #     with open(f'./data/linear_regression_model_{bs_index}.pkl', 'wb') as file:
+            #         pickle.dump(model, file)
 
         print(f"RF log file: {RF_log_file.name}")
-        print(f"LR log file: {LR_log_file.name}")
+        # print(f"LR log file: {LR_log_file.name}")
 
         print("End of script")
         print("************************************")

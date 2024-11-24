@@ -83,7 +83,7 @@ def print_alarm_types(df_logs, suffix, node_name):
 
 def GenMatrices(service_name, suffix, time_window_epoch, prediction_window_epoch, moving_window_epoch, prediction_window_offset_epoch, aggregated_alarms_TH, alarm_clusters):
 
-    logs_file = f"./data/AI-ECommerce-Learn_structured.csv"  
+    logs_file = f"./data/AI-ECommerce-Learn_structured.csv" 
 
     # Load the log data from the CSV file
     print(f"Processing log file: {logs_file}")

@@ -84,8 +84,8 @@ app.get('/userslist', function(req, res) {
       const duration = endTime - startTime;
       
       // 
-      const min_value = 200;
-      const max_value = 300;
+      const min_value = 400;
+      const max_value = 600;
 
       if(err) {
         // const msg = `${currentTimeUnix},${ERROR_FAIL},${SOURCE_SERVICE},${API_ENDPOINT},${err},,Error fetching users list from user-service: code ${err}`;
