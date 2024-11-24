@@ -20,7 +20,7 @@ services:
       - ./servemodelfastapi/TrainAlarms.py:/TrainAlarms.py
       - ./servemodelfastapi/PreprocessData.py:/PreprocessData.py
       - "./servemodelfastapi/data/:/data/"
-      - ./logstash_ingest_data/AI-ECommerce-APIGateway.csv:/AI-ECommerce-APIGateway.csv
+      - ./logstash_ingest_data/system_unified_log.csv:/system_unified_log.csv
 
 
   apigateway:

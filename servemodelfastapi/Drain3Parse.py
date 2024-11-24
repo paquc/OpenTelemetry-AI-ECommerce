@@ -6,18 +6,33 @@ import pandas as pd
 from drain3.file_persistence import FilePersistence
 
 
+# log_pattern = re.compile(
+#         r"(?P<Date>\d{4}-\d{2}-\d{2})\s"                      # Date: yyyy-mm-dd
+#         r"(?P<Time>\d{2}:\d{2}:\d{2}\.\d{3}),"                # Time: hh:mm:ss.sss
+#         r"(?P<Level>\w+),"                                    # Level: info, error, etc.
+#         r"(?P<EpochTime>\d+),"                                # Epoch Time: Unix timestamp in milliseconds
+#         r"(?P<Status>\w+),"                                   # Status: OK, ERROR, etc.
+#         r"(?P<Component>[^\s,]+),"                            # Component: Component name (e.g., apigateway)
+#         r"(?P<Endpoint>[^,]*),"                               # Endpoint: URL or API endpoint (e.g., /userslist)
+#         r"(?P<DataVal1>\d*),"                                 # Duration: Numeric value (e.g., response time)
+#         r"(?P<DataVal2>[^,]*),"                               # Extra Field: Optional extra field (empty in this example)
+#         r"(?P<Content>.*)"                                    # Message: Log message
+#     )
+
 log_pattern = re.compile(
-        r"(?P<Date>\d{4}-\d{2}-\d{2})\s"                      # Date: yyyy-mm-dd
-        r"(?P<Time>\d{2}:\d{2}:\d{2}\.\d{3}),"                # Time: hh:mm:ss.sss
-        r"(?P<Level>\w+),"                                    # Level: info, error, etc.
-        r"(?P<EpochTime>\d+),"                                # Epoch Time: Unix timestamp in milliseconds
-        r"(?P<Status>\w+),"                                   # Status: OK, ERROR, etc.
-        r"(?P<Component>[^\s,]+),"                            # Component: Component name (e.g., apigateway)
-        r"(?P<Endpoint>[^,]*),"                               # Endpoint: URL or API endpoint (e.g., /userslist)
-        r"(?P<DataVal1>\d*),"                                 # Duration: Numeric value (e.g., response time)
-        r"(?P<DataVal2>[^,]*),"                               # Extra Field: Optional extra field (empty in this example)
-        r"(?P<Content>.*)"                                    # Message: Log message
-    )
+    r"(?P<FirstTimestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z)\s"  # ISO 8601 Timestamp with nanoseconds
+    r"\{name=(?P<Name>[^\}]+)\}\s"                                       # Metadata: {name=value}
+    r"(?P<Date>\d{4}-\d{2}-\d{2})\s"                                     # Date: yyyy-mm-dd
+    r"(?P<Time>\d{2}:\d{2}:\d{2}\.\d{3}),"                               # Time: hh:mm:ss.sss
+    r"(?P<Level>\w+),"                                                   # Level: info, error, etc.
+    r"(?P<EpochTime>\d+),"                                               # Epoch Time: Unix timestamp in milliseconds
+    r"(?P<Status>\w+),"                                                  # Status: OK, ERROR, etc.
+    r"(?P<Component>[^\s,]+),"                                           # Component: Component name (e.g., payment-service)
+    r"(?P<Endpoint>[^,]*),"                                              # Endpoint: URL or API endpoint (e.g., process)
+    r"(?P<DataVal1>\d*),"                                                # Duration: Numeric value (e.g., response time)
+    r"(?P<DataVal2>[^,]*),"                                              # Extra Field: Optional extra field (empty in this example)
+    r"(?P<Content>.*)"                                                   # Message: Log message
+)
 
 # 1. New log entry comes-in: 2024-11-15 07:22:10.883,info,1731698530883,OK,apigateway,/userslist,11,,Users list fetched successfully from user-service in 11 ms
 # 2. Add log message to Drain3 parser: 0,2024-11-15 07:22:10.883,info,1731698530883,OK,apigateway,/userslist,11,,Users list fetched successfully from user-service in 11 ms,E1,Users list fetched successfully from user-service in <*> ms
@@ -108,7 +123,7 @@ def Drain3ParseLearn():
     drain_parser = TemplateMiner(persistence, config=config)
 
     # Train Drain3
-    with open('AI-ECommerce-APIGateway.csv', 'r') as log_file:
+    with open('system_unified_log.csv', 'r') as log_file:
         for line in log_file:
             # Remove any leading/trailing whitespace from the line
             line = line.strip()
@@ -120,7 +135,7 @@ def Drain3ParseLearn():
     log_data = []
 
     # Parse the log file and extract the log fields in inference mode
-    with open('AI-ECommerce-APIGateway.csv', 'r') as log_file:
+    with open('system_unified_log.csv', 'r') as log_file:
         for log in log_file:
             match = log_pattern.match(log)
             if match:
@@ -142,7 +157,6 @@ def Drain3ParseLearn():
                 
                 log_entry = {
                     "DateTime": date_time,
-                    # "Time": time,
                     "Severity": level,
                     "EpochTime": epoch_time,
                     "ErrorType": status,
