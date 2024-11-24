@@ -1,4 +1,6 @@
 const winston = require('winston');
+const fs = require('fs');
+const path = require('path');
 require('winston-daily-rotate-file');
 const { format } = winston;
 const { combine, timestamp, printf, colorize, align } = winston.format;
@@ -15,6 +17,10 @@ const fileRotateTransport = new winston.transports.DailyRotateFile({
   datePattern: 'YYYY-MM-DD',
   maxFiles: '1d',
 });
+
+function isLogFileExists(logFilePath) {
+  return fs.existsSync(logFilePath);
+}
 
 function createLogger(logFilePath) {
   return winston.createLogger({
@@ -45,5 +51,6 @@ module.exports =
 {
   createLogger,
   createMessage,
+  isLogFileExists,
 };
 

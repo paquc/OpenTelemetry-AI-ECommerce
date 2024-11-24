@@ -1,9 +1,9 @@
 const logger_name='products-service-logger';
 const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
-const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-Product.csv';
+const logFilePath = '/usr/share/logstash/ingest_data/AppServiceProduct.csv';
 
-const {createLogger, createMessage} = require('../winstonlogger.js');
+const {createLogger, createMessage, isLogFileExists} = require('../winstonlogger.js');
 
 const SOURCE_SERVICE = 'product-service';
 const ERROR_NONE = 'OK';
@@ -60,7 +60,14 @@ function updateProducts() {
     });
 }
 
-wlogger = createLogger(logFilePath);
-wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', 'PRODUCTS service started with success'));
 
 logEventMessage(logger_name, 'PRODUCTS service started', severity_info, getLineNumber());
+
+function checkLogFile() {
+    if(isLogFileExists()==false) {
+      const logger = createLogger(logFilePath);
+      logger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', 'PRODUCTS service started with success'));
+    }
+  }
+  
+  setInterval(checkLogFile, 1000);
