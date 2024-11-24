@@ -22,6 +22,7 @@ services:
       - "./servemodelfastapi/data/:/data/"
       - ./logstash_ingest_data/AI-ECommerce-APIGateway.csv:/AI-ECommerce-APIGateway.csv
 
+
   apigateway:
     build:
       context: .
