@@ -13,6 +13,8 @@
     <!-- Socket.IO library for real-time communication -->
     <script src="/socket.io/socket.io.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/uuid@9.0.0/dist/umd/uuidv4.min.js"></script>
+
     <!-- AngularJS script defining the main module and controller logic -->
     <script>
         // Define the AngularJS module called 'end-user'
@@ -25,6 +27,16 @@
 
         // Define the controller function 'ProductController', which controls the data and behavior for the view
         function ProductController($scope) {
+
+            // Auto-generate a UUID on page load
+            // generateUUID();
+
+            function generateUUID () {
+                const newUUID = uuidv4(); // Call the globally available uuidv4 function
+                console.log('Generated UUID:', newUUID); // Log it for debugging
+                $scope.uuid = newUUID; // Assign it to scope for display
+            }
+            
             // logEventMessage('admin-service-logger', 'END-USER service controller called', severity_info, getLineNumber());
             // Create a new user by emitting an event to the 'user' namespace
             userService.emit('create', {}, function(err, data) {
@@ -37,10 +49,16 @@
             // Call the 'list' function to load the list of products
             list();
 
+            // const requestId = uuidv4();
+
             // Function to request the list of products from the server
             function list() {
+                
                 // Emit a 'list' event to the 'product' namespace to retrieve the list of products
-                productService.emit('list', function(err, data) {
+                productService.emit(
+                    'list',
+                    // { request_ID }, // Send the request ID with the payload
+                    function(err, data) {
                     // Once data is received, update the scope with the product list
                     $scope.products = data;
                     // Trigger AngularJS to update the view
@@ -50,6 +68,7 @@
 
             // Function called when the user attempts to purchase a product
             $scope.purchase = function(id) {
+                
                 // Emit a 'buy' event to the 'purchase' namespace with the user's ID and the product ID
                 purchaseService.emit('buy', { userId: $scope.user.id, productId: id }, function(err, data) {
                     if (err) return; // If there's an error, do nothing

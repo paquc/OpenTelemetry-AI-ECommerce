@@ -88,7 +88,7 @@ app.get('/userslist', function(req, res) {
   userRequester.send(
     {
       type: 'list',
-      requestId: request_ID, // Include the request ID
+      request_ID: request_ID, // Include the request ID
     }, 
     function(err, users) {
       const endTime = Date.now();

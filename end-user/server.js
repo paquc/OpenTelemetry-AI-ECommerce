@@ -6,12 +6,12 @@ var app = require('express')(),
     server = require('http').Server(app),
     io = require('socket.io')(server),
     cote = require('cote'),
+    { v4: uuidv4 } = require('uuid'),
     {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
 
 app.get('/', function (req, res) {
     console.log(`${req.ip} requested end-user interface`);
-
     res.sendFile(__dirname + '/index.html');
 });
 

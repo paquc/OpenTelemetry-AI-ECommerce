@@ -13,6 +13,8 @@ const ERROR_NONE = 'OK';
 const ERROR_DELAY = 'SVC_USER_REQ_DELAY';
 const ERROR_FAIL = 'SVC_USER_REQ_FAIL';
 
+const { v4: uuidv4 } = require('uuid');
+
 var cote = require('cote'),
     models = require('../models');
 
@@ -36,12 +38,26 @@ var paymentRequester = new cote.Requester({
 purchaseResponder.on('*', console.log);
 
 purchaseResponder.on('buy', function(req, cb) {
+    let {request_ID}  = req; // Extract the request ID from the incoming request
+    if (!request_ID) {
+        request_ID = uuidv4();
+    }
+    wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'buy', '', '', `Request to buy a product for ID=${req.productId}`, request_ID));
+
     var purchase = new models.Purchase({});
 
     models.Product.get(req.productId, function(err, product) {
+        
         if (product.stock == 0) return cb(true);
 
-        paymentRequester.send({ type: 'process', userId: req.userId, price: product.price }, function(err) {
+        paymentRequester.send(
+            { 
+                type: 'process', 
+                userId: req.userId, 
+                price: product.price,
+                request_ID: request_ID, // Include the request ID
+            },
+            function(err) {
             if (err) return cb(err);
 
             product.stock--;
