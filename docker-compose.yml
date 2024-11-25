@@ -33,7 +33,7 @@ services:
       - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
       - "./filebeat_ingest_data/:/usr/share/filebeat/ingest_data/"
       - ./winstonlogger.js:/winstonlogger.js 
-      - ./apigateway/AI-ECommerce-APIGateway.csv:/AI-ECommerce-APIGateway.csv
+      - "./apigateway/AI-ECommerce-APIGateway.csv:/AI-ECommerce-APIGateway.csv"
     container_name: apigateway
     ports:
       - "9000:9000"

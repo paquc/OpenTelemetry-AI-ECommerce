@@ -22,17 +22,18 @@ exporters:
     endpoint: http://loki:3100/otlp
     tls:
       insecure: true
-  # otlp/aspecto:
-  #     endpoint: otelcol.aspecto.io:4317
-  #     headers:
-  #       Authorization: 3b8f7807-14e2-4733-8253-8f2548fe3f92   # Security TOKEN for Carl
   prometheus:
     endpoint: otel-collector-gateway:8889   # Exports metrics sent by services in Prometheus format ready to scrape by prometheus
   otlp/tempo:
     endpoint: tempo:4317
     tls:
       insecure: true
+  # otlphttp/elastic:
+  #     endpoint: 'https://fleet-server:8220' # APM Server URL
+  #     tls:
+  #       insecure: true
     
+#apm_server_url: 'http://fleet-server:8200' # APM Server URL
 
 extensions:
  health_check:

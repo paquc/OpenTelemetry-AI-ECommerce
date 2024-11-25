@@ -36,8 +36,8 @@ function createLogger(logFilePath) {
 
 // const msg = `${currentTimeUnix},${ERROR_NONE},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Users list fetched successfully from user-service in ${duration} ms`;
 
-function createMessage(currentTimeUnix, errorType, sourceService, apiEndpoint, val1, val2, message) {
-  return `${currentTimeUnix},${errorType},${sourceService},${apiEndpoint},${val1},${val2},${message}`;
+function createMessage(currentTimeUnix, errorType, sourceService, apiEndpoint, val1, val2, message, request_ID = '') {
+  return `${currentTimeUnix},${errorType},${sourceService},${apiEndpoint},${val1},${val2},${message},${request_ID}`;
 }
 
 

@@ -32,6 +32,8 @@ const errors = require('./errors.js');
 
 require('dotenv').config();
 
+const { v4: uuidv4 } = require('uuid');
+
 //Wrap your application Code
 const express = require('express');
 const fs = require('fs');
@@ -71,15 +73,24 @@ function logEventMessage(message, severity) {
 
 
 app.get('/', (req, res) => {
+  const request_ID = uuidv4();
+  console.log(`Request ID: ${request_ID} - API Gateway service running...`);
   res.send('running...');
   logEventMessage(`api gateway running ${PORT}`, severity_trace);
-  logger.error(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', 'API Gateway service running'));
+  logger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', 'API Gateway service running', request_ID));
 });
 
 
 app.get('/userslist', function(req, res) {
+  const request_ID = uuidv4();
+  console.log(`Request ID: ${request_ID} - API Gateway service running...`);
   const startTime = Date.now();
-  userRequester.send({type: 'list'}, function(err, users) {
+  userRequester.send(
+    {
+      type: 'list',
+      requestId: request_ID, // Include the request ID
+    }, 
+    function(err, users) {
       const endTime = Date.now();
       const duration = endTime - startTime;
       
@@ -89,19 +100,19 @@ app.get('/userslist', function(req, res) {
 
       if(err) {
         // const msg = `${currentTimeUnix},${ERROR_FAIL},${SOURCE_SERVICE},${API_ENDPOINT},${err},,Error fetching users list from user-service: code ${err}`;
-        logger.error(createMessage( Date.now(), ERROR_FAIL, SOURCE_SERVICE, API_ENDPOINT, err, '', `Error fetching users list from user-service: code ${err}`));
+        logger.error(createMessage( Date.now(), ERROR_FAIL, SOURCE_SERVICE, API_ENDPOINT, err, '', `Error fetching users list from user-service: code ${err}`, request_ID));
         res.status(500).send('Error fetching users list');
       }
       else {
         if (duration < min_value) {
           // const msg = `${currentTimeUnix},${ERROR_NONE},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Users list fetched successfully from user-service in ${duration} ms`;
-          logger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Users list fetched successfully from user-service in ${duration} ms`));
+          logger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Users list fetched successfully from user-service in ${duration} ms`, request_ID));
         } else if (duration >= min_value && duration < max_value) {
           // const slowMsg = `${currentTimeUnix},${ERROR_DELAY},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Fetching users list took longer than expected (max=300ms): ${duration} ms`;
-          logger.warn(createMessage( Date.now(), ERROR_DELAY, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Fetching users list took longer than expected (max=${min_value}ms): ${duration} ms`));
+          logger.warn(createMessage( Date.now(), ERROR_DELAY, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Fetching users list took longer than expected (max=${min_value}ms): ${duration} ms`, request_ID));
         } else if (duration >= max_value) {
           // const slowMsg = `${currentTimeUnix},${ERROR_DELAY},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Fetching users list took too much time according the customer SLA (max=500ms): ${duration} ms`;
-          logger.error(createMessage( Date.now(), ERROR_DELAY, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Fetching users list took too much time according the customer SLA (max=${max_value}ms): ${duration} ms`));
+          logger.error(createMessage( Date.now(), ERROR_DELAY, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Fetching users list took too much time according the customer SLA (max=${max_value}ms): ${duration} ms`, request_ID));
         }
         else {
         }
@@ -136,12 +147,12 @@ const logger = winston.createLogger({
     new winston.transports.File({
       filename: logFilePath,
     }),
-    // fileRotateTransport,
+    fileRotateTransport,
     // new LogtailTransport(logtail),
   ],
 });
 
-logger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', 'API Gateway service started with success'));
+logger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', 'API Gateway service started with success', ''));
 
 // START listening...
 app.listen(PORT);
