@@ -28,9 +28,8 @@ services:
       context: .
       dockerfile: Dockerfile.apigateway
     volumes:
-      - ./apigateway/apigateway.js:/apigateway.js
-      - ./apigateway/.env:/.env
-      - ./winstonlogger.js:/winstonlogger.js
+      - ./apigateway/apigateway.js:/app/apigateway.js
+      - ./apigateway/.env:/app/.env
       - ./logstash_ingest_data/:/usr/share/logstash/ingest_data/
       - ./filebeat_ingest_data/:/usr/share/filebeat/ingest_data/
     container_name: apigateway

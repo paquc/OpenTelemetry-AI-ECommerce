@@ -1,7 +1,7 @@
 FROM node:20.11.0
 
 # Change folder inside the container
-WORKDIR /
+WORKDIR /app
 
 # Copy package.json to the container to be used by npm install
 COPY apigateway/package.json .
@@ -12,7 +12,6 @@ RUN npm install dotenv
 
 COPY apigateway/  .
 COPY tracing/  .
-COPY winstonlogger.js .
 
 EXPOSE 80
 

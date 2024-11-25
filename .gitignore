@@ -19,8 +19,3 @@ logstash_ingest_data/AI-ECommerce-Payment.csv
 logstash_ingest_data/AI-ECommerce-Product.csv
 logstash_ingest_data/AI-ECommerce-User.csv
 logstash_ingest_data/Unified_log.csv
-logstash_ingest_data/AppServiceAPIGateway.csv
-logstash_ingest_data/AppServicePayment.csv
-logstash_ingest_data/AppServiceProduct.csv
-logstash_ingest_data/AppServicePurchase.csv
-logstash_ingest_data/AppServiceUser.csv
