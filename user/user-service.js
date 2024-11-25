@@ -44,12 +44,8 @@ userResponder.on('create',
 userResponder.on('list', 
     function(req, cb) {
         logEventMessage(logger_name, 'USER service called - list - Find all users in BD', severity_info, getLineNumber());
-        const startTime = Date.now();
         var query = req.query || {};
         models.User.find(query, cb);
-        const endTime = Date.now();
-        const duration = endTime - startTime;
-        wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'list', duration, '', `Query all users from database ${duration} ms`));
 });
 
 userResponder.on('get', 
