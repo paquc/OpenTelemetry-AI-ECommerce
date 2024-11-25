@@ -46,7 +46,7 @@ def addlog():
 @app.post("/addentry")
 def addlogentry(date: str , sever: str, epoch: str, error_type: str, service: str, endpoint: str, data1: str, data2: str, message: str):
     log_entry = date + "," + sever + "," + epoch + "," + error_type + "," + service + "," + endpoint + "," + data1 + "," + data2 + "," + message
-    alarm_clusters = ['E3']
+    alarm_clusters = ['E4']
     data = Drain3Parse.ParseNewEvent(log_entry, alarm_clusters)
     if data is not None:
         prediction = predict.RF_Prediction(data)
@@ -60,7 +60,7 @@ def addlogentry(date: str , sever: str, epoch: str, error_type: str, service: st
 
 
 # curl -X GET 'http://127.0.0.1:8088/Drain3ParseLearn'
-@app.get("/Drain3ParseLearn")
+@app.get("/Drain3Parse")
 def Drain3Learn():
     Drain3Parse.Drain3ParseLearn()
     return {"Drain3": "Done."}
@@ -69,7 +69,7 @@ def Drain3Learn():
 # curl -X GET 'http://127.0.0.1:8088/GenMatrix'
 @app.get("/GenMatrix")
 def GenMatrix():
-    alarm_clusters = ['E3']
+    alarm_clusters = ['E4']
     gm.GenMatrices("apigateway", "warns", 500, 500, 10, -500, 10, alarm_clusters)
     return {"Gen matrices": "Done."}
 
@@ -77,14 +77,14 @@ def GenMatrix():
 # curl -X GET 'http://127.0.0.1:8088/GenMatrix'
 @app.get("/GenMatrixV2")
 def GenMatrixV2():
-    gmV2.GenMatricesV2('100ms', 10)
+    gmV2.GenMatricesV2('150ms', 2)
     return {"Gen matrices V2": "Done."}
 
 
 # curl -X GET 'http://127.0.0.1:8088/TrainModels'
 @app.get("/TrainModels")
 def TrainModels():
-    train.TrainModels(1, 1, 0, 1, 70, 30, 0)
+    train.TrainModels(0, 1, 0, 1, 80, 20, 0)
     return {"Train models": "Done."}
 
 

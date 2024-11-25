@@ -1,5 +1,23 @@
 import pandas as pd
 import sys
+import os
+
+def remove_duplicates(file_path, output_path=None):
+    # Load the file
+    df = pd.read_csv(file_path)
+    
+    # Drop duplicate rows and keep the first occurrence
+    df_dedup = df.drop_duplicates(keep='first')
+    
+    # Define the output path
+    if output_path is None:
+        output_path = file_path  # Overwrite the original file if no output path is provided
+    
+    # Save the deduplicated data
+    df_dedup.to_csv(output_path, index=False)
+    
+    print(f"Duplicates removed. Deduplicated file saved to {output_path}")
+    return df_dedup
 
 # ******************************************
 # Function to split DataFrame based on time intervals and aggregate by Cluster ID counts
@@ -57,8 +75,8 @@ def GenMatricesV2(time_interval, error_threshold):
     # time_interval = '15min'  # Change to your preferred interval
 
     # Define the anomaly conditions (specific clusters or thresholds)
-    anomaly_clusters = ['E2']
-    alarm_clusters = ['E3']
+    anomaly_clusters = ['E3']
+    alarm_clusters = ['E4']
 
     # error_threshold = 3  # If the sum of occurrences of these clusters in a chunk exceeds this, label as anomaly
 
@@ -80,9 +98,18 @@ def GenMatricesV2(time_interval, error_threshold):
 
     # Optionally, save the result to a new CSV file
     #result_df.to_csv('./Thunderbird_Brain_results/Thunderbird.log_structured_Preprocess_Samples.csv', index=False)
-    output_file = f"./data/occurences_matrix_preprocessed.csv"
-
+    output_file = f"./data/occurences_matrix_preprocessed_dups.csv"
     result_df.to_csv(output_file, index=False)
+
+    output_file_dedup = f"./data/occurences_matrix_preprocessed.csv"
+    remove_duplicates(output_file, output_file_dedup)
+
+    # Delete the intermediate file with duplicates
+    if os.path.exists(output_file):
+        os.remove(output_file)
+        print(f"Intermediate file {output_file} deleted.")
+    else:
+        print(f"Intermediate file {output_file} not found.")
 
     print(f"Preprocessing completed and saved to CSV file: {output_file}")
 

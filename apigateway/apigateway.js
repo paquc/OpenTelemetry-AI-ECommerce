@@ -20,6 +20,8 @@ const PORT = process.env.PORT || 9000;
 // io = require('socket.io')
 const cote = require('cote')
 
+const {createMessage} = require('./winstonlogger.js');
+
 const winston = require('winston');
 const { format } = winston;
 const { combine, timestamp, printf, colorize, align } = winston.format;
@@ -71,6 +73,7 @@ function logEventMessage(message, severity) {
 app.get('/', (req, res) => {
   res.send('running...');
   logEventMessage(`api gateway running ${PORT}`, severity_trace);
+  logger.error(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', 'API Gateway service running'));
 });
 
 
@@ -79,27 +82,26 @@ app.get('/userslist', function(req, res) {
   userRequester.send({type: 'list'}, function(err, users) {
       const endTime = Date.now();
       const duration = endTime - startTime;
-      const currentTimeUnix = Date.now();
-
+      
       // 
-      const min_value = 200;
-      const max_value = 300;
+      const min_value = 400;
+      const max_value = 600;
 
       if(err) {
-        const msg = `${currentTimeUnix},${ERROR_FAIL},${SOURCE_SERVICE},${API_ENDPOINT},${err},,Error fetching users list from user-service: code ${err}`;
-        logger.error(msg);
+        // const msg = `${currentTimeUnix},${ERROR_FAIL},${SOURCE_SERVICE},${API_ENDPOINT},${err},,Error fetching users list from user-service: code ${err}`;
+        logger.error(createMessage( Date.now(), ERROR_FAIL, SOURCE_SERVICE, API_ENDPOINT, err, '', `Error fetching users list from user-service: code ${err}`));
         res.status(500).send('Error fetching users list');
       }
       else {
         if (duration < min_value) {
-          const msg = `${currentTimeUnix},${ERROR_NONE},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Users list fetched successfully from user-service in ${duration} ms`;
-          logger.info(msg);
+          // const msg = `${currentTimeUnix},${ERROR_NONE},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Users list fetched successfully from user-service in ${duration} ms`;
+          logger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Users list fetched successfully from user-service in ${duration} ms`));
         } else if (duration >= min_value && duration < max_value) {
-          const slowMsg = `${currentTimeUnix},${ERROR_DELAY},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Fetching users list took longer than expected (max=300ms): ${duration} ms`;
-          logger.warn(slowMsg);
+          // const slowMsg = `${currentTimeUnix},${ERROR_DELAY},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Fetching users list took longer than expected (max=300ms): ${duration} ms`;
+          logger.warn(createMessage( Date.now(), ERROR_DELAY, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Fetching users list took longer than expected (max=${min_value}ms): ${duration} ms`));
         } else if (duration >= max_value) {
-          const slowMsg = `${currentTimeUnix},${ERROR_DELAY},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Fetching users list took too much time according the customer SLA (max=500ms): ${duration} ms`;
-          logger.error(slowMsg);
+          // const slowMsg = `${currentTimeUnix},${ERROR_DELAY},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Fetching users list took too much time according the customer SLA (max=500ms): ${duration} ms`;
+          logger.error(createMessage( Date.now(), ERROR_DELAY, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Fetching users list took too much time according the customer SLA (max=${max_value}ms): ${duration} ms`));
         }
         else {
         }
@@ -110,10 +112,9 @@ app.get('/userslist', function(req, res) {
 
 errors.errorsCounter.add(0);
 
-// START listening...
-app.listen(PORT);
 
-const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-APIGateway.csv';
+// const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-APIGateway.csv';
+const logFilePath = 'AI-ECommerce-APIGateway.csv';
 
 const fileRotateTransport = new winston.transports.DailyRotateFile({
   filename: 'combined-%DATE%.log',
@@ -135,9 +136,13 @@ const logger = winston.createLogger({
     new winston.transports.File({
       filename: logFilePath,
     }),
-    fileRotateTransport,
+    // fileRotateTransport,
     // new LogtailTransport(logtail),
   ],
 });
 
+logger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', 'API Gateway service started with success'));
+
+// START listening...
+app.listen(PORT);
 logEventMessage(`API Gateway running... on ${PORT}`, severity_trace);

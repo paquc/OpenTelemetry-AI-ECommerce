@@ -19,18 +19,21 @@ services:
       - ./servemodelfastapi/Drain3Parse.py:/Drain3Parse.py
       - ./servemodelfastapi/TrainAlarms.py:/TrainAlarms.py
       - ./servemodelfastapi/PreprocessData.py:/PreprocessData.py
-      - ./servemodelfastapi/data/:/data/
-      - ./logstash_ingest_data/AI-ECommerce-APIGateway.csv:/AI-ECommerce-APIGateway.csv
+      - "./servemodelfastapi/data/:/data/"
+      - ./logstash_ingest_data/system_unified_log.csv:/system_unified_log.csv
+
 
   apigateway:
     build:
       context: .
       dockerfile: Dockerfile.apigateway
     volumes:
-      - ./apigateway/apigateway.js:/app/apigateway.js
-      - ./apigateway/.env:/app/.env
-      - ./logstash_ingest_data/:/usr/share/logstash/ingest_data/
-      - ./filebeat_ingest_data/:/usr/share/filebeat/ingest_data/
+      - ./apigateway/apigateway.js:/apigateway.js
+      - ./apigateway/.env:/.env
+      - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
+      - "./filebeat_ingest_data/:/usr/share/filebeat/ingest_data/"
+      - ./winstonlogger.js:/winstonlogger.js 
+      - ./apigateway/AI-ECommerce-APIGateway.csv:/AI-ECommerce-APIGateway.csv
     container_name: apigateway
     ports:
       - "9000:9000"
@@ -139,7 +142,7 @@ services:
     volumes:
       - ./tracing/tracing.js:/src/payment/tracing.js
       - ./payment/payment-service.js:/src/payment/payment-service.js
-      - ./logstash_ingest_data/:/usr/share/logstash/ingest_data/
+      - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
       - ./winstonlogger.js:/src/winstonlogger.js
     environment:
       - PG=true
@@ -155,7 +158,7 @@ services:
     volumes:
       - ./tracing/tracing.js:/src/product/tracing.js
       - ./product/product-service.js:/src/product/product-service.js
-      - ./logstash_ingest_data/:/usr/share/logstash/ingest_data/
+      - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
       - ./winstonlogger.js:/src/winstonlogger.js
     environment:
       - PG=true
@@ -171,7 +174,7 @@ services:
     volumes:
       - ./tracing/tracing.js:/src/purchase/tracing.js
       - ./purchase/purchase-service.js:/src/purchase/purchase-service.js
-      - ./logstash_ingest_data/:/usr/share/logstash/ingest_data/
+      - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
       - ./winstonlogger.js:/src/winstonlogger.js
     environment:
       - PG=true
@@ -187,7 +190,7 @@ services:
     volumes:
       - ./tracing/tracing.js:/src/user/tracing.js
       - ./user/user-service.js:/src/user/user-service.js
-      - ./logstash_ingest_data/:/usr/share/logstash/ingest_data/
+      - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
       - ./winstonlogger.js:/src/winstonlogger.js
     environment:
       - PG=true
@@ -510,6 +513,7 @@ services:
       - certs:/usr/share/logstash/certs
       - logstashdata01:/usr/share/logstash/data
       - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
+      - "./apigateway/:/apigateway/"
       - "./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
     environment:
       - xpack.monitoring.enabled=false
