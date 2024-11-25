@@ -1,7 +1,6 @@
 const logger_name='users-service-logger';
 const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
-const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-User.csv';
 
 const {createLogger, createMessage} = require('../winstonlogger.js');
 
@@ -73,6 +72,8 @@ function updateUsers() {
         userPublisher.publish('update', users);
     });
 }
+
+const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-User';
 
 wlogger = createLogger(logFilePath);
 wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', 'USERS service started with success'));

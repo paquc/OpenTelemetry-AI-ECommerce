@@ -3,7 +3,6 @@ require('dotenv').config();
 const logger_name='purchase-service-logger';
 const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
-const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-Purchase.csv';
 
 const {createLogger, createMessage} = require('../winstonlogger.js');
 
@@ -108,6 +107,8 @@ function updatePurchases() {
         purchasePublisher.publish('update', purchases);
     });
 }
+
+const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-Purchase';
 
 wlogger = createLogger(logFilePath);
 wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', 'PURCHASE service started with success'));

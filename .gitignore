@@ -19,3 +19,4 @@ logstash_ingest_data/AI-ECommerce-Payment.csv
 logstash_ingest_data/AI-ECommerce-Product.csv
 logstash_ingest_data/AI-ECommerce-User.csv
 apigateway/AI-ECommerce-APIGateway.csv
+logstash_ingest_data/

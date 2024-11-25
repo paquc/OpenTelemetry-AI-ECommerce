@@ -13,6 +13,8 @@ const csvFormat = format.printf(({ level, message, timestamp }) => {
 const fileRotateTransport = new winston.transports.DailyRotateFile({
   filename: 'combined-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
+  zippedArchive: true,
+  maxSize: '20m',
   maxFiles: '1d',
 });
 
@@ -26,10 +28,18 @@ function createLogger(logFilePath) {
       csvFormat
     ),
     transports: [
-      new winston.transports.File({
-        filename: logFilePath,
-      }),
-      fileRotateTransport,
+      new winston.transports.Console(),
+      new winston.transports.DailyRotateFile({
+        filename: logFilePath + '-%DATE%.csv',
+        datePattern: 'YYYY-MM-DD',
+        zippedArchive: true,
+        maxSize: '2m',
+        maxFiles: '1d',
+      })
+      // new winston.transports.File({
+      //   filename: logFilePath,
+      // }),
+      // fileRotateTransport,
     ],
   });
 }

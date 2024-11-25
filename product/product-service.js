@@ -1,7 +1,6 @@
 const logger_name='products-service-logger';
 const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
-const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-Product.csv';
 
 const {createLogger, createMessage} = require('../winstonlogger.js');
 
@@ -79,6 +78,8 @@ function updateProducts() {
         productPublisher.publish('update', products);
     });
 }
+
+const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-Product';
 
 wlogger = createLogger(logFilePath);
 wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', 'PRODUCTS service started with success'));
