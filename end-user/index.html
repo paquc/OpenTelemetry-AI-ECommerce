@@ -27,15 +27,6 @@
 
         // Define the controller function 'ProductController', which controls the data and behavior for the view
         function ProductController($scope) {
-
-            // Auto-generate a UUID on page load
-            // generateUUID();
-
-            function generateUUID () {
-                const newUUID = uuidv4(); // Call the globally available uuidv4 function
-                console.log('Generated UUID:', newUUID); // Log it for debugging
-                $scope.uuid = newUUID; // Assign it to scope for display
-            }
             
             // logEventMessage('admin-service-logger', 'END-USER service controller called', severity_info, getLineNumber());
             // Create a new user by emitting an event to the 'user' namespace
@@ -67,17 +58,24 @@
             }
 
             // Function called when the user attempts to purchase a product
-            $scope.purchase = function(id) {
+            $scope.purchase = function(id, req_id) {
                 
                 // Emit a 'buy' event to the 'purchase' namespace with the user's ID and the product ID
-                purchaseService.emit('buy', { userId: $scope.user.id, productId: id }, function(err, data) {
-                    if (err) return; // If there's an error, do nothing
+                purchaseService.emit(
+                    'buy',
+                    {
+                        userId: $scope.user.id, 
+                        productId: id,
+                        request_ID: req_id, // Include the request ID
+                    }, 
+                    function(err, data) {
+                        if (err) return; // If there's an error, do nothing
 
-                    // After a successful purchase, reload the product list
-                    list();
-                    // Update the user's balance and data after the purchase
-                    $scope.user = data.user;
-                });
+                        // After a successful purchase, reload the product list
+                        list();
+                        // Update the user's balance and data after the purchase
+                        $scope.user = data.user;
+                    });
             };
 
             // Listen for 'update' events from the 'product' namespace to dynamically update the product list when a product changes
@@ -115,7 +113,7 @@
             class="btn btn-sm" 
             ng-class="{'btn-success': user.balance >= product.price}" 
             ng-disabled="user.balance < product.price" 
-            ng-click="purchase(product.id)" 
+            ng-click="purchase(product.id, uuidv4())" 
             ng-style="{'visibility': product.stock > 0 ? 'visible' : 'hidden' }" > Buy &mdash; ${{product.price}}
         </button>
     </div>

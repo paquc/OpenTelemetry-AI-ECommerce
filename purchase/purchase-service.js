@@ -35,6 +35,11 @@ var paymentRequester = new cote.Requester({
     key: 'payment'
 });
 
+var userRequester = new cote.Requester({
+    name: 'admin user requester',
+    namespace: 'user'
+  });
+
 purchaseResponder.on('*', console.log);
 
 purchaseResponder.on('buy', function(req, cb) {
@@ -82,6 +87,10 @@ purchaseResponder.on('buy', function(req, cb) {
 });
 
 purchaseResponder.on('list', function(req, cb) {
+    let {request_ID}  = req; // Extract the request ID from the incoming request
+    if (!request_ID) {
+        request_ID = uuidv4();
+    }
     const startTime = Date.now();
     
     // Execute the query to the DB
@@ -91,7 +100,7 @@ purchaseResponder.on('list', function(req, cb) {
     const endTime = Date.now();
     const duration = endTime - startTime;
     
-    wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'list', duration, '', `Purchases list fetched successfully from postgres database in ${duration} ms`));
+    wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'list', duration, '', `Purchases list fetched successfully from postgres database in ${duration} ms`, request_ID));
 });
 
 function updatePurchases() {

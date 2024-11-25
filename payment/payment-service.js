@@ -20,6 +20,11 @@ var paymentResponder = new cote.Responder({
     key: 'payment'
 });
 
+var userRequester = new cote.Requester({
+    name: 'admin user requester',
+    namespace: 'user'
+  });
+
 paymentResponder.on('*', console.log);
 
 paymentResponder.on('process', function(req, cb) {
@@ -37,6 +42,16 @@ paymentResponder.on('process', function(req, cb) {
         const duration = endTime - startTime;
         wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'process', duration, '', `Payment processed successfully for user ID=${req.userId} in ${duration} ms`, request_ID));
     });
+
+    userRequester.send(
+        {
+          type: 'list',
+          request_ID: request_ID, // Include the request ID
+        }, 
+        function(err, users) {
+            
+      });
+
 });
 
 wlogger = createLogger(logFilePath);

@@ -85,6 +85,7 @@ app.get('/userslist', function(req, res) {
   const request_ID = uuidv4();
   console.log(`Request ID: ${request_ID} - API Gateway service running...`);
   const startTime = Date.now();
+  
   userRequester.send(
     {
       type: 'list',
@@ -119,6 +120,7 @@ app.get('/userslist', function(req, res) {
         res.status(200).send(users);
       }
   });
+  
 });
 
 errors.errorsCounter.add(0);
