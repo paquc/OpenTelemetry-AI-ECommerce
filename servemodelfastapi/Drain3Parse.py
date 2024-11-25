@@ -54,6 +54,7 @@ E3_list = 0
 E4_list = 0
 E5_list = 0
 E6_list = 0
+E7_list = 0
 
 def ParseNewEvent(log_entry, alarm_clusters):
     global E1_list
@@ -62,6 +63,7 @@ def ParseNewEvent(log_entry, alarm_clusters):
     global E4_list
     global E5_list
     global E6_list
+    global E7_list
     global newItemsCounter
     global newEvent
 
@@ -90,6 +92,8 @@ def ParseNewEvent(log_entry, alarm_clusters):
             E5_list += 1
         if result.cluster_id == 6:
             E6_list += 1
+        if result.cluster_id == 7:
+            E7_list += 1
 
         newItemsCounter += 1
 
@@ -101,6 +105,7 @@ def ParseNewEvent(log_entry, alarm_clusters):
                 'E4': [E4_list], 
                 'E5': [E5_list], 
                 'E6': [E6_list], 
+                'E7': [E7_list], 
             })
             
             print("********************************************************")
@@ -116,17 +121,18 @@ def ParseNewEvent(log_entry, alarm_clusters):
             E4_list = 0
             E5_list = 0
             E6_list = 0
+            E7_list = 0
 
             newEvent = pd.DataFrame({
-                'E1': [],       # Info
-                'E2': [],       # Warnings
-                'E3': [],        # Errors
-                'E4': [],        # Errors
-                'E5': [],        # Errors
-                'E6': []        # Errors
+                'E1': [],
+                'E2': [],
+                'E3': [],
+                'E4': [],
+                'E5': [],
+                'E6': [],
+                'E7': [],
             })
 
-            # newDataFrame = newDataFrame.drop(columns=['E1'])
             if alarm_clusters:
                 newDataFrame.drop(columns=alarm_clusters, inplace=True)
                 print(newDataFrame)

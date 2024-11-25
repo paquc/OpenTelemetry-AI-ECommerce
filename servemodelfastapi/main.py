@@ -77,14 +77,14 @@ def GenMatrix():
 # curl -X GET 'http://127.0.0.1:8088/GenMatrix'
 @app.get("/GenMatrixV2")
 def GenMatrixV2():
-    gmV2.GenMatricesV2('200ms', 3)
+    gmV2.GenMatricesV2('150ms', 2)
     return {"Gen matrices V2": "Done."}
 
 
 # curl -X GET 'http://127.0.0.1:8088/TrainModels'
 @app.get("/TrainModels")
 def TrainModels():
-    train.TrainModels(1, 1, 0, 1, 70, 30, 0)
+    train.TrainModels(0, 1, 0, 1, 80, 20, 0)
     return {"Train models": "Done."}
 
 

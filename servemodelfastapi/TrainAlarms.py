@@ -60,6 +60,9 @@ def get_model_evaluation(y_test, y_pred, model_name, log_file, estimators, rando
         log_file.write(f'WARNING - Only 1 class present in the predicted set: {unique_classes_pred}\n\n')    
         compute_AUC = False
 
+    print("******************************************************")
+    print("******************* TRAINING RESULTS *****************")
+    print("******************************************************")
     # Accuracy
     accuracy = accuracy_score(y_test, y_pred)
     msg=f"Accuracy: {accuracy:.4f}"
@@ -97,8 +100,11 @@ def get_model_evaluation(y_test, y_pred, model_name, log_file, estimators, rando
 
     # Alternatively, print the classification report
     msg=classification_report(y_test, y_pred)
-    print(msg)
-    log_file.write(msg+"\n")
+    # print(msg)
+    # log_file.write(msg+"\n")
+
+    print("******************************************************")
+    print("******************************************************")
 
     if not RF:
         # Get the coefficients and intercept
@@ -223,7 +229,7 @@ def TrainModels(train_LR, train_RF, use_bootstrap, n_bootstrap_samples, train_da
                 model = RandomForestClassifier(n_estimators=estimators, random_state=randomize_val)         # class_weight='balanced', n_estimators=(bs_index+1)*2, warm_start=False, random_state=(bs_index+1)*10)
                 model.fit(X_train, y_train)
 
-                print(X_train.head())
+                # print(X_train.head())
 
                 y_test_pred = model.predict(X_test)
                 get_model_evaluation(y_test, y_test_pred, f'Random Forest Classifier - TEST DATA - {bs_index}', RF_log_file, estimators, randomize_val, model, X_train, True)
@@ -232,8 +238,8 @@ def TrainModels(train_LR, train_RF, use_bootstrap, n_bootstrap_samples, train_da
                     y_val_pred = model.predict(X_val)
                     get_model_evaluation(y_val, y_val_pred, f'Random Forest Classifier - VALIDATION DATA - {bs_index}', RF_log_file, estimators, randomize_val, model, X_train, True)
 
-                y_train_pred = model.predict(X_train)
-                get_model_evaluation(y_train, y_train_pred, f'Random Forest Classifier - TRAIN DATA - {bs_index}', RF_log_file, estimators, randomize_val, model, X_train, True)
+                # y_train_pred = model.predict(X_train)
+                # get_model_evaluation(y_train, y_train_pred, f'Random Forest Classifier - TRAIN DATA - {bs_index}', RF_log_file, estimators, randomize_val, model, X_train, True)
 
 
                 # Assume `model` is your trained model
