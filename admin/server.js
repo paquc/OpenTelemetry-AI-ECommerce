@@ -43,6 +43,8 @@ app.get('/product', function(req, res) {
     });
 });
 
+// curl -X POST 'http://127.0.0.1:5000/product' -H "Content-Type: application/json" -d '{"product": {"name": "Sample Product","price": 25.99,"quantity": 100}}'
+
 app.post('/product', function(req, res) {
     productRequester.send({type: 'create', product: req.body.product}, function(err, product) {
         res.send(product);
