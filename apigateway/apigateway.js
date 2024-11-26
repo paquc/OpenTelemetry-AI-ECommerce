@@ -83,7 +83,6 @@ app.get('/', (req, res) => {
 
 app.get('/userslist', function(req, res) {
   const request_ID = uuidv4();
-  console.log(`Request ID: ${request_ID} - API Gateway service running...`);
   const startTime = Date.now();
   
   userRequester.send(
@@ -106,14 +105,11 @@ app.get('/userslist', function(req, res) {
       }
       else {
         if (duration < min_value) {
-          // const msg = `${currentTimeUnix},${ERROR_NONE},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Users list fetched successfully from user-service in ${duration} ms`;
           logger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Users list fetched successfully from user-service in ${duration} ms`, request_ID));
         } else if (duration >= min_value && duration < max_value) {
-          // const slowMsg = `${currentTimeUnix},${ERROR_DELAY},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Fetching users list took longer than expected (max=300ms): ${duration} ms`;
-          logger.warn(createMessage( Date.now(), ERROR_DELAY, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Fetching users list took longer than expected (max=${min_value}ms): ${duration} ms`, request_ID));
+          logger.info(createMessage( Date.now(), ERROR_DELAY, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Fetching users list took longer than expected (max=${min_value}ms): ${duration} ms`, request_ID));
         } else if (duration >= max_value) {
-          // const slowMsg = `${currentTimeUnix},${ERROR_DELAY},${SOURCE_SERVICE},${API_ENDPOINT},${duration},,Fetching users list took too much time according the customer SLA (max=500ms): ${duration} ms`;
-          logger.error(createMessage( Date.now(), ERROR_DELAY, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Fetching users list took too much time according the customer SLA (max=${max_value}ms): ${duration} ms`, request_ID));
+          logger.info(createMessage( Date.now(), ERROR_DELAY, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Fetching users list took too much time according the customer SLA (max=${max_value}ms): ${duration} ms`, request_ID));
         }
         else {
         }

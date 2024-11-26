@@ -102,14 +102,14 @@ const batchSpanProcessor = new BatchSpanProcessor(OTLPTracesExporter, {
   exportTimeoutMillis: 30000,   // Maximum allowed time to send a batch
 });
 
-/*
-const nodeTraceProvider = new NodeTracerProvider();
-registerInstrumentations({
-  instrumentations: [new SocketIoInstrumentation()],
- });
-nodeTraceProvider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-nodeTraceProvider.register();
-*/
+
+// const provider = new NodeTracerProvider();
+// registerInstrumentations({
+//   tracerProvider: provider,
+//   instrumentations: [new SocketIoInstrumentation()],
+// });
+// provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+// provider.register();
 
 /////////////////
 // Metrics...

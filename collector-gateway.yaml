@@ -17,7 +17,7 @@ processors:
 
 exporters:
   logging:
-    loglevel: debug # debug, info, warn, error
+    loglevel: info # debug, info, warn, error
   otlphttp/loki:                        
     endpoint: http://loki:3100/otlp
     tls:
@@ -28,10 +28,7 @@ exporters:
     endpoint: tempo:4317
     tls:
       insecure: true
-  # otlphttp/elastic:
-  #     endpoint: 'https://fleet-server:8220' # APM Server URL
-  #     tls:
-  #       insecure: true
+  
     
 #apm_server_url: 'http://fleet-server:8200' # APM Server URL
 
@@ -52,8 +49,8 @@ service:
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [prometheus]  
+      exporters: [logging,prometheus]  
     traces:
       receivers: [otlp]
       processors: [batch, resource]
-      exporters: [otlp/tempo]
+      exporters: [logging,otlp/tempo]

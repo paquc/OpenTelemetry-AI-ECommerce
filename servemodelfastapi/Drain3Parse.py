@@ -16,7 +16,8 @@ log_pattern_real_time = re.compile(
         r"(?P<Endpoint>[^,]*),"                               # Endpoint: URL or API endpoint (e.g., /userslist)
         r"(?P<DataVal1>\d*),"                                 # Duration: Numeric value (e.g., response time)
         r"(?P<DataVal2>[^,]*),"                               # Extra Field: Optional extra field (empty in this example)
-        r"(?P<Content>.*)"                                    # Message: Log message
+        r"(?P<Content>.*),"                                   # Message: Log message
+        r"(?P<UUID>[a-f0-9\-]{36})"                           # UUID: Standard 36-character UUID format
     )
 
 log_pattern = re.compile(
@@ -27,11 +28,12 @@ log_pattern = re.compile(
     r"(?P<Level>\w+),"                                                   # Level: info, error, etc.
     r"(?P<EpochTime>\d+),"                                               # Epoch Time: Unix timestamp in milliseconds
     r"(?P<Status>\w+),"                                                  # Status: OK, ERROR, etc.
-    r"(?P<Component>[^\s,]+),"                                           # Component: Component name (e.g., payment-service)
-    r"(?P<Endpoint>[^,]*),"                                              # Endpoint: URL or API endpoint (e.g., process)
+    r"(?P<Component>[^\s,]+),"                                           # Component: Component name (e.g., user-service)
+    r"(?P<Endpoint>[^,]*),"                                              # Endpoint: URL or API endpoint (e.g., list)
     r"(?P<DataVal1>\d*),"                                                # Duration: Numeric value (e.g., response time)
     r"(?P<DataVal2>[^,]*),"                                              # Extra Field: Optional extra field (empty in this example)
-    r"(?P<Content>.*)"                                                   # Message: Log message
+    r"(?P<Content>[^,]*),"                                               # Message: Log message up to the UUID
+    r"(?P<UUID>[a-f0-9\-]{36})"                                          # UUID: Standard 36-character UUID format
 )
 
 # 1. New log entry comes-in: 2024-11-15 07:22:10.883,info,1731698530883,OK,apigateway,/userslist,11,,Users list fetched successfully from user-service in 11 ms
@@ -178,6 +180,7 @@ def Drain3ParseLearn():
                 data_val1 = match.group("DataVal1")
                 data_val2 = match.group("DataVal2")
                 log_content = match.group("Content")  # Extract the Content field
+                uuid_content = match.group("UUID")
             
                 result = drain_parser.match(log_content)
 
@@ -194,8 +197,9 @@ def Drain3ParseLearn():
                     "DataVal1": data_val1,
                     "DataVal2": data_val2,
                     "Content": log_content,
+                    "UUID": uuid_content,
                     "EventId": event_id,
-                    "EventTemplate": result.get_template()
+                    "EventTemplate": result.get_template(),
                 }
                 
                 # Append the dictionary to the list

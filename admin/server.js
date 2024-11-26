@@ -1,13 +1,13 @@
 const logger_name='admin-service-logger';
 
-//const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
+const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
 var app = require('express')(),
     bodyParser = require('body-parser'),
     server = require('http').Server(app),
     io = require('socket.io')(server),
-    cote = require('cote'),
-    {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
+    cote = require('cote');
+    // {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
 app.use(bodyParser.json());
 
