@@ -42,11 +42,19 @@ log_pattern = re.compile(
  # Create a pandas DataFrame
 newEvent = pd.DataFrame({
     'E1': [],       # Info
-    'E2': [],        
-    'E3': [],         
-    'E4': [],         
-    'E5': [],         
-    'E6': []         
+    'E10': [],           # Warnings
+    'E11': [],
+    'E12': [],
+    'E13': [],
+    'E14': [],
+    'E2': [],
+    'E3': [],
+    'E4': [],
+    'E5': [],
+    'E6': [],
+    'E7': [],
+    'E9': [],
+    'E8': [],
 })
 
 newItemsCounter = 0
@@ -57,6 +65,15 @@ E4_list = 0
 E5_list = 0
 E6_list = 0
 E7_list = 0
+E8_list = 0
+E9_list = 0
+E10_list = 0
+E11_list = 0
+E12_list = 0
+E13_list = 0
+E14_list = 0
+
+# E1,E10,E11,E12,E13,E14,E2,E3,E4,E5,E6,E7,E9,IsAlarm
 
 def ParseNewEvent(log_entry, alarm_clusters):
     global E1_list
@@ -66,6 +83,13 @@ def ParseNewEvent(log_entry, alarm_clusters):
     global E5_list
     global E6_list
     global E7_list
+    global E8_list
+    global E9_list
+    global E10_list
+    global E11_list
+    global E12_list
+    global E13_list
+    global E14_list
     global newItemsCounter
     global newEvent
 
@@ -76,7 +100,10 @@ def ParseNewEvent(log_entry, alarm_clusters):
     drain_parser = TemplateMiner(persistence, config=config)
 
     # log_entry = "2024-11-15 07:22:10.883,info,1731698530883,OK,apigateway,/userslist,11,,Users list fetched successfully from user-service in 11 ms"
+    # print("********************************************************")
     # print(log_entry)
+    # print("********************************************************")
+
     match = log_pattern_real_time.match(log_entry)
     if match:
         log_content = match.group("Content")  # Extract the Content field
@@ -96,22 +123,45 @@ def ParseNewEvent(log_entry, alarm_clusters):
             E6_list += 1
         if result.cluster_id == 7:
             E7_list += 1
+        if result.cluster_id == 8:
+            E8_list += 1
+        if result.cluster_id == 9:
+            E9_list += 1
+        if result.cluster_id == 10:
+            E10_list += 1
+        if result.cluster_id == 11:
+            E11_list += 1
+        if result.cluster_id == 12:
+            E12_list += 1
+        if result.cluster_id == 13:
+            E13_list += 1
+        if result.cluster_id == 14:
+            E14_list += 1
 
         newItemsCounter += 1
 
-        if newItemsCounter == 50:
+        if newItemsCounter == 200:
             newEvent = pd.DataFrame({
                 'E1': [E1_list],       # Info
-                'E2': [E2_list],       # Info
-                'E3': [E3_list], 
-                'E4': [E4_list], 
-                'E5': [E5_list], 
-                'E6': [E6_list], 
-                'E7': [E7_list], 
+                'E10': [E10_list],
+                'E11': [E11_list],
+                'E12': [E12_list],
+                'E13': [E13_list],
+                'E14': [E14_list],
+                'E2': [E2_list],
+                'E3': [E3_list],
+                'E4': [E4_list],
+                'E5': [E5_list],
+                'E6': [E6_list],
+                'E7': [E7_list],
+                'E9': [E9_list],
+                'E8': [E8_list],
             })
             
             print("********************************************************")
+            print("********************************************************")
             print(newEvent)
+            print("********************************************************")
             print("********************************************************")
 
             newDataFrame = newEvent.copy()
@@ -124,15 +174,29 @@ def ParseNewEvent(log_entry, alarm_clusters):
             E5_list = 0
             E6_list = 0
             E7_list = 0
+            E8_list = 0
+            E9_list = 0
+            E10_list = 0
+            E11_list = 0
+            E12_list = 0
+            E13_list = 0
+            E14_list = 0
 
             newEvent = pd.DataFrame({
-                'E1': [],
+                'E1': [],       # Info
+                'E10': [],           # Warnings
+                'E11': [],
+                'E12': [],
+                'E13': [],
+                'E14': [],
                 'E2': [],
                 'E3': [],
                 'E4': [],
                 'E5': [],
                 'E6': [],
                 'E7': [],
+                'E9': [],
+                'E8': [],
             })
 
             if alarm_clusters:
