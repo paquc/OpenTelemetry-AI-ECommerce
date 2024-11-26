@@ -36,7 +36,6 @@ userResponder.on('create',
         if (!request_ID) {
             request_ID = uuidv4();
         }
-
         logEventMessage(logger_name, 'USER service called - create - Create new user in BD', severity_info, getLineNumber());
         const startTime = Date.now();
         models.User.create({}, cb);
@@ -49,14 +48,17 @@ userResponder.on('create',
 
 userResponder.on('list', 
     function(req, cb) {
+        const startTime = Date.now();
         let {request_ID}  = req; // Extract the request ID from the incoming request
         if (!request_ID) {
             request_ID = uuidv4();
         }
-        wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'list', '', '', `Users list request`, request_ID));
         logEventMessage(logger_name, 'USER service called - list - Find all users in BD', severity_info, getLineNumber());
         var query = req.query || {};
         models.User.find(query, cb);
+        const endTime = Date.now();
+        const duration = endTime - startTime;
+        wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'list', duration, '', `Users queried with success in ${duration}ms`, request_ID));
 });
 
 userResponder.on('get', 

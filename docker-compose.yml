@@ -103,6 +103,7 @@ services:
       - ./tracing/tracing.js:/src/admin/tracing.js
       - ./admin/server.js:/src/admin/server.js
       - ./admin/index.html:/src/admin/index.html
+      - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
     restart: on-failure
     ports:
       - 5000:5000

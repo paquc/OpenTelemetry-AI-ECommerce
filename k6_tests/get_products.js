@@ -71,8 +71,8 @@ if (testType === 5) {
 export { options };
 
 // Function that will call the /userslist endpoint and check if the response contains the expected number of users
-function listUsers(numberOfUsers, print) {
-  const res = http.get('http://localhost:9000/userslist');
+function getProducts(numberOfUsers, print) {
+  const res = http.get('http://localhost:5000/product');
   const users = JSON.parse(res.body);
   if (print)
     console.log(users);
@@ -81,5 +81,5 @@ function listUsers(numberOfUsers, print) {
 }
 
 export default function () {
-  listUsers(6, false);
+  getProducts(6, false);
 }

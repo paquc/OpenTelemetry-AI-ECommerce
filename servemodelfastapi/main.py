@@ -77,7 +77,7 @@ def GenMatrix():
 # curl -X GET 'http://127.0.0.1:8088/GenMatrix'
 @app.get("/GenMatrixV2")
 def GenMatrixV2():
-    gmV2.GenMatricesV2('150ms', 2)
+    gmV2.GenMatricesV2('4200ms', 2)
     return {"Gen matrices V2": "Done."}
 
 

@@ -71,15 +71,49 @@ if (testType === 5) {
 export { options };
 
 // Function that will call the /userslist endpoint and check if the response contains the expected number of users
-function listUsers(numberOfUsers, print) {
-  const res = http.get('http://localhost:9000/userslist');
-  const users = JSON.parse(res.body);
+function useSystem(numberOfUsers, print) {
+
+  let res = http.get('http://localhost:9000/userslist');
+  let users = JSON.parse(res.body);
   if (print)
     console.log(users);
-  check(res, { [`contains ${numberOfUsers} users`]: (r) => JSON.parse(r.body).length === numberOfUsers });
+  // check(res, { [`contains ${numberOfUsers} users`]: (r) => JSON.parse(r.body).length === numberOfUsers });
   sleep(randomIntBetween(0, sleep_duration));
+
+  res = http.get('http://localhost:5000/product');
+  const products = JSON.parse(res.body);
+  if (print)
+    console.log(users);
+  // check(res, { [`contains ${numberOfUsers} users`]: (r) => JSON.parse(r.body).length === numberOfUsers });
+  sleep(randomIntBetween(0, sleep_duration));
+
+  res = http.get('http://localhost:5000/purchase');
+  const purchases = JSON.parse(res.body);
+  if (print)
+    console.log(users);
+  // check(res, { [`contains ${numberOfUsers} users`]: (r) => JSON.parse(r.body).length === numberOfUsers });
+  sleep(randomIntBetween(0, sleep_duration));
+
+  res = http.get('http://localhost:5000/user');
+  const user = JSON.parse(res.body);
+  if (print)
+    console.log(users);
+  // check(res, { [`contains ${numberOfUsers} users`]: (r) => JSON.parse(r.body).length === numberOfUsers });
+  sleep(randomIntBetween(0, sleep_duration));
+
+
+  // // Create login request.
+  // let formdata = {
+  //   "name": "Car",
+  //   "price": "100",
+  //   "stock": "100"
+  // };
+  // let headers = { "Content-Type": "application/json" };
+  // // Send login request
+  // http.post('http://localhost:5000/product', formdata, { headers: headers });
+
 }
 
 export default function () {
-  listUsers(6, false);
+  useSystem(6, false);
 }

@@ -75,8 +75,8 @@ def GenMatricesV2(time_interval, error_threshold):
     # time_interval = '15min'  # Change to your preferred interval
 
     # Define the anomaly conditions (specific clusters or thresholds)
-    anomaly_clusters = ['E3']
-    alarm_clusters = ['E4']
+    anomaly_clusters = ['E9']
+    alarm_clusters = ['E8']
 
     # error_threshold = 3  # If the sum of occurrences of these clusters in a chunk exceeds this, label as anomaly
 

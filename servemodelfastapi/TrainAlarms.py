@@ -100,8 +100,8 @@ def get_model_evaluation(y_test, y_pred, model_name, log_file, estimators, rando
 
     # Alternatively, print the classification report
     msg=classification_report(y_test, y_pred)
-    # print(msg)
-    # log_file.write(msg+"\n")
+    print(msg)
+    log_file.write(msg+"\n")
 
     print("******************************************************")
     print("******************************************************")
