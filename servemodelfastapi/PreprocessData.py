@@ -49,10 +49,7 @@ def split_and_aggregate_by_cluster(df, time_interval, error_threshold, anomaly_c
             if row[anomaly_clusters].sum() >= error_threshold:
                 # print(row[anomaly_clusters].sum())
                 cluster_counts.at[index, 'IsAlarm'] = '1'
-        else:
-            # Check if any cluster exceeds the threshold
-            if row.sum() >= error_threshold:
-                cluster_counts.at[index, 'IsAlarm'] = '1'
+        
 
     # ******************************************
     # IMPORTANT!!!!!!!!!
@@ -75,8 +72,8 @@ def GenMatricesV2(time_interval, error_threshold):
     # time_interval = '15min'  # Change to your preferred interval
 
     # Define the anomaly conditions (specific clusters or thresholds)
-    anomaly_clusters = ['E9']
-    alarm_clusters = ['E8']
+    anomaly_clusters = ['E14', 'E15', 'E16', 'E17']  # Specific clusters to label as anomaly
+    alarm_clusters = []
 
     # error_threshold = 3  # If the sum of occurrences of these clusters in a chunk exceeds this, label as anomaly
 
@@ -95,6 +92,14 @@ def GenMatricesV2(time_interval, error_threshold):
 
     # Display the resulting DataFrame
     print(result_df)
+
+    # Sort the columns in the desired order
+    # Sort the columns in the desired order
+    desired_order = ['E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7', 'E8', 'E9', 'E10', 'E11', 'E12', 'E13', 'E14', 'E15', 'E16', 'E17', 'IsAlarm']
+    result_df = result_df.reindex(columns=desired_order)
+
+    # Remove column that dont have an impact on predictions
+    result_df.drop(columns=['E9','E2','E3','E1','E7','E6','E11','E12','E17'], inplace=True)
 
     # Optionally, save the result to a new CSV file
     #result_df.to_csv('./Thunderbird_Brain_results/Thunderbird.log_structured_Preprocess_Samples.csv', index=False)

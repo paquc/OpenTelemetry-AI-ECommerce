@@ -108,7 +108,7 @@ app.get('/userslist', function(req, res) {
         } else if (duration >= min_value && duration < max_value) {
           logger.info(createMessage( Date.now(), ERROR_DELAY, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Fetching users list took longer than expected (max=${min_value}ms): ${duration} ms`, request_ID));
         } else if (duration >= max_value) {
-          logger.info(createMessage( Date.now(), ERROR_DELAY, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Fetching users list took too much time according the customer SLA (max=${max_value}ms): ${duration} ms`, request_ID));
+          logger.info(createMessage( Date.now(), ERROR_DELAY, SOURCE_SERVICE, API_ENDPOINT, duration, '', `Fetching users list took too much time according the customer SLO (max=${max_value}ms): ${duration} ms`, request_ID));
         }
         else {
         }

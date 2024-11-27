@@ -32,8 +32,8 @@ function logCPU(){
 
     const cpu = globalCPU;
 
-    const min_value = 5.0;
-    const max_value = 10.0;
+    const min_value = 2.0;
+    const max_value = 4.0;
 
     if (cpu < min_value) {
         wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'cpu-usage', cpu, '', `ADMIN API cpu usage running normally at ${cpu}%`, uuidv4()));
@@ -170,7 +170,7 @@ logEventMessage(logger_name, 'ADMIN service is listening on port 5000 *****', se
 const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-Admin';
 
 wlogger = createLogger(logFilePath);
-wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', 'ADMIN API service started with success'));
+wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'Startup', '', '', 'ADMIN API service started with success'));
 
 new cote.Sockend(io, {
     name: 'admin sockend server'
@@ -179,7 +179,7 @@ new cote.Sockend(io, {
 setInterval(() => {
     getCpuUsage();
     // logCPU();
-}, 2000);
+}, 100);
 
 
 

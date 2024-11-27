@@ -1,0 +1,42 @@
+Train data size: 80, Validation size: 0, Test size: 20
+
+Data sample 0 - Start index: 0, End index: 246, Chunk size: 246
+
+------------------------------------
+--- Random Forest Classifier - TEST DATA - 0 ---
+
+Size of test set: 49
+Size of predicted set: 49
+
+Number of estimators: 10
+Randomize value: 55
+
+Unique classes in TESTS\VALIDATION set: [0 1]
+Unique classes in PREDICTED set: [0 1]
+
+Accuracy: 0.9592
+Recall: 1.00
+AUC: 0.90
+Mean Absolute Error (MAE): 0.04
+R-squared: 0.75
+              precision    recall  f1-score   support
+
+           0       1.00      0.80      0.89        10
+           1       0.95      1.00      0.97        39
+
+    accuracy                           0.96        49
+   macro avg       0.98      0.90      0.93        49
+weighted avg       0.96      0.96      0.96        49
+
+Caracteristiques les plus importantes:
+Feature  Importance
+    E15    0.424552
+    E10    0.143808
+    E16    0.141782
+    E14    0.079113
+     E8    0.067391
+    E13    0.063783
+     E5    0.041135
+     E4    0.038436
+------------------------------------
+
