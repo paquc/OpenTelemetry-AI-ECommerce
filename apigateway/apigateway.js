@@ -99,7 +99,6 @@ app.get('/userslist', function(req, res) {
       const max_value = 400;
 
       if(err) {
-        // const msg = `${currentTimeUnix},${ERROR_FAIL},${SOURCE_SERVICE},${API_ENDPOINT},${err},,Error fetching users list from user-service: code ${err}`;
         logger.error(createMessage( Date.now(), ERROR_FAIL, SOURCE_SERVICE, API_ENDPOINT, err, '', `Error fetching users list from user-service: code ${err}`, request_ID));
         res.status(500).send('Error fetching users list');
       }

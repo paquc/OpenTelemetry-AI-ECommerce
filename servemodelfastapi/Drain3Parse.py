@@ -20,6 +20,7 @@ log_pattern_real_time = re.compile(
         r"(?P<UUID>[a-f0-9\-]{36})"                           # UUID: Standard 36-character UUID format
     )
 
+
 log_pattern = re.compile(
     r"(?P<FirstTimestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z)\s"  # ISO 8601 Timestamp with nanoseconds
     r"\{name=(?P<Name>[^\}]+)\}\s"                                       # Metadata: {name=value}
@@ -30,11 +31,28 @@ log_pattern = re.compile(
     r"(?P<Status>\w+),"                                                  # Status: OK, ERROR, etc.
     r"(?P<Component>[^\s,]+),"                                           # Component: Component name (e.g., user-service)
     r"(?P<Endpoint>[^,]*),"                                              # Endpoint: URL or API endpoint (e.g., list)
-    r"(?P<DataVal1>\d*),"                                                # Duration: Numeric value (e.g., response time)
-    r"(?P<DataVal2>[^,]*),"                                              # Extra Field: Optional extra field (empty in this example)
+    r"(?P<DataVal1>-?\d*(\.\d+)?|),"                                     # DataVal1: Integer, Float, or empty
+    r"(?P<DataVal2>-?\d*(\.\d+)?|),"                                     # DataVal2: Integer, Float, or empty
     r"(?P<Content>[^,]*),"                                               # Message: Log message up to the UUID
     r"(?P<UUID>[a-f0-9\-]{36})"                                          # UUID: Standard 36-character UUID format
 )
+
+
+# log_pattern = re.compile(
+#     r"(?P<FirstTimestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z)\s"  # ISO 8601 Timestamp with nanoseconds
+#     r"\{name=(?P<Name>[^\}]+)\}\s"                                       # Metadata: {name=value}
+#     r"(?P<Date>\d{4}-\d{2}-\d{2})\s"                                     # Date: yyyy-mm-dd
+#     r"(?P<Time>\d{2}:\d{2}:\d{2}\.\d{3}),"                               # Time: hh:mm:ss.sss
+#     r"(?P<Level>\w+),"                                                   # Level: info, error, etc.
+#     r"(?P<EpochTime>\d+),"                                               # Epoch Time: Unix timestamp in milliseconds
+#     r"(?P<Status>\w+),"                                                  # Status: OK, ERROR, etc.
+#     r"(?P<Component>[^\s,]+),"                                           # Component: Component name (e.g., user-service)
+#     r"(?P<Endpoint>[^,]*),"                                              # Endpoint: URL or API endpoint (e.g., list)
+#     r"(?P<DataVal1>\d*),"                                                # Duration: Numeric value (e.g., response time)
+#     r"(?P<DataVal2>[^,]*),"                                              # Extra Field: Optional extra field (empty in this example)
+#     r"(?P<Content>[^,]*),"                                               # Message: Log message up to the UUID
+#     r"(?P<UUID>[a-f0-9\-]{36})"                                          # UUID: Standard 36-character UUID format
+# )
 
 # 1. New log entry comes-in: 2024-11-15 07:22:10.883,info,1731698530883,OK,apigateway,/userslist,11,,Users list fetched successfully from user-service in 11 ms
 # 2. Add log message to Drain3 parser: 0,2024-11-15 07:22:10.883,info,1731698530883,OK,apigateway,/userslist,11,,Users list fetched successfully from user-service in 11 ms,E1,Users list fetched successfully from user-service in <*> ms
@@ -224,8 +242,11 @@ def Drain3ParseLearn():
             line = line.strip()
             match = log_pattern.match(line)
             if match:
+                # print("Match found for line: ", line)
                 log_content = match.group("Content")  # Extract the Content field
                 result = drain_parser.add_log_message(log_content)
+            else:
+                print("No match found for line: ", line)
 
     log_data = []
 

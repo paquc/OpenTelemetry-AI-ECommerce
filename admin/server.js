@@ -4,12 +4,16 @@ const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tr
 
 const {createLogger, createMessage} = require('../winstonlogger.js');
 
+require('dotenv').config();
+
 const { v4: uuidv4 } = require('uuid');
+const os = require('os');
 
 const SOURCE_SERVICE = 'admin-service';
 const ERROR_NONE = 'OK';
-const ERROR_DELAY = 'SVC_USER_REQ_DELAY';
-const ERROR_FAIL = 'SVC_USER_REQ_FAIL';
+const ERROR_CPU_WARN = 'ADMIN_SERVICE_CPU_WARN';
+
+const http = require('http')
 
 var app = require('express')(),
     bodyParser = require('body-parser'),
@@ -19,6 +23,60 @@ var app = require('express')(),
     // {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
 app.use(bodyParser.json());
+
+const fs = require('fs');
+
+let globalCPU = 0;
+
+function logCPU(){
+
+    const cpu = globalCPU;
+
+    const min_value = 5.0;
+    const max_value = 10.0;
+
+    if (cpu < min_value) {
+        wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'cpu-usage', cpu, '', `ADMIN API cpu usage running normally at ${cpu}%`, uuidv4()));
+    } else if (cpu >= min_value && cpu < max_value) {
+        wlogger.info(createMessage( Date.now(), ERROR_CPU_WARN, SOURCE_SERVICE, 'cpu-usage', cpu, '', `ADMIN API cpu usage running high at (TH=${min_value}%) ${cpu}%`, uuidv4()));
+    } else if (cpu >= max_value) {
+        wlogger.info(createMessage( Date.now(), ERROR_CPU_WARN, SOURCE_SERVICE, 'cpu-usage', cpu, '', `ADMIN API cpu usage running OVER the SLO (max=${max_value}%) at ${cpu}%`, uuidv4()));
+    }
+    else {
+    }
+}
+
+function getCpuUsage() {
+
+    fs.readFile('/proc/stat', 'utf8', (err, data) => {
+        if (err) {
+            wlogger.error(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'cpu-usage', '', '', `Error reading /proc/stat: ${err}`, uuidv4()));
+            return;
+        }
+        const lines = data.split('\n');
+        const cpuLine = lines.find(line => line.startsWith('cpu '));
+        if (!cpuLine) {
+            wlogger.error(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'cpu-usage', '', '', `Could not find CPU stats in /proc/stat`, uuidv4()));
+            return;
+        }
+
+        const times = cpuLine.split(' ').slice(1).map(Number); // Remove 'cpu' label
+        const idle = times[3]; // Idle time is the 4th value
+        const total = times.reduce((acc, time) => acc + time, 0);
+
+        if (this.lastTotal && this.lastIdle) {
+            const totalDiff = total - this.lastTotal;
+            const idleDiff = idle - this.lastIdle;
+            const usage = ((totalDiff - idleDiff) / totalDiff) * 100;
+            let remaincpu = 100 - usage;
+            globalCPU = remaincpu.toFixed(2);
+        }
+
+        this.lastTotal = total;
+        this.lastIdle = idle;
+    });
+}
+
 
 app.all('*', function(req, res, next) {
     console.log(req.method, req.url);
@@ -30,6 +88,7 @@ app.get('/', function(req, res) {
 });
 
 app.get('/product', function(req, res) {
+    logCPU()
     const startTime = Date.now();
     let {request_ID}  = req; // Extract the request ID from the incoming request
     if (!request_ID) {
@@ -46,18 +105,21 @@ app.get('/product', function(req, res) {
 // curl -X POST 'http://127.0.0.1:5000/product' -H "Content-Type: application/json" -d '{"product": {"name": "Sample Product","price": 25.99,"quantity": 100}}'
 
 app.post('/product', function(req, res) {
+    logCPU()
     productRequester.send({type: 'create', product: req.body.product}, function(err, product) {
         res.send(product);
     });
 });
 
 app.delete('/product/:id', function(req, res) {
+    logCPU()
     productRequester.send({type: 'delete', id: req.params.id}, function(err, product) {
         res.send(product);
     });
 });
 
 app.get('/user', function(req, res) {
+    logCPU()
     const startTime = Date.now();
     let {request_ID}  = req; // Extract the request ID from the incoming request
     if (!request_ID) {
@@ -72,6 +134,7 @@ app.get('/user', function(req, res) {
 });
 
 app.get('/purchase', function(req, res) {
+    logCPU()
     const startTime = Date.now();
     let {request_ID}  = req; // Extract the request ID from the incoming request
     if (!request_ID) {
@@ -112,3 +175,12 @@ wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', 
 new cote.Sockend(io, {
     name: 'admin sockend server'
 });
+
+setInterval(() => {
+    getCpuUsage();
+    // logCPU();
+}, 2000);
+
+
+
+

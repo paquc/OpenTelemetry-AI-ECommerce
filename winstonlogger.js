@@ -25,8 +25,9 @@ function createLogger(logFilePath) {
         filename: logFilePath + '-%DATE%.csv',
         datePattern: 'YYYY-MM-DD',
         zippedArchive: true,
-        maxSize: '2m',
+        // maxSize: '50m',
         maxFiles: '1d',
+        auditFile: 'auditlogs/audit.json', // Custom path for audit.json
       })
     ],
   });
