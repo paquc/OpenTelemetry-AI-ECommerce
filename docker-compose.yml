@@ -38,6 +38,40 @@ services:
     ports:
       - "9000:9000"
 
+  apigateway_second:
+    build:
+      context: .
+      dockerfile: Dockerfile.apigateway
+    volumes:
+      - ./apigateway/apigateway.js:/apigateway.js
+      - ./apigateway/.env:/.env
+      - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
+      - "./filebeat_ingest_data/:/usr/share/filebeat/ingest_data/"
+      - ./winstonlogger.js:/winstonlogger.js 
+      - "./apigateway/AI-ECommerce-APIGateway.csv:/AI-ECommerce-APIGateway.csv"
+    container_name: apigateway_second
+    ports:
+      - "9001:9000"    
+
+
+  lb:
+    image: dockercloud/haproxy:1.6.7
+    # links:
+    #   - apigateway
+    #   - apigateway_second
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - ADDITIONAL_SERVICES=project_dir:web,project_dir:blog
+    ports:
+      - 9005:80
+      - 443:443
+    depends_on:
+      - apigateway
+      - apigateway_second
+    restart: on-failure
+
+
   influxdb:
     image: influxdb:1.8
     container_name: influxdb
@@ -77,18 +111,7 @@ services:
     environment:
       - PG=true
 
-  lb:
-    image: dockercloud/haproxy
-    links:
-      - admin
-      - end-user
-      - monitoring
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - 80:80
-      - 443:443
-    restart: on-failure
+  
 
   admin:
     build:
