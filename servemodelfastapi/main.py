@@ -46,7 +46,8 @@ def addlog():
 @app.post("/addentry")
 def addlogentry(date: str , sever: str, epoch: str, error_type: str, service: str, endpoint: str, data1: str, data2: str, message: str, uuid: str):
     log_entry = date + "," + sever + "," + epoch + "," + error_type + "," + service + "," + endpoint + "," + data1 + "," + data2 + "," + message + "," + uuid
-    alarm_clusters = []
+    # E4,E5,E8,E10,E13,E14,E15,E16,IsAlarm
+    alarm_clusters = ['E4','E5','E8','E10','E13','E14','E15','E16']
     data = Drain3Parse.ParseNewEvent(log_entry, alarm_clusters)
     if data is not None:
         prediction = predict.RF_Prediction(data)
@@ -55,7 +56,7 @@ def addlogentry(date: str , sever: str, epoch: str, error_type: str, service: st
             with open(file_path, "a") as file:
                 file.write(f"Alarm: " + log_entry + "\n")
             return {"Alarm": "True"}
-         
+                 
     return {"Alarm": "False"}
 
 

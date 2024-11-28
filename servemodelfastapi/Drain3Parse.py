@@ -41,58 +41,96 @@ log_pattern = re.compile(
 # 1. New log entry comes-in: 2024-11-15 07:22:10.883,info,1731698530883,OK,apigateway,/userslist,11,,Users list fetched successfully from user-service in 11 ms
 # 2. Add log message to Drain3 parser: 0,2024-11-15 07:22:10.883,info,1731698530883,OK,apigateway,/userslist,11,,Users list fetched successfully from user-service in 11 ms,E1,Users list fetched successfully from user-service in <*> ms
 
- # Create a pandas DataFrame
-newEvent = pd.DataFrame({
-    'E1': [],       # Info
-    'E10': [],           # Warnings
-    'E11': [],
-    'E12': [],
-    'E13': [],
-    'E14': [],
-    'E2': [],
-    'E3': [],
-    'E4': [],
-    'E5': [],
-    'E6': [],
-    'E7': [],
-    'E9': [],
-    'E8': [],
-})
+newEvent = pd.DataFrame()
+
+# Create a pandas DataFrame
+# newEvent = pd.DataFrame({
+#     'E1': [],       # Info
+#     'E10': [],           # Warnings
+#     'E11': [],
+#     'E12': [],
+#     'E13': [],
+#     'E14': [],
+#     'E2': [],
+#     'E3': [],
+#     'E4': [],
+#     'E5': [],
+#     'E6': [],
+#     'E7': [],
+#     'E9': [],
+#     'E8': [],
+# })
 
 newItemsCounter = 0
-E1_list = 0
-E2_list = 0
-E3_list = 0
-E4_list = 0
-E5_list = 0
-E6_list = 0
-E7_list = 0
-E8_list = 0
-E9_list = 0
-E10_list = 0
-E11_list = 0
-E12_list = 0
-E13_list = 0
-E14_list = 0
 
-# E1,E10,E11,E12,E13,E14,E2,E3,E4,E5,E6,E7,E9,IsAlarm
+
+# E1_list = 0
+# E2_list = 0
+# E3_list = 0
+# E4_list = 0
+# E5_list = 0
+# E6_list = 0
+# E7_list = 0
+# E8_list = 0
+# E9_list = 0
+# E10_list = 0
+# E11_list = 0
+# E12_list = 0
+# E13_list = 0
+# E14_list = 0
+# E15_list = 0
+# E16_list = 0
+# E17_list = 0
+
+from collections import OrderedDict
+
+# Create an OrderedDict
+ordered_dict = OrderedDict()
+
+# ordered_dict[1] = 'One'
+# ordered_dict[2] = 'Two'
+# ordered_dict[3] = 'Three'
+
+# Initialize 100 elements in the OrderedDict
+for i in range(1, 25):
+    ordered_dict[i] = 0
+
+# Access by key
+# print(ordered_dict[2])  # Output: 'Two'
+
+# Iterate over the OrderedDict
+# for key, value in ordered_dict.items():
+#     print(f"{key}: {value}")
+# Output:
+# 1: One
+# 2: Two
+# 3: Three
+
+# Convert to a list for indexed access
+# ordered_list = list(ordered_dict.items())
+# print(ordered_list[1])  # Output: (2, 'Two')
+
+# E4,E5,E8,E10,E13,E14,E15,E16,IsAlarm
+
 
 def ParseNewEvent(log_entry, alarm_clusters):
-    global E1_list
-    global E2_list
-    global E3_list
-    global E4_list
-    global E5_list
-    global E6_list
-    global E7_list
-    global E8_list
-    global E9_list
-    global E10_list
-    global E11_list
-    global E12_list
-    global E13_list
-    global E14_list
+    # global E1_list
+    # global E2_list
+    # global E3_list
+    # global E4_list
+    # global E5_list
+    # global E6_list
+    # global E7_list
+    # global E8_list
+    # global E9_list
+    # global E10_list
+    # global E11_list
+    # global E12_list
+    # global E13_list
+    # global E14_list
+    
     global newItemsCounter
+    global ordered_dict
     global newEvent
 
     config = TemplateMinerConfig()
@@ -111,54 +149,78 @@ def ParseNewEvent(log_entry, alarm_clusters):
         log_content = match.group("Content")  # Extract the Content field
         result = drain_parser.add_log_message(log_content)  # Add the log message to the Drain3 parser to continue training while receiving new log entries
         result = drain_parser.match(log_content)
-        if result.cluster_id == 1:
-            E1_list += 1
-        if result.cluster_id == 2:
-            E2_list += 1
-        if result.cluster_id == 3:
-            E3_list += 1
-        if result.cluster_id == 4:
-            E4_list += 1
-        if result.cluster_id == 5:
-            E5_list += 1
-        if result.cluster_id == 6:
-            E6_list += 1
-        if result.cluster_id == 7:
-            E7_list += 1
-        if result.cluster_id == 8:
-            E8_list += 1
-        if result.cluster_id == 9:
-            E9_list += 1
-        if result.cluster_id == 10:
-            E10_list += 1
-        if result.cluster_id == 11:
-            E11_list += 1
-        if result.cluster_id == 12:
-            E12_list += 1
-        if result.cluster_id == 13:
-            E13_list += 1
-        if result.cluster_id == 14:
-            E14_list += 1
+
+        ordered_dict[result.cluster_id] += 1
+
+        # if result.cluster_id == 1:
+        #     E1_list += 1
+        # if result.cluster_id == 2:
+        #     E2_list += 1
+        # if result.cluster_id == 3:
+        #     E3_list += 1
+        # if result.cluster_id == 4:
+        #     E4_list += 1
+        # if result.cluster_id == 5:
+        #     E5_list += 1
+        # if result.cluster_id == 6:
+        #     E6_list += 1
+        # if result.cluster_id == 7:
+        #     E7_list += 1
+        # if result.cluster_id == 8:
+        #     E8_list += 1
+        # if result.cluster_id == 9:
+        #     E9_list += 1
+        # if result.cluster_id == 10:
+        #     E10_list += 1
+        # if result.cluster_id == 11:
+        #     E11_list += 1
+        # if result.cluster_id == 12:
+        #     E12_list += 1
+        # if result.cluster_id == 13:
+        #     E13_list += 1
+        # if result.cluster_id == 14:
+        #     E14_list += 1
 
         newItemsCounter += 1
 
-        if newItemsCounter == 200:
-            newEvent = pd.DataFrame({
-                'E1': [E1_list],       # Info
-                'E10': [E10_list],
-                'E11': [E11_list],
-                'E12': [E12_list],
-                'E13': [E13_list],
-                'E14': [E14_list],
-                'E2': [E2_list],
-                'E3': [E3_list],
-                'E4': [E4_list],
-                'E5': [E5_list],
-                'E6': [E6_list],
-                'E7': [E7_list],
-                'E9': [E9_list],
-                'E8': [E8_list],
-            })
+        # print('Events counters list: ')
+        # for key, value in ordered_dict.items():
+        #     if value != 0:
+        #         print(f"{key}: {value}")
+
+        # for key, value in ordered_dict.items():
+        #     if value != 0:
+        #         event = "E" + str(key)
+        #         newEvent[event] = value
+        #         print(newEvent)
+
+        # print(ordered_dict)
+
+        if newItemsCounter == 20:
+            
+            for key, value in ordered_dict.items():
+                event = "E" + str(key)
+                newEvent[event] = [value]
+                # print(f"{event}: {value}")
+
+
+            # newEvent = pd.DataFrame({
+            #     'E1': [E1_list],       
+            #     'E10': [E10_list],
+            #     'E11': [E11_list],
+            #     'E12': [E12_list],
+            #     'E13': [E13_list],
+            #     'E14': [E14_list],
+            #     'E2': [E2_list],
+            #     'E3': [E3_list],
+            #     'E4': [E4_list],
+            #     'E5': [E5_list],
+            #     'E6': [E6_list],
+            #     'E7': [E7_list],
+            #     'E9': [E9_list],
+            #     'E8': [E8_list],
+            # })
+
             
             print("********************************************************")
             print("********************************************************")
@@ -169,40 +231,48 @@ def ParseNewEvent(log_entry, alarm_clusters):
             newDataFrame = newEvent.copy()
             
             newItemsCounter = 0
-            E1_list = 0
-            E2_list = 0
-            E3_list = 0
-            E4_list = 0
-            E5_list = 0
-            E6_list = 0
-            E7_list = 0
-            E8_list = 0
-            E9_list = 0
-            E10_list = 0
-            E11_list = 0
-            E12_list = 0
-            E13_list = 0
-            E14_list = 0
+            for i in range(1, 25):
+                ordered_dict[i] = 0
 
-            newEvent = pd.DataFrame({
-                'E1': [],       # Info
-                'E10': [],           # Warnings
-                'E11': [],
-                'E12': [],
-                'E13': [],
-                'E14': [],
-                'E2': [],
-                'E3': [],
-                'E4': [],
-                'E5': [],
-                'E6': [],
-                'E7': [],
-                'E9': [],
-                'E8': [],
-            })
+            newEvent = newEvent.fillna(0)
+
+            # E1_list = 0
+            # E2_list = 0
+            # E3_list = 0
+            # E4_list = 0
+            # E5_list = 0
+            # E6_list = 0
+            # E7_list = 0
+            # E8_list = 0
+            # E9_list = 0
+            # E10_list = 0
+            # E11_list = 0
+            # E12_list = 0
+            # E13_list = 0
+            # E14_list = 0
+
+            # newEvent = pd.DataFrame({
+            #     'E1': [],       # Info
+            #     'E10': [],           # Warnings
+            #     'E11': [],
+            #     'E12': [],
+            #     'E13': [],
+            #     'E14': [],
+            #     'E2': [],
+            #     'E3': [],
+            #     'E4': [],
+            #     'E5': [],
+            #     'E6': [],
+            #     'E7': [],
+            #     'E9': [],
+            #     'E8': [],
+            # })
 
             if alarm_clusters:
-                newDataFrame.drop(columns=alarm_clusters, inplace=True)
+                # Keep only columns given by alarm_clusters
+                newDataFrame = newDataFrame[alarm_clusters]
+                newDataFrame.reset_index(drop=True, inplace=True)
+                # newDataFrame.drop(columns=alarm_clusters, inplace=True)
                 print(newDataFrame)
 
             return newDataFrame
