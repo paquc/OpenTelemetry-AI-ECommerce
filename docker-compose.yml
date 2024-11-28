@@ -85,6 +85,17 @@ services:
   #     - apigateway_second
   #   restart: on-failure
 
+  # docker pull jaegertracing/all-in-one
+  # docker run -d --name=jaeger -p 16686:16686 -p 16687:16687 jaegertracing/all-in-one
+  jaeger:
+    image: jaegertracing/all-in-one
+    container_name: jaeger
+    ports:
+      - "16686:16686"
+      - "16687:16687"
+      - "4317"          # OTLP gRPC receiver
+      # - "14268"       # HTTP port to receive traces from the OTEL Collector
+      # - "14250"       # gRPC port to receive traces from the OTEL Collector
 
   influxdb:
     image: influxdb:1.8

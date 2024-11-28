@@ -18,6 +18,10 @@ processors:
 exporters:
   logging:
     loglevel: info # debug, info, warn, error
+  otlp/jaeger:
+    endpoint: jaeger:4317   # Jaeger is the container’s name in docker-compose.
+    tls:
+      insecure: true
   otlphttp/loki:                        
     endpoint: http://loki:3100/otlp
     tls:
@@ -53,4 +57,4 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch, resource]
-      exporters: [logging,otlp/tempo]
+      exporters: [logging,otlp/tempo,otlp/jaeger]
