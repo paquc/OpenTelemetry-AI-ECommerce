@@ -19,3 +19,4 @@ logstash_ingest_data/AI-ECommerce-User.csv
 apigateway/AI-ECommerce-APIGateway.csv
 logstash_ingest_data/
 parsing/Drain3/drain3_state.bin
+servemodelfastapi/data/alarms.log
