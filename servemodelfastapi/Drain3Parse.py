@@ -50,7 +50,7 @@ ordered_dict = OrderedDict()
 for i in range(1, 25):
     ordered_dict[i] = 0
 
-def ParseNewEvent(log_entry, alarm_clusters):
+def ParseNewEvent(log_entry, events_clusters, alarm_clusters):
     global newItemsCounter
     global ordered_dict
     global newEvent
@@ -73,10 +73,12 @@ def ParseNewEvent(log_entry, alarm_clusters):
         result = drain_parser.match(log_content)
 
         ordered_dict[result.cluster_id] += 1
-
         newItemsCounter += 1
 
-        if newItemsCounter == 1000:
+        event_type = "E" + str(result.cluster_id)
+        # if event_type in alarm_clusters:
+          
+        if newItemsCounter >= 1000 and event_type in alarm_clusters:
             
             for key, value in ordered_dict.items():
                 event = "E" + str(key)
@@ -97,9 +99,9 @@ def ParseNewEvent(log_entry, alarm_clusters):
 
             newEvent = newEvent.fillna(0)
 
-            if alarm_clusters:
+            if events_clusters:
                 # Keep only columns given by alarm_clusters
-                newDataFrame = newDataFrame[alarm_clusters]
+                newDataFrame = newDataFrame[events_clusters]
                 newDataFrame.reset_index(drop=True, inplace=True)
                 # newDataFrame.drop(columns=alarm_clusters, inplace=True)
                 print(newDataFrame)

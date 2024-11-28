@@ -47,8 +47,9 @@ def addlog():
 def addlogentry(date: str , sever: str, epoch: str, error_type: str, service: str, endpoint: str, data1: str, data2: str, message: str, uuid: str):
     log_entry = date + "," + sever + "," + epoch + "," + error_type + "," + service + "," + endpoint + "," + data1 + "," + data2 + "," + message + "," + uuid
     # E4,E5,E8,E10,E13,E14,E15,E16,IsAlarm
-    alarm_clusters = ['E4','E5','E8','E10','E13','E14','E15','E16']
-    data = Drain3Parse.ParseNewEvent(log_entry, alarm_clusters)
+    events_clusters = ['E4','E5','E8','E10','E13','E14','E15','E16']
+    alarm_clusters = ['E14','E15','E16']
+    data = Drain3Parse.ParseNewEvent(log_entry, events_clusters, alarm_clusters)
     if data is not None:
         prediction = predict.RF_Prediction(data)
         if prediction:

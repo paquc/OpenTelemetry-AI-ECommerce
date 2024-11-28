@@ -53,23 +53,37 @@ services:
     ports:
       - "9001:9000"    
 
-
-  lb:
-    image: dockercloud/haproxy:1.6.7
-    # links:
-    #   - apigateway
-    #   - apigateway_second
+  haproxy:
+    image: haproxy:2.7
+    container_name: haproxy
+    links:
+      - apigateway
+      - apigateway_second
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - ADDITIONAL_SERVICES=apigateway,apigateway_second
+      - ./haproxy:/haproxy-override
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     ports:
-      - 9005:80
-      - 443:443
+      - 80:80
+      - 70:70  # haproxy admin console, login with user:pass
     depends_on:
       - apigateway
       - apigateway_second
     restart: on-failure
+
+  # lb:
+  #   image: dockercloud/haproxy:1.6.7
+  #   links:
+  #     - apigateway
+  #     - apigateway_second
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     # - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+  #   ports:
+  #     - 9005:80
+  #   depends_on:
+  #     - apigateway
+  #     - apigateway_second
+  #   restart: on-failure
 
 
   influxdb:
@@ -322,7 +336,7 @@ services:
       - init
    
   setup:
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.1
     container_name: setup_elk
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
@@ -387,7 +401,7 @@ services:
     depends_on:
       setup:
         condition: service_healthy
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.1
     container_name: es01
     labels:
       co.elastic.logs/module: elasticsearch
@@ -432,7 +446,7 @@ services:
     depends_on:
       es01:
         condition: service_healthy
-    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    image: docker.elastic.co/kibana/kibana:8.16.1
     container_name: kibana
     labels:
       co.elastic.logs/module: kibana
@@ -474,7 +488,7 @@ services:
         condition: service_healthy
       kibana:
         condition: service_healthy
-    image: docker.elastic.co/beats/metricbeat:${STACK_VERSION}
+    image: docker.elastic.co/beats/metricbeat:8.16.1
     container_name: metricbeat01
     user: root
     volumes:
@@ -503,7 +517,7 @@ services:
     depends_on:
       es01:
         condition: service_healthy
-    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
+    image: docker.elastic.co/beats/filebeat:8.16.1
     container_name: filebeat01
     user: root
     volumes:
@@ -529,7 +543,7 @@ services:
         condition: service_healthy
       kibana:
         condition: service_healthy
-    image: docker.elastic.co/logstash/logstash:${STACK_VERSION}
+    image: docker.elastic.co/logstash/logstash:8.16.1
     container_name: logstash01
     labels:
       co.elastic.logs/module: logstash
@@ -552,7 +566,7 @@ services:
         condition: service_healthy
       es01:
         condition: service_healthy
-    image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION}
+    image: docker.elastic.co/beats/elastic-agent:8.16.1
     container_name: fleet-server
     volumes:
       - certs:/certs

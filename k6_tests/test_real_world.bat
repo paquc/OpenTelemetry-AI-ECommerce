@@ -21,7 +21,7 @@ k6 run .\use_system.js
 :: BREAKPOINT test
 set TEST_TYPE=4
 set TEST_SLEEP_DURATION=0
-set RAMPS_UP_PERIOD=20s
+set RAMPS_UP_PERIOD=10s
 set RAMP_TARGET=200
 k6 run .\use_system.js 
 
