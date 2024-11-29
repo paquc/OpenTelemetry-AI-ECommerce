@@ -59,7 +59,7 @@
 
             // Function called when the user attempts to purchase a product
             $scope.purchase = function(id, req_id) {
-                
+                                
                 // Emit a 'buy' event to the 'purchase' namespace with the user's ID and the product ID
                 purchaseService.emit(
                     'buy',

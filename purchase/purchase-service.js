@@ -1,8 +1,9 @@
+const io = require('socket.io')
+
 require('dotenv').config();
 
 const logger_name='purchase-service-logger';
-const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
-
+const {trace, context, propagation, tracer, logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
 const {createLogger, createMessage} = require('../winstonlogger.js');
 
@@ -13,6 +14,9 @@ const ERROR_DELAY = 'SVC_USER_REQ_DELAY';
 const ERROR_FAIL = 'SVC_USER_REQ_FAIL';
 
 const { v4: uuidv4 } = require('uuid');
+
+
+// var paymentService = io. .connect('/payment');
 
 var cote = require('cote'),
     models = require('../models');
@@ -41,12 +45,36 @@ var userRequester = new cote.Requester({
 
 purchaseResponder.on('*', console.log);
 
+// 'buy' request format:
+// {
+//     userId: $scope.user.id, 
+//     productId: id,
+//     request_ID: req_id, // Include the request ID
+// }
+
 purchaseResponder.on('buy', function(req, cb) {
     let {request_ID}  = req; // Extract the request ID from the incoming request
     if (!request_ID) {
         request_ID = uuidv4();
     }
     wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'buy', '', '', `Request to buy a product for ID=${req.productId}`, request_ID));
+
+    // Create a root span
+    const rootSpan = tracer.startSpan('purchaseResponder.on:root:buy');
+    // Attach the root span to a new context
+    const rootContext = trace.setSpan(context.active(), rootSpan);
+    console.log('payment-service rootContext /call', JSON.stringify(rootContext));
+
+    // Inject the span context into the request
+    call_req = {type: 'call', request_ID: request_ID};
+
+    propagation.inject(rootContext, call_req, {
+        set: (carrier, key, value) => {
+            carrier[key] = value; // Define how to set keys in the request
+        },
+    });
+    console.log('purchase-service /buy', call_req);
+    paymentRequester.send( call_req );
 
     var purchase = new models.Purchase({});
 
@@ -85,6 +113,8 @@ purchaseResponder.on('buy', function(req, cb) {
             });
         });
     });
+    rootSpan.setStatus({ code: 1 }); // Mark the span as successful
+    rootSpan.end(); // End the span
 });
 
 purchaseResponder.on('list', function(req, cb) {

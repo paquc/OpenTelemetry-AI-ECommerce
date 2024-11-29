@@ -1,6 +1,5 @@
 const logger_name='payment-service-logger';
-const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
-
+const {trace, context, propagation, tracer, logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
 const {createLogger, createMessage} = require('../winstonlogger.js');
 
@@ -24,9 +23,30 @@ var userRequester = new cote.Requester({
     namespace: 'user'
   });
 
-paymentResponder.on('*', console.log);
+paymentResponder.on('*', function(req){
+    console.log('payment-service /*', req);
+})
+
+
+
+paymentResponder.on('call', function(req){
+    // Extract context from request
+    console.log('payment-service constext /call', JSON.stringify(context.active()));
+    const parentContext = propagation.extract(context.active(), req, {
+        get: (carrier, key) => carrier[key], // Define how to get keys from the request
+    });
+    // Start a new span with the extracted context
+    const span = tracer.startSpan('paymentResponder.on', undefined, parentContext);
+    console.log('payment-service /call', req);
+    span.setAttribute('request.data', JSON.stringify(req));
+    span.setStatus({ code: 1 }); // Mark the span as successful
+    span.end(); // End the span
+})
+
+
 
 paymentResponder.on('process', function(req, cb) {
+    console.log('payment-service /process', req);
     let {request_ID}  = req; // Extract the request ID from the incoming request
     if (!request_ID) {
         request_ID = uuidv4();

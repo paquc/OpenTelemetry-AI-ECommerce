@@ -1,8 +1,8 @@
 // DO THAT first !!!
 //************************************************************************ */
-const { NodeTracerProvider } = require("@opentelemetry/node");
-const { registerInstrumentations } = require('@opentelemetry/instrumentation');
-const { ConsoleSpanExporter, SimpleSpanProcessor } = require("@opentelemetry/tracing");
+//const { NodeTracerProvider } = require("@opentelemetry/node");
+//const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+// const { ConsoleSpanExporter, SimpleSpanProcessor } = require("@opentelemetry/tracing");
 
 // const provider = new NodeTracerProvider();
 // registerInstrumentations({
@@ -31,7 +31,10 @@ const serviceNameProvider = require(__dirname + '/servicename.js');
 
 const { Resource } = require('@opentelemetry/resources');
 const opentelemetry = require("@opentelemetry/sdk-node");
-const { diag, DiagConsoleLogger, DiagLogLevel, metrics } = require('@opentelemetry/api');
+const { trace, diag, DiagConsoleLogger, DiagLogLevel, metrics } = require('@opentelemetry/api');
+
+const context = require('@opentelemetry/api').context;
+const propagation = require('@opentelemetry/api').propagation;
 
 //////////////////////////////////////////////
 // Traces instrumentations
@@ -45,7 +48,7 @@ const { ExpressInstrumentation } = require("@opentelemetry/instrumentation-expre
 const { NestInstrumentation } = require("@opentelemetry/instrumentation-nestjs-core");
 const { NetInstrumentation } = require("@opentelemetry/instrumentation-net");
 const { GrpcInstrumentation } = require("@opentelemetry/instrumentation-grpc");
-//const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
+const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
 //const { PgInstrumentation } = require("@opentelemetry/instrumentation-pg");
 //const { MongooseInstrumentation } = require("@opentelemetry/instrumentation-mongoose");
 
@@ -59,7 +62,11 @@ const { logs, SeverityNumber } = require('@opentelemetry/api-logs');
 //////////////////////////////////
 // Traces
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
-const { BatchSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { ConsoleSpanExporter, SimpleSpanProcessor, BatchSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+
+
+
+
 
 //////////////////////////////////
 // Metrics
@@ -120,14 +127,13 @@ const batchSpanProcessor = new BatchSpanProcessor(OTLPTracesExporter, {
   exportTimeoutMillis: 30000,   // Maximum allowed time to send a batch
 });
 
+// Initialize the tracer provider
+//const tracerProvider = new NodeTracerProvider();
+//tracerProvider.addSpanProcessor(batchSpanProcessor);
+//tracerProvider.register();
 
-// const provider = new NodeTracerProvider();
-// provider.register();
-
-// registerInstrumentations({
-//   instrumentations: [new SocketIoInstrumentation()],
-// });
-// provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+// Get a tracer instance
+const tracer = trace.getTracer('cote-instrumentation-tracer');
 
 /////////////////
 // Metrics...
@@ -190,6 +196,9 @@ function getLineNumber() {
 // START the SDK in a node and start instrumenting
 sdk.start();
 
+// DOC Node-SDK: https://open-telemetry.github.io/opentelemetry-js/modules/_opentelemetry_sdk_node.html
+
+
 ////////////////////////////////////
 // Monitor service status 
 //  AFTER  SDK is tarted!
@@ -221,9 +230,11 @@ module.exports =
   severity_debug,
   simulation_trace,
   logEventMessage,
+  tracer,
+  context,
+  propagation,
+  trace,
 };
-
-
 
 // https://www.npmjs.com/package/@opentelemetry/sdk-node
 // https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_sdk_trace_base.BasicTracerProvider.html#addSpanProcessor

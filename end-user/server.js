@@ -1,14 +1,12 @@
 const logger_name='enduser-service-logger';
 
-// const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
+const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
 var app = require('express')(),
     server = require('http').Server(app),
     io = require('socket.io')(server),
     cote = require('cote'),
-    { v4: uuidv4 } = require('uuid'),
-    {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
-
+    { v4: uuidv4 } = require('uuid');
 
 app.get('/', function (req, res) {
     console.log(`${req.ip} requested end-user interface`);
