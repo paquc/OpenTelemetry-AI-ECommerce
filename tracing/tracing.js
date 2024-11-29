@@ -1,3 +1,19 @@
+// DO THAT first !!!
+//************************************************************************ */
+const { NodeTracerProvider } = require("@opentelemetry/node");
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+const { ConsoleSpanExporter, SimpleSpanProcessor } = require("@opentelemetry/tracing");
+
+// const provider = new NodeTracerProvider();
+// registerInstrumentations({
+//   tracerProvider: provider,
+//   instrumentations: [new SocketIoInstrumentation()],
+// });
+
+// provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+// provider.register();
+
+//************************************************************************ */
 
 // DOC Node-SDK: https://open-telemetry.github.io/opentelemetry-js/modules/_opentelemetry_sdk_node.html
 console.log("TRACING--> Loading traing.js...");
@@ -10,6 +26,9 @@ const simulation_trace = 'SIMULATION';
 
 const serviceNameProvider = require(__dirname + '/servicename.js');
 
+// const { SemanticResourceAttributes, ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
+// const { Incubating } = require('@opentelemetry/semantic-conventions/incubating');
+
 const { Resource } = require('@opentelemetry/resources');
 const opentelemetry = require("@opentelemetry/sdk-node");
 const { diag, DiagConsoleLogger, DiagLogLevel, metrics } = require('@opentelemetry/api');
@@ -17,31 +36,30 @@ const { diag, DiagConsoleLogger, DiagLogLevel, metrics } = require('@opentelemet
 //////////////////////////////////////////////
 // Traces instrumentations
 //
-// const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node");  // Don.t work
+
+// const {AwsLambdaInstrumentation} = require('@opentelemetry/instrumentation-aws-lambda');
+// const { getNodeAutoInstrumentations, getResourceDetectorsFromEnv } = require("@opentelemetry/auto-instrumentations-node");  // Don.t work
 const { SocketIoInstrumentation } = require("@opentelemetry/instrumentation-socket.io");
-// const { SocketIoInstrumentation } = require("opentelemetry-instrumentation-socket.io");
 const { HttpInstrumentation } = require("@opentelemetry/instrumentation-http");
 const { ExpressInstrumentation } = require("@opentelemetry/instrumentation-express");
 const { NestInstrumentation } = require("@opentelemetry/instrumentation-nestjs-core");
 const { NetInstrumentation } = require("@opentelemetry/instrumentation-net");
 const { GrpcInstrumentation } = require("@opentelemetry/instrumentation-grpc");
-const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
+//const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
 //const { PgInstrumentation } = require("@opentelemetry/instrumentation-pg");
 //const { MongooseInstrumentation } = require("@opentelemetry/instrumentation-mongoose");
 
-// const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
 //////////////////////////////////
 // Logs
 const { OTLPLogExporter } = require('@opentelemetry/exporter-logs-otlp-http');
 const { LoggerProvider, ConsoleLogRecordExporter, SimpleLogRecordProcessor } = require('@opentelemetry/sdk-logs');
 const { logs, SeverityNumber } = require('@opentelemetry/api-logs');
-const { SemanticResourceAttributes, ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
 //////////////////////////////////
 // Traces
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
-const { BatchSpanProcessor, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { BatchSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 
 //////////////////////////////////
 // Metrics
@@ -104,12 +122,12 @@ const batchSpanProcessor = new BatchSpanProcessor(OTLPTracesExporter, {
 
 
 // const provider = new NodeTracerProvider();
+// provider.register();
+
 // registerInstrumentations({
-//   tracerProvider: provider,
 //   instrumentations: [new SocketIoInstrumentation()],
 // });
 // provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-// provider.register();
 
 /////////////////
 // Metrics...
@@ -126,31 +144,15 @@ const periodicMeterExporterReader = new PeriodicExportingMetricReader({
 
 // DOC Node-SDK: https://open-telemetry.github.io/opentelemetry-js/modules/_opentelemetry_sdk_node.html
 
-// Configure only the HTTP instrumentation
-/*
-const autoInstrumentations = getNodeAutoInstrumentations({
-  '@opentelemetry/instrumentation-http':        { enabled: true  },
-  // Disable other instrumentations
-  '@opentelemetry/instrumentation-express':     { enabled: false },
-  '@opentelemetry/instrumentation-redis':       { enabled: false },
-  '@opentelemetry/instrumentation-socket.io':   { enabled: false },
-  '@opentelemetry/instrumentation-aws-lambda':  { enabled: false },
-  '@opentelemetry/instrumentation-aws-sdk':     { enabled: false },
-});
-*/
-
 const sdk = new opentelemetry.NodeSDK({
     serviceName: serviceNameProvider.serviceName,
     instrumentations: [
-      //getNodeAutoInstrumentations(),
       new SocketIoInstrumentation(),
       new HttpInstrumentation(), 
       new ExpressInstrumentation(),
       new NestInstrumentation(),  
       new NetInstrumentation(),
       new GrpcInstrumentation(),
-      //new PgInstrumentation(),
-      //new MongooseInstrumentation(),
     ],          
     spanProcessors: [batchSpanProcessor, ],                   // Optional - you can add more span processors
     traceExporter: OTLPTracesExporter,                        // Optional - if omitted, the tracing SDK will be initialized from environment variables

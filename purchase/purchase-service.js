@@ -52,7 +52,8 @@ purchaseResponder.on('buy', function(req, cb) {
 
     models.Product.get(req.productId, function(err, product) {
         
-        if (product.stock == 0) return cb(true);
+        if (product.stock == 0) 
+            return cb(true);
 
         paymentRequester.send(
             { 
@@ -62,7 +63,8 @@ purchaseResponder.on('buy', function(req, cb) {
                 request_ID: request_ID, // Include the request ID
             },
             function(err) {
-            if (err) return cb(err);
+            if (err) 
+                return cb(err);
 
             product.stock--;
 

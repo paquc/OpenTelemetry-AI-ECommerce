@@ -34,9 +34,12 @@ services:
       - "./filebeat_ingest_data/:/usr/share/filebeat/ingest_data/"
       - ./winstonlogger.js:/winstonlogger.js 
       - "./apigateway/AI-ECommerce-APIGateway.csv:/AI-ECommerce-APIGateway.csv"
+      - ./tracing/tracing.js:/tracing/tracing.js
     container_name: apigateway
     ports:
       - "9000:9000"
+    depends_on:
+      - admin
 
   apigateway_second:
     build:
@@ -49,9 +52,12 @@ services:
       - "./filebeat_ingest_data/:/usr/share/filebeat/ingest_data/"
       - ./winstonlogger.js:/winstonlogger.js 
       - "./apigateway/AI-ECommerce-APIGateway.csv:/AI-ECommerce-APIGateway.csv"
+      - ./tracing/tracing.js:/tracing/tracing.js
     container_name: apigateway_second
     ports:
       - "9001:9000"    
+    depends_on:
+      - admin
 
   haproxy:
     image: haproxy:2.7
@@ -136,8 +142,6 @@ services:
     environment:
       - PG=true
 
-  
-
   admin:
     build:
       context: .
@@ -156,7 +160,12 @@ services:
     restart: on-failure
     ports:
       - 5000:5000
-
+    depends_on:
+      - payment-service
+      - product-service
+      - purchase-service
+      - user-service
+    
   end-user:
     build:
       context: .
@@ -173,6 +182,8 @@ services:
     restart: on-failure
     ports:
       - 5001:5001
+    depends_on:
+      - admin
 
   monitoring:
     extends: base
@@ -228,7 +239,7 @@ services:
       - ./winstonlogger.js:/src/winstonlogger.js
     environment:
       - PG=true
-    # restart: on-failure
+    restart: on-failure
     depends_on:
       - db
 
