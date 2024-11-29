@@ -31,14 +31,18 @@ paymentResponder.on('*', function(req){
 
 paymentResponder.on('call', function(req){
     // Extract context from request
-    console.log('payment-service constext /call', JSON.stringify(context.active()));
     const parentContext = propagation.extract(context.active(), req, {
         get: (carrier, key) => carrier[key], // Define how to get keys from the request
     });
+
     // Start a new span with the extracted context
-    const span = tracer.startSpan('paymentResponder.on', undefined, parentContext);
-    console.log('payment-service /call', req);
+    const span = tracer.startSpan('paymentResponder.on:call', undefined, parentContext);
+
     span.setAttribute('request.data', JSON.stringify(req));
+
+    // do come work...
+    console.log('paymentResponder.on:call', req);
+
     span.setStatus({ code: 1 }); // Mark the span as successful
     span.end(); // End the span
 })

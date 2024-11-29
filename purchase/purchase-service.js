@@ -63,7 +63,7 @@ purchaseResponder.on('buy', function(req, cb) {
     const rootSpan = tracer.startSpan('purchaseResponder.on:root:buy');
     // Attach the root span to a new context
     const rootContext = trace.setSpan(context.active(), rootSpan);
-    console.log('payment-service rootContext /call', JSON.stringify(rootContext));
+    console.log('payment-service rootContext /call', rootContext);
 
     // Inject the span context into the request
     call_req = {type: 'call', request_ID: request_ID};
@@ -113,8 +113,10 @@ purchaseResponder.on('buy', function(req, cb) {
             });
         });
     });
+
     rootSpan.setStatus({ code: 1 }); // Mark the span as successful
     rootSpan.end(); // End the span
+    
 });
 
 purchaseResponder.on('list', function(req, cb) {
