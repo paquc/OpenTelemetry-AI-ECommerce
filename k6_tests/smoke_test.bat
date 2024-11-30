@@ -1,9 +1,9 @@
 :: SMOKE TEST
 set TEST_SLEEP_DURATION=0
-
 set TEST_TYPE=1
 set TEST_DURATION=10s
 set NUMBER_OF_USERS=5
+
 k6 run .\use_system.js 
 
 

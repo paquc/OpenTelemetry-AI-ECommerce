@@ -27,7 +27,7 @@ const { format } = winston;
 const { combine, timestamp, printf, colorize, align } = winston.format;
 require('winston-daily-rotate-file');
 
-const tracing = require('./tracing');
+// const tracing = require('./tracing');
 const {trace, context, propagation, tracer, getLineNumber} = require('./tracing.js');
 
 const errors = require('./errors.js');
@@ -57,28 +57,28 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function logEventMessage(message, severity) {
+// function logEventMessage(message, severity) {
 
-  const logger = tracing.loggerProvider.getLogger('apigateway-service-logger');
+//   const logger = tracing.loggerProvider.getLogger('apigateway-service-logger');
 
-  // emit a log message 
-  logger.emit({
-    severityText: severity,
-    body: message,
-    attributes: { 
-      'log.project': 'ETS-Project',
-      'log.service': 'apigateway'}
-  });
+//   // emit a log message 
+//   logger.emit({
+//     severityText: severity,
+//     body: message,
+//     attributes: { 
+//       'log.project': 'ETS-Project',
+//       'log.service': 'apigateway'}
+//   });
 
-  console.log(`${severity} : ${message}`); 
-};
+//   console.log(`${severity} : ${message}`); 
+// };
 
 
 app.get('/', (req, res) => {
   const request_ID = uuidv4();
   console.log(`Request ID: ${request_ID} - API Gateway service running...`);
   res.send('running...');
-  logEventMessage(`api gateway running ${PORT}`, severity_trace);
+  // logEventMessage(`api gateway running ${PORT}`, severity_trace);
   logger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', 'API Gateway service running', request_ID));
 });
 
@@ -90,15 +90,15 @@ app.get('/userslist', function(req, res) {
   const rootSpan = tracer.startSpan('APIGateway::GET::userslist');
   // Attach the root span to a new context
   const rootContext = trace.setSpan(context.active(), rootSpan);
-  list_req = {
-    type: 'list',
-    request_ID: request_ID, // Include the request ID
-  };
+  
+  let list_req = {type: 'list', request_ID: request_ID};
+  
   propagation.inject(rootContext, list_req, {
     set: (carrier, key, value) => {
         carrier[key] = value; // Define how to set keys in the request
     },
   });
+
   userRequester.send(list_req, function(err, users) {
       const endTime = Date.now();
       const duration = endTime - startTime;
@@ -107,6 +107,8 @@ app.get('/userslist', function(req, res) {
       const max_value = 400;
 
       if(err) {
+        rootSpan.setStatus({ code: 0 }); 
+        rootSpan.end(); // End the span
         logger.error(createMessage( Date.now(), ERROR_FAIL, SOURCE_SERVICE, API_ENDPOINT, err, '', `Error fetching users list from user-service: code ${err}`, request_ID));
         res.status(500).send('Error fetching users list');
       }
@@ -123,6 +125,9 @@ app.get('/userslist', function(req, res) {
         res.status(200).send(users);
       }
   });
+
+  rootSpan.setStatus({ code: 1 }); // Mark the span as successful
+  rootSpan.end(); // End the span
   
 });
 
@@ -161,4 +166,4 @@ logger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '', '', '', '
 
 // START listening...
 app.listen(PORT);
-logEventMessage(`API Gateway running... on ${PORT}`, severity_trace);
+// logEventMessage(`API Gateway running... on ${PORT}`, severity_trace);
