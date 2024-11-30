@@ -1,6 +1,6 @@
 const logger_name='products-service-logger';
-const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
+const {trace, context, propagation, tracer, logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
 const {createLogger, createMessage} = require('../winstonlogger.js');
 
@@ -29,6 +29,13 @@ var productPublisher = new cote.Publisher({
 productResponder.on('*', console.log);
 
 productResponder.on('list', function(req, cb) {
+    // Extract context from request
+    const parentContext = propagation.extract(context.active(), req, {
+        get: (carrier, key) => carrier[key], // Define how to get keys from the request
+    });
+    // Start a new span with the extracted context
+    const span = tracer.startSpan('productResponder.on::list', undefined, parentContext);
+    span.setAttribute('request.data', JSON.stringify(req));
     let {request_ID}  = req; // Extract the request ID from the incoming request
     if (!request_ID) {
         request_ID = uuidv4();
@@ -39,9 +46,18 @@ productResponder.on('list', function(req, cb) {
     const endTime = Date.now();
     const duration = endTime - startTime;
     wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'list', duration, '', `Products fetched with success in ${duration} ms`, request_ID));
+    span.setStatus({ code: 1 }); // Mark the span as successful
+    span.end(); // End the span
 });
 
 productResponder.on('create', function(req, cb) {
+    // Extract context from request
+    const parentContext = propagation.extract(context.active(), req, {
+        get: (carrier, key) => carrier[key], // Define how to get keys from the request
+    });
+    // Start a new span with the extracted context
+    const span = tracer.startSpan('productResponder.on::create', undefined, parentContext);
+    span.setAttribute('request.data', JSON.stringify(req));
     let {request_ID}  = req; // Extract the request ID from the incoming request
     if (!request_ID) {
         request_ID = uuidv4();
@@ -54,9 +70,18 @@ productResponder.on('create', function(req, cb) {
         cb(err, products);
         updateProducts();
     });
+    span.setStatus({ code: 1 }); // Mark the span as successful
+    span.end(); // End the span
 });
 
 productResponder.on('delete', function(req, cb) {
+    // Extract context from request
+    const parentContext = propagation.extract(context.active(), req, {
+        get: (carrier, key) => carrier[key], // Define how to get keys from the request
+    });
+    // Start a new span with the extracted context
+    const span = tracer.startSpan('productResponder.on::delete', undefined, parentContext);
+    span.setAttribute('request.data', JSON.stringify(req));
     let {request_ID}  = req; // Extract the request ID from the incoming request
     if (!request_ID) {
         request_ID = uuidv4();
@@ -71,6 +96,8 @@ productResponder.on('delete', function(req, cb) {
             updateProducts();
         });
     });
+    span.setStatus({ code: 1 }); // Mark the span as successful
+    span.end(); // End the span
 });
 
 function updateProducts() {

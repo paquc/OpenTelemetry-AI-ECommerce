@@ -27,7 +27,9 @@ const { format } = winston;
 const { combine, timestamp, printf, colorize, align } = winston.format;
 require('winston-daily-rotate-file');
 
-const tracing = require('./tracing');
+// const tracing = require('./tracing');
+const {trace, context, propagation, tracer, logEventMessage, severity_info, getLineNumber} = require('./tracing.js');
+
 const errors = require('./errors.js');
 
 require('dotenv').config();
@@ -84,17 +86,23 @@ app.get('/', (req, res) => {
 app.get('/userslist', function(req, res) {
   const request_ID = uuidv4();
   const startTime = Date.now();
-  
-  userRequester.send(
-    {
-      type: 'list',
-      request_ID: request_ID, // Include the request ID
-    }, 
-    function(err, users) {
+  // Create a root span
+  const rootSpan = tracer.startSpan('APIGateway::GET::userslist');
+  // Attach the root span to a new context
+  const rootContext = trace.setSpan(context.active(), rootSpan);
+  list_req = {
+    type: 'list',
+    request_ID: request_ID, // Include the request ID
+  };
+  propagation.inject(rootContext, list_req, {
+    set: (carrier, key, value) => {
+        carrier[key] = value; // Define how to set keys in the request
+    },
+  });
+  userRequester.send(list_req, function(err, users) {
       const endTime = Date.now();
       const duration = endTime - startTime;
       
-      // 
       const min_value = 100;
       const max_value = 400;
 

@@ -73,6 +73,7 @@ export { options };
 // Function that will call the /userslist endpoint and check if the response contains the expected number of users
 function useSystem(numberOfUsers, print) {
 
+  // Call API Gateway
   let res = http.get('http://localhost:9000/userslist');
   let users = JSON.parse(res.body);
   if (print)
@@ -80,6 +81,7 @@ function useSystem(numberOfUsers, print) {
   // check(res, { [`contains ${numberOfUsers} users`]: (r) => JSON.parse(r.body).length === numberOfUsers });
   sleep(randomIntBetween(0, sleep_duration));
 
+  // Call Admin server
   res = http.get('http://localhost:5000/product');
   const products = JSON.parse(res.body);
   if (print)
@@ -87,6 +89,7 @@ function useSystem(numberOfUsers, print) {
   // check(res, { [`contains ${numberOfUsers} users`]: (r) => JSON.parse(r.body).length === numberOfUsers });
   sleep(randomIntBetween(0, sleep_duration));
 
+  // Call Admin server
   res = http.get('http://localhost:5000/purchase');
   const purchases = JSON.parse(res.body);
   if (print)
@@ -94,6 +97,7 @@ function useSystem(numberOfUsers, print) {
   // check(res, { [`contains ${numberOfUsers} users`]: (r) => JSON.parse(r.body).length === numberOfUsers });
   sleep(randomIntBetween(0, sleep_duration));
 
+  // Call Admin server
   res = http.get('http://localhost:5000/user');
   const user = JSON.parse(res.body);
   if (print)

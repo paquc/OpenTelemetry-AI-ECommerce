@@ -1,6 +1,6 @@
 const logger_name='admin-service-logger';
 
-const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
+const {trace, context, propagation, tracer, logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
 const {createLogger, createMessage} = require('../winstonlogger.js');
 
@@ -88,64 +88,114 @@ app.get('/', function(req, res) {
 });
 
 app.get('/product', function(req, res) {
-    logCPU()
+    logCPU();
+    const rootSpan = tracer.startSpan('AdminService::GET /product'); // Create a root span
+    const rootContext = trace.setSpan(context.active(), rootSpan);
     const startTime = Date.now();
     let {request_ID}  = req; // Extract the request ID from the incoming request
     if (!request_ID) {
         request_ID = uuidv4();
     }
-    productRequester.send({type: 'list'}, function(err, products) {
+    list_req={type: 'list'};
+    propagation.inject(rootContext, list_req, {
+        set: (carrier, key, value) => {
+            carrier[key] = value; // Define how to set keys in the request
+        },
+    });
+    productRequester.send(list_req, function(err, products) {
         res.send(products);
         const endTime = Date.now();
         const duration = endTime - startTime;
         wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '/product', duration, '', `Products listed successfully from product-service in ${duration} ms`, request_ID));
     });
+    rootSpan.setStatus({ code: 1 }); // Mark the span as successful
+    rootSpan.end(); // End the span
 });
 
 // curl -X POST 'http://127.0.0.1:5000/product' -H "Content-Type: application/json" -d '{"product": {"name": "Sample Product","price": 25.99,"quantity": 100}}'
 
 app.post('/product', function(req, res) {
-    logCPU()
-    productRequester.send({type: 'create', product: req.body.product}, function(err, product) {
+    logCPU();
+    const rootSpan = tracer.startSpan('AdminService::POST /product'); // Create a root span
+    const rootContext = trace.setSpan(context.active(), rootSpan);
+    create_req={type: 'create', product: req.body.product};
+    propagation.inject(rootContext, create_req, {
+        set: (carrier, key, value) => {
+            carrier[key] = value; // Define how to set keys in the request
+        },
+    });
+    productRequester.send(create_req, function(err, product) {
         res.send(product);
     });
+    rootSpan.setStatus({ code: 1 }); // Mark the span as successful
+    rootSpan.end(); // End the span
 });
 
 app.delete('/product/:id', function(req, res) {
-    logCPU()
-    productRequester.send({type: 'delete', id: req.params.id}, function(err, product) {
+    logCPU();
+    const rootSpan = tracer.startSpan('AdminService::DELETE /product:id'); // Create a root span
+    const rootContext = trace.setSpan(context.active(), rootSpan);
+    delete_req={type: 'delete', id: req.params.id};
+    propagation.inject(rootContext, delete_req, {
+        set: (carrier, key, value) => {
+            carrier[key] = value; // Define how to set keys in the request
+        },
+    });
+    productRequester.send(delete_req, function(err, product) {
         res.send(product);
     });
+    rootSpan.setStatus({ code: 1 }); // Mark the span as successful
+    rootSpan.end(); // End the span
 });
 
 app.get('/user', function(req, res) {
-    logCPU()
+    logCPU();
+    const rootSpan = tracer.startSpan('AdminService::GET /user'); // Create a root span
+    const rootContext = trace.setSpan(context.active(), rootSpan);
     const startTime = Date.now();
     let {request_ID}  = req; // Extract the request ID from the incoming request
     if (!request_ID) {
         request_ID = uuidv4();
     }
-    userRequester.send({type: 'list'}, function(err, users) {
+    list_req={type: 'list'};
+    propagation.inject(rootContext, list_req, {
+        set: (carrier, key, value) => {
+            carrier[key] = value; // Define how to set keys in the request
+        },
+    });
+    userRequester.send(list_req, function(err, users) {
         res.send(users);
         const endTime = Date.now();
         const duration = endTime - startTime;
         wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '/user', duration, '', `Users listed successfully from user-service in ${duration} ms`, request_ID));
     });
+    rootSpan.setStatus({ code: 1 }); // Mark the span as successful
+    rootSpan.end(); // End the span
 });
 
 app.get('/purchase', function(req, res) {
-    logCPU()
+    logCPU();
+    const rootSpan = tracer.startSpan('AdminService::GET /purchase'); // Create a root span
+    const rootContext = trace.setSpan(context.active(), rootSpan);
     const startTime = Date.now();
     let {request_ID}  = req; // Extract the request ID from the incoming request
     if (!request_ID) {
         request_ID = uuidv4();
     }
-    purchaseRequester.send({type: 'list'}, function(err, purchases) {
+    list_req={type: 'list'};
+    propagation.inject(rootContext, list_req, {
+        set: (carrier, key, value) => {
+            carrier[key] = value; // Define how to set keys in the request
+        },
+    });
+    purchaseRequester.send(list_req, function(err, purchases) {
         res.send(purchases);
         const endTime = Date.now();
         const duration = endTime - startTime;
         wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, '/purchase', duration, '', `Purchases listed successfully from purchase-service in ${duration} ms`, request_ID));
     });
+    rootSpan.setStatus({ code: 1 }); // Mark the span as successful
+    rootSpan.end(); // End the span
 });
 
 var productRequester = new cote.Requester({
