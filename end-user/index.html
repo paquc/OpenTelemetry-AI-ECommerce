@@ -15,6 +15,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/uuid@9.0.0/dist/umd/uuidv4.min.js"></script>
 
+    <script src="https://unpkg.com/@opentelemetry/api"></script>
+    <script src="https://unpkg.com/@opentelemetry/instrumentation-socket.io"></script>
+
     <!-- AngularJS script defining the main module and controller logic -->
     <script>
         // Define the AngularJS module called 'end-user'
@@ -25,9 +28,12 @@
         var purchaseService = io.connect('/purchase');  // Connect to the 'purchase' namespace for purchase-related communication
         var userService = io.connect('/user');  // Connect to the 'user' namespace for user-related communication
 
+        const {context, trace, propagation} = require('@opentelemetry/api');
+        const tracer = trace.getTracer('end-user-instrumentation-tracer');
+
         // Define the controller function 'ProductController', which controls the data and behavior for the view
         function ProductController($scope) {
-            
+
             // logEventMessage('admin-service-logger', 'END-USER service controller called', severity_info, getLineNumber());
             // Create a new user by emitting an event to the 'user' namespace
             userService.emit('create', {}, function(err, data) {
@@ -57,17 +63,34 @@
                 });
             }
 
+            function startSpan(name, req) {
+                // Create a root span
+                var rootSpan = tracer.startSpan(name);
+                // Attach the root span to a new context
+                var rootContext = trace.setSpan(context.active(), rootSpan);
+                propagation.inject(rootContext, req, {
+                    set: (carrier, key, value) => {
+                        carrier[key] = value; // Define how to set keys in the request
+                    },
+                });
+
+                return req;
+            }
+
             // Function called when the user attempts to purchase a product
-            $scope.purchase = function(id, req_id) {
-                                
-                // Emit a 'buy' event to the 'purchase' namespace with the user's ID and the product ID
-                purchaseService.emit(
-                    'buy',
-                    {
+            $scope.purchase = function(id, req_id, span_id) {
+
+                // const rootSpan = tracer.startSpan('scope.purchase:buy');
+
+                buy_req = {
                         userId: $scope.user.id, 
                         productId: id,
-                        request_ID: req_id, // Include the request ID
-                    }, 
+                        request_ID: req_id,     // Include the request ID
+                    };
+                
+                // Emit a 'buy' event to the 'purchase' namespace with the user's ID and the product ID
+                purchaseService.emit(
+                    'buy', buy_req,
                     function(err, data) {
                         if (err) return; // If there's an error, do nothing
 
@@ -113,7 +136,7 @@
             class="btn btn-sm" 
             ng-class="{'btn-success': user.balance >= product.price}" 
             ng-disabled="user.balance < product.price" 
-            ng-click="purchase(product.id, uuidv4())" 
+            ng-click="purchase(product.id, uuidv4(), uuidv4())" 
             ng-style="{'visibility': product.stock > 0 ? 'visible' : 'hidden' }" > Buy &mdash; ${{product.price}}
         </button>
     </div>

@@ -1,6 +1,6 @@
 const logger_name='users-service-logger';
-const {logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
+const {trace, context, propagation, tracer, logEventMessage, severity_info, getLineNumber} = require(__dirname + '/tracing.js');
 
 const {createLogger, createMessage} = require('../winstonlogger.js');
 
@@ -48,6 +48,13 @@ userResponder.on('create',
 
 userResponder.on('list', 
     function(req, cb) {
+        // Extract context from request
+        const parentContext = propagation.extract(context.active(), req, {
+            get: (carrier, key) => carrier[key], // Define how to get keys from the request
+        });
+        // Start a new span with the extracted context
+        const span = tracer.startSpan('userResponder.on:list', undefined, parentContext);
+        span.setAttribute('request.data', JSON.stringify(req));
         const startTime = Date.now();
         let {request_ID}  = req; // Extract the request ID from the incoming request
         if (!request_ID) {
@@ -59,6 +66,8 @@ userResponder.on('list',
         const endTime = Date.now();
         const duration = endTime - startTime;
         wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'list', duration, '', `Users queried with success in ${duration}ms`, request_ID));
+        span.setStatus({ code: 1 }); // Mark the span as successful
+        span.end(); // End the span
 });
 
 userResponder.on('get', 

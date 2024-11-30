@@ -59,21 +59,21 @@ purchaseResponder.on('buy', function(req, cb) {
     }
     wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'buy', '', '', `Request to buy a product for ID=${req.productId}`, request_ID));
 
+    // Field for the parent span context
+    // traceparent: '00-138ada151edbc4a0b92ef368f48eeaa6-a76f4b900589f3d5-01'
     // Create a root span
-    const rootSpan = tracer.startSpan('purchaseResponder.on:root:buy');
+    const rootSpan = tracer.startSpan('purchaseResponder.on::buy');
     // Attach the root span to a new context
     const rootContext = trace.setSpan(context.active(), rootSpan);
-    console.log('payment-service rootContext /call', rootContext);
-
     // Inject the span context into the request
     call_req = {type: 'call', request_ID: request_ID};
-
     propagation.inject(rootContext, call_req, {
         set: (carrier, key, value) => {
             carrier[key] = value; // Define how to set keys in the request
         },
     });
-    console.log('purchase-service /buy', call_req);
+    // console.log('purchaseResponder.on::call', call_req);  // for debug only
+    rootSpan.setAttribute('request.data', JSON.stringify(call_req));
     paymentRequester.send( call_req );
 
     var purchase = new models.Purchase({});
@@ -83,16 +83,23 @@ purchaseResponder.on('buy', function(req, cb) {
         if (product.stock == 0) 
             return cb(true);
 
-        paymentRequester.send(
-            { 
-                type: 'process', 
-                userId: req.userId, 
-                price: product.price,
-                request_ID: request_ID, // Include the request ID
+        pay_req = { 
+            type: 'process', 
+            userId: req.userId, 
+            price: product.price,
+            request_ID: request_ID, // Include the request ID
+        };    
+        propagation.inject(rootContext, pay_req, {
+            set: (carrier, key, value) => {
+                carrier[key] = value; // Define how to set keys in the request
             },
-            function(err) {
-            if (err) 
+        });
+        paymentRequester.send( pay_req, function(err) {
+            if (err) {
+                rootSpan.setStatus({ code: 0 }); // Mark the span as error
+                rootSpan.end(); // End the span
                 return cb(err);
+            }
 
             product.stock--;
 
@@ -116,7 +123,7 @@ purchaseResponder.on('buy', function(req, cb) {
 
     rootSpan.setStatus({ code: 1 }); // Mark the span as successful
     rootSpan.end(); // End the span
-    
+
 });
 
 purchaseResponder.on('list', function(req, cb) {

@@ -27,38 +27,41 @@ paymentResponder.on('*', function(req){
     console.log('payment-service /*', req);
 })
 
-
-
 paymentResponder.on('call', function(req){
     // Extract context from request
     const parentContext = propagation.extract(context.active(), req, {
         get: (carrier, key) => carrier[key], // Define how to get keys from the request
     });
-
     // Start a new span with the extracted context
-    const span = tracer.startSpan('paymentResponder.on:call', undefined, parentContext);
-
+    const span = tracer.startSpan('paymentResponder.on::call', undefined, parentContext);
     span.setAttribute('request.data', JSON.stringify(req));
-
     // do come work...
     console.log('paymentResponder.on:call', req);
-
     span.setStatus({ code: 1 }); // Mark the span as successful
     span.end(); // End the span
 })
 
-
-
 paymentResponder.on('process', function(req, cb) {
-    console.log('payment-service /process', req);
+    // Extract context from request
+    const parentContext = propagation.extract(context.active(), req, {
+        get: (carrier, key) => carrier[key], // Define how to get keys from the request
+    });
+    // Start a new span with the extracted context
+    const payProcessSpan = tracer.startSpan('paymentResponder.on::process', undefined, parentContext);
+    payProcessSpan.setAttribute('request.data', JSON.stringify(req));
+    
     let {request_ID}  = req; // Extract the request ID from the incoming request
     if (!request_ID) {
         request_ID = uuidv4();
     }
     const startTime = Date.now();
     models.User.get(req.userId, function(err, user) {
-        if (user.balance < req.price) 
+        if (user.balance < req.price) {
+            payProcessSpan.setStatus({ code: 1 }); // Mark the span as successful
+            payProcessSpan.end(); // End the span
             return cb(true);
+        }
+
         user.balance -= req.price;
         user.save(cb);
         const endTime = Date.now();
@@ -66,14 +69,31 @@ paymentResponder.on('process', function(req, cb) {
         wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'process', duration, '', `Payment processed successfully for user ID=${req.userId} in ${duration} ms`, request_ID));
     });
 
+    // Attach the root span to a new context
+    const listContext = trace.setSpan(context.active(), payProcessSpan);
+
+    list_req = {
+        type: 'list',
+        request_ID: request_ID, // Include the request ID
+      };
+
+    propagation.inject(listContext, list_req, {
+        set: (carrier, key, value) => {
+            carrier[key] = value; // Define how to set keys in the request
+        },
+    });
+    
     userRequester.send(
-        {
-          type: 'list',
-          request_ID: request_ID, // Include the request ID
-        }, 
+        list_req, 
         function(err, users) {
-            
-      });
+    });
+    
+    
+    payProcessSpan.setStatus({ code: 1 }); // Mark the span as successful
+    payProcessSpan.end(); // End the span
+
+    payProcessSpan.setStatus({ code: 1 }); // Mark the span as successful
+    payProcessSpan.end(); // End the span
 
 });
 
