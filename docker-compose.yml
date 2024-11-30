@@ -36,6 +36,8 @@ services:
       - "./apigateway/AI-ECommerce-APIGateway.csv:/AI-ECommerce-APIGateway.csv"
       - ./tracing/tracing.js:/tracing/tracing.js
     container_name: apigateway
+    environment:
+      - TZ=TZ=America/Toronto
     ports:
       - "9000:9000"
     depends_on:
@@ -54,6 +56,8 @@ services:
       - "./apigateway/AI-ECommerce-APIGateway.csv:/AI-ECommerce-APIGateway.csv"
       - ./tracing/tracing.js:/tracing/tracing.js
     container_name: apigateway_second
+    environment:
+      - TZ=TZ=America/Toronto
     ports:
       - "9001:9000"    
     depends_on:
