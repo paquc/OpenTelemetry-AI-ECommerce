@@ -27,8 +27,8 @@ const { format } = winston;
 const { combine, timestamp, printf, colorize, align } = winston.format;
 require('winston-daily-rotate-file');
 
-// const tracing = require('./tracing');
-const {trace, context, propagation, tracer, logEventMessage, severity_info, getLineNumber} = require('./tracing.js');
+const tracing = require('./tracing');
+const {trace, context, propagation, tracer, getLineNumber} = require('./tracing.js');
 
 const errors = require('./errors.js');
 
