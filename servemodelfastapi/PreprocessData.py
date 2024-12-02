@@ -99,7 +99,7 @@ def GenMatricesV2(time_interval, error_threshold):
     result_df = result_df.reindex(columns=desired_order)
 
     # Remove column that dont have an impact on predictions
-    result_df.drop(columns=['E9','E2','E3','E1','E7','E6','E11','E12','E17'], inplace=True)
+    result_df.drop(columns=['E9','E2','E3','E1','E7','E6','E11','E12'], inplace=True)
 
     # Optionally, save the result to a new CSV file
     #result_df.to_csv('./Thunderbird_Brain_results/Thunderbird.log_structured_Preprocess_Samples.csv', index=False)

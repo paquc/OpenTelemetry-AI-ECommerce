@@ -95,7 +95,7 @@ app.get('/userslist', function(req, res) {
   
   propagation.inject(rootContext, list_req, {
     set: (carrier, key, value) => {
-        carrier[key] = value; // Define how to set keys in the request
+        carrier[key] = value; 
     },
   });
 
