@@ -15,9 +15,6 @@ const ERROR_FAIL = 'SVC_USER_REQ_FAIL';
 
 const { v4: uuidv4 } = require('uuid');
 
-
-// var paymentService = io. .connect('/payment');
-
 var cote = require('cote'),
     models = require('../models');
 

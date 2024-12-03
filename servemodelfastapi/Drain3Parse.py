@@ -6,6 +6,8 @@ import pandas as pd
 from drain3.file_persistence import FilePersistence
 from collections import OrderedDict
 
+# Log example:
+# 2024-11-29 02:33:02.130,info,1732847582130,OK,product-service,list,1,,Products fetched with success in 1 ms,b579481a-ce40-4e28-9244-bd4f4899aca3
 log_pattern_real_time = re.compile(
     r"(?P<Date>\d{4}-\d{2}-\d{2})\s"                                     # Date: yyyy-mm-dd
     r"(?P<Time>\d{2}:\d{2}:\d{2}\.\d{3}),"                               # Time: hh:mm:ss.sss
@@ -21,6 +23,8 @@ log_pattern_real_time = re.compile(
     )
 
 
+# Log example:
+# 2024-11-27T03:55:07.458992118Z {name=a31243cb2d2b} 2024-11-27 03:55:07.397,info,1732679707397,OK,purchase-service,buy,,,Request to buy a product for ID=3,0f10d5e8-c3b1-4014-8630-65af53640e3d
 log_pattern = re.compile(
     r"(?P<FirstTimestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z)\s"  # ISO 8601 Timestamp with nanoseconds
     r"\{name=(?P<Name>[^\}]+)\}\s"                                       # Metadata: {name=value}
