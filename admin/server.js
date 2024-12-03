@@ -38,9 +38,9 @@ function logCPU(){
     if (cpu < min_value) {
         wlogger.info(createMessage( Date.now(), ERROR_NONE, SOURCE_SERVICE, 'cpu-usage', cpu, '', `ADMIN API cpu usage running normally at ${cpu}%`, uuidv4()));
     } else if (cpu >= min_value && cpu < max_value) {
-        wlogger.info(createMessage( Date.now(), ERROR_CPU_WARN, SOURCE_SERVICE, 'cpu-usage', cpu, '', `ADMIN API cpu usage running high at (TH=${min_value}%) ${cpu}%`, uuidv4()));
+        wlogger.warn(createMessage( Date.now(), ERROR_CPU_WARN, SOURCE_SERVICE, 'cpu-usage', cpu, '', `ADMIN API cpu usage running high at (TH=${min_value}%) ${cpu}%`, uuidv4()));
     } else if (cpu >= max_value) {
-        wlogger.info(createMessage( Date.now(), ERROR_CPU_WARN, SOURCE_SERVICE, 'cpu-usage', cpu, '', `ADMIN API cpu usage running OVER the SLO (max=${max_value}%) at ${cpu}%`, uuidv4()));
+        wlogger.warn(createMessage( Date.now(), ERROR_CPU_WARN, SOURCE_SERVICE, 'cpu-usage', cpu, '', `ADMIN API cpu usage running OVER the SLO (max=${max_value}%) at ${cpu}%`, uuidv4()));
     }
     else {
     }

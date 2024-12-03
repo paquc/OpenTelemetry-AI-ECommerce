@@ -21,3 +21,5 @@ logstash_ingest_data/
 parsing/Drain3/drain3_state.bin
 servemodelfastapi/data/alarms.log
 servemodelfastapi/dataV2/
+servemodelfastapi/dataV1/
+servemodelfastapi/data/

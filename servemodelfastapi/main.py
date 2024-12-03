@@ -83,6 +83,13 @@ def GenMatrixV2():
     return {"Gen matrices V2": "Done."}
 
 
+# curl -X GET 'http://127.0.0.1:8088/GenMatrix'
+@app.get("/GenMatrixV3")
+def GenMatrixV3():
+    gmV2.GenMatricesV3('1000ms', 3, 1)
+    return {"Gen matrices V2": "Done."}
+
+
 # curl -X GET 'http://127.0.0.1:8088/TrainModels'
 @app.get("/TrainModels")
 def TrainModels():
