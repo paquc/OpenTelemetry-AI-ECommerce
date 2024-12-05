@@ -54,7 +54,7 @@ ordered_dict = OrderedDict()
 for i in range(1, 25):
     ordered_dict[i] = 0
 
-def ParseNewEvent(log_entry, events_clusters, alarm_clusters):
+def ParseNewEvent(log_entry, events_clusters, alarm_clusters, events_stack_size):
     global newItemsCounter
     global ordered_dict
     global newEvent
@@ -82,7 +82,7 @@ def ParseNewEvent(log_entry, events_clusters, alarm_clusters):
         event_type = "E" + str(result.cluster_id)
         # if event_type in alarm_clusters:
           
-        if newItemsCounter >= 1000 and event_type in alarm_clusters:
+        if newItemsCounter >= events_stack_size and event_type in alarm_clusters:
             
             for key, value in ordered_dict.items():
                 event = "E" + str(key)

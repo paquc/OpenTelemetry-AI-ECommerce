@@ -49,7 +49,7 @@ def addlogentry(date: str , sever: str, epoch: str, error_type: str, service: st
     # E4,E5,E8,E10,E13,E14,E15,E16,IsAlarm
     events_clusters = ['E4','E5','E8','E10','E13','E14','E15','E16']
     alarm_clusters = ['E14','E15','E16']
-    data = Drain3Parse.ParseNewEvent(log_entry, events_clusters, alarm_clusters)
+    data = Drain3Parse.ParseNewEvent(log_entry, events_clusters, alarm_clusters, 125000)
     if data is not None:
         prediction = predict.RF_Prediction(data)
         if prediction:
@@ -83,17 +83,17 @@ def GenMatrixV2():
     return {"Gen matrices V2": "Done."}
 
 
-# curl -X GET 'http://127.0.0.1:8088/GenMatrix'
+# curl -X GET 'http://127.0.0.1:8088/GenMatrixV3'
 @app.get("/GenMatrixV3")
 def GenMatrixV3():
-    gmV2.GenMatricesV3('1000ms', 3, 1)
+    gmV2.GenMatricesV3('20min', 15, 2)
     return {"Gen matrices V2": "Done."}
 
 
 # curl -X GET 'http://127.0.0.1:8088/TrainModels'
 @app.get("/TrainModels")
 def TrainModels():
-    train.TrainModels(0, 1, 0, 1, 80, 20, 0)
+    train.TrainModels(0, 1, 0, 1, 70, 30, 0)
     return {"Train models": "Done."}
 
 
