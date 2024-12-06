@@ -42,6 +42,7 @@ paymentResponder.on('call', function(req){
 })
 
 paymentResponder.on('process', function(req, cb) {
+    
     // Extract context from request
     const parentContext = propagation.extract(context.active(), req, {
         get: (carrier, key) => carrier[key], // Define how to get keys from the request

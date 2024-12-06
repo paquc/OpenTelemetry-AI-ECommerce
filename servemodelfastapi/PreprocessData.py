@@ -145,8 +145,8 @@ def split_and_aggregate_by_clusterV3(df, time_interval, error_threshold, anomaly
 
     # Label the chunk as 'anomaly' based on the specified threshold and specific Cluster IDs
     for index, row in cluster_counts.iterrows():
-        row_index = cluster_counts.index.get_loc(index)
         if anomaly_clusters:
+            row_index = cluster_counts.index.get_loc(index)
             if row_index + pred_index < len(cluster_counts):
                 pred_cluster = cluster_counts.iloc[row_index + pred_index]
                 # Check if any of the anomaly clusters exceed the error threshold
@@ -154,15 +154,6 @@ def split_and_aggregate_by_clusterV3(df, time_interval, error_threshold, anomaly
                     # print(row[anomaly_clusters].sum())
                     cluster_counts.at[index, 'IsAlarm'] = '1'
         
-
-    # ******************************************
-    # IMPORTANT!!!!!!!!!
-    # Drop the columns corresponding to the Cluster IDs in anomaly_clusters
-    if anomaly_clusters:
-        print("Dropping columns: ", anomaly_clusters)
-        cluster_counts.drop(columns=anomaly_clusters, inplace=True)
-    # ******************************************
-   
     return cluster_counts
 
 
@@ -178,7 +169,8 @@ def GenMatricesV3(time_interval, error_threshold, pred_index):
 
     # Define the anomaly conditions (specific clusters or thresholds)
     # anomaly_clusters = ['E9', 'E10', 'E11', 'E12']  # Specific clusters to label as anomaly
-    anomaly_clusters = ['E10', 'E12']  # CPU and LATANCE errors
+    anomaly_clusters = ['E10']  # CPU and LATANCE errors
+    # anomaly_clusters = ['E12']  # CPU and LATANCE errors
     alarm_clusters = []
 
     # error_threshold = 3  # If the sum of occurrences of these clusters in a chunk exceeds this, label as anomaly
@@ -204,8 +196,15 @@ def GenMatricesV3(time_interval, error_threshold, pred_index):
     desired_order = ['E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7', 'E8', 'E9', 'E10', 'E11', 'E12', 'E13', 'E14', 'E15', 'E16', 'E17', 'IsAlarm']
     result_df = result_df.reindex(columns=desired_order)
 
+    if anomaly_clusters:
+        print("Dropping columns: ", anomaly_clusters)
+        result_df.drop(columns=anomaly_clusters, inplace=True)
+
     # Remove column that dont have an impact on predictions
-    result_df.drop(columns=['E14', 'E12', 'E10', 'E13', 'E16', 'E17'], inplace=True)
+    # result_df = result_df[['E9', 'E11', 'IsAlarm']]
+    result_df.drop(columns=['E13', 'E14', 'E15', 'E16', 'E17'], inplace=True)
+
+    
 
     # Optionally, save the result to a new CSV file
     #result_df.to_csv('./Thunderbird_Brain_results/Thunderbird.log_structured_Preprocess_Samples.csv', index=False)

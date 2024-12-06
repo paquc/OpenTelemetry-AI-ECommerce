@@ -11,8 +11,8 @@ const ERROR_FAIL = 'SVC_USER_REQ_FAIL';
 
 const { v4: uuidv4 } = require('uuid');
 
-var cote = require('cote'),
-    models = require('../models');
+var cote = require('cote');
+var models = require('../models');
 
 var productResponder = new cote.Responder({
     name: 'product responder',

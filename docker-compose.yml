@@ -79,22 +79,7 @@ services:
       - apigateway
       - apigateway_second
     restart: on-failure
-
-  # lb:
-  #   image: dockercloud/haproxy:1.6.7
-  #   links:
-  #     - apigateway
-  #     - apigateway_second
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     # - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
-  #   ports:
-  #     - 9005:80
-  #   depends_on:
-  #     - apigateway
-  #     - apigateway_second
-  #   restart: on-failure
-
+ 
   # docker pull jaegertracing/all-in-one
   # docker run -d --name=jaeger -p 16686:16686 -p 16687:16687 jaegertracing/all-in-one
   jaeger:
@@ -107,23 +92,23 @@ services:
       # - "14268"       # HTTP port to receive traces from the OTEL Collector
       # - "14250"       # gRPC port to receive traces from the OTEL Collector
 
-  influxdb:
-    image: influxdb:1.8
-    container_name: influxdb
-    ports:
-      - "8086:8086"
-    environment:
-      - INFLUXDB_DB=k6
+  # influxdb:
+  #   image: influxdb:1.8
+  #   container_name: influxdb
+  #   ports:
+  #     - "8086:8086"
+  #   environment:
+  #     - INFLUXDB_DB=k6
 
-  k6:
-    image: grafana/k6:0.55.0
-    container_name: k6  
-    ports:
-      - "6565:6565"
-    environment:
-      - K6_OUT=influxdb=http://influxdb:8086/k6
-    volumes:
-      - ./examples:/scripts
+  # k6:
+  #   image: grafana/k6:0.55.0
+  #   container_name: k6  
+  #   ports:
+  #     - "6565:6565"
+  #   environment:
+  #     - K6_OUT=influxdb=http://influxdb:8086/k6
+  #   volumes:
+  #     - ./examples:/scripts
 
   splunk:
     image: splunk/splunk:9.3
@@ -626,55 +611,8 @@ services:
       - KIBANA_FLEET_USERNAME=elastic
       - KIBANA_FLEET_PASSWORD=${ELASTIC_PASSWORD}
       - KIBANA_HOST=https://kibana:5601
-
-  webapp:
-    build:
-      context: app
-    volumes:
-      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro"
-      - "/proc:/hostfs/proc:ro"
-      - "/:/hostfs:ro"
-    ports:
-      - 8010:8000    
-    
-  #mimir:
-  #  image: grafana/mimir:2.13.0
-  #  container_name: mimir
-  # command: ["-ingester.native-histograms-ingestion-enabled=true", "-config.file=/etc/mimir.yaml"]
-  #  ports:
-  #    - "9009:9009"
-  #  volumes:
-  #    - "./mimir/mimir.yaml:/etc/mimir.yaml"  
-
-  # Generate fake traces...
-  # k6-tracing:
-  #   image: ghcr.io/grafana/xk6-client-tracing:v0.0.5
-  #   container_name: k6
-  #   environment:
-  #     - ENDPOINT=collector-gateway:4317 # Export to OTEL Collector simulatated traces
-  #   #restart: always
-  #   depends_on:
-  #     - collector-gateway  
-
-  # docker run --name logparser -it -v logparser:/logparser logpai/logparser:py3 bash
-  # docker run --name logparser -it -v logparser:/logparser logparser_py3_8:1.0 bash
-  # logparser:
-  #   build:
-  #     context: ./logparserDocker
-  #     dockerfile: Dockerfile
-  #   container_name: logparser_py38
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         memory: 64g  
-  #   volumes:
-  #     - logparserpy38:/logparser
-  #   stdin_open: true        # Keep STDIN open for interaction
-  #   tty: true               # Allocate a pseudo-TTY
-  #   command: /bin/bash      # Start the container with Bash
-
+ 
+ 
 volumes:
   certs:
     driver: local

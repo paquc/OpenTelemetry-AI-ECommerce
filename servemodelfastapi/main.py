@@ -83,17 +83,18 @@ def GenMatrixV2():
     return {"Gen matrices V2": "Done."}
 
 
-# curl -X GET 'http://127.0.0.1:8088/GenMatrixV3'
-@app.get("/GenMatrixV3")
-def GenMatrixV3():
-    gmV2.GenMatricesV3('20min', 15, 2)
+# curl -X POST "http://127.0.0.1:8088/GenMatrixV3?interval=10min&th=20"
+@app.post("/GenMatrixV3")
+def GenMatrixV3(interval: str, th: int):
+    gmV2.GenMatricesV3(interval, th, 2)
+    # gmV2.GenMatricesV3('10min', 200, 2)
     return {"Gen matrices V2": "Done."}
 
 
 # curl -X GET 'http://127.0.0.1:8088/TrainModels'
 @app.get("/TrainModels")
 def TrainModels():
-    train.TrainModels(0, 1, 0, 1, 70, 30, 0)
+    train.TrainModels(0, 1, 0, 1, 80, 20, 0)
     return {"Train models": "Done."}
 
 
