@@ -127,10 +127,6 @@ const batchSpanProcessor = new BatchSpanProcessor(OTLPTracesExporter, {
   exportTimeoutMillis: 30000,   // Maximum allowed time to send a batch
 });
 
-// Initialize the tracer provider
-//const tracerProvider = new NodeTracerProvider();
-//tracerProvider.addSpanProcessor(batchSpanProcessor);
-//tracerProvider.register();
 
 // Get a tracer instance
 const tracer = trace.getTracer('cote-instrumentation-tracer');

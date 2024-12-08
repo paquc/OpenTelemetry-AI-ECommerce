@@ -92,10 +92,6 @@ paymentResponder.on('process', function(req, cb) {
     
     payProcessSpan.setStatus({ code: 1 }); // Mark the span as successful
     payProcessSpan.end(); // End the span
-
-    payProcessSpan.setStatus({ code: 1 }); // Mark the span as successful
-    payProcessSpan.end(); // End the span
-
 });
 
 const logFilePath = '/usr/share/logstash/ingest_data/AI-ECommerce-Payment';

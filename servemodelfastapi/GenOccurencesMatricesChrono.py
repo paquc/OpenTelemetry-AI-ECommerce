@@ -81,9 +81,9 @@ def print_alarm_types(df_logs, suffix, node_name):
             alarm_tpes_output_file.write(f"\n\n")
 
 
-def GenMatrices(service_name, suffix, time_window_epoch, prediction_window_epoch, moving_window_epoch, prediction_window_offset_epoch, aggregated_alarms_TH, alarm_clusters):
+def GenMatrices(time_window_epoch, prediction_window_epoch, moving_window_epoch, prediction_window_offset_epoch, aggregated_alarms_TH, alarm_clusters):
 
-    logs_file = f"./data/AI-ECommerce-Learn_structured.csv" 
+    logs_file = f"./data/system_unified_log_28.11.2024.csv" 
 
     # Load the log data from the CSV file
     print(f"Processing log file: {logs_file}")
@@ -92,7 +92,7 @@ def GenMatrices(service_name, suffix, time_window_epoch, prediction_window_epoch
     print(f"Last epoch time: {df_logs.iloc[-1]['EpochTime']}")
     #sys.exit(0)
 
-    file_suffix = f"{suffix}_{service_name}_{time_window_epoch}_{prediction_window_epoch}_{moving_window_epoch}_{prediction_window_offset_epoch}"
+    # file_suffix = f"{time_window_epoch}_{prediction_window_epoch}_{moving_window_epoch}_{prediction_window_offset_epoch}"
     
     # Open the output file in write mode
     output_sequences_file = f"./data/alarm_sequences.csv"

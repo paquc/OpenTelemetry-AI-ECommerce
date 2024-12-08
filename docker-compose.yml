@@ -22,6 +22,28 @@ services:
       - "./servemodelfastapi/data/:/data/"
       - ./logstash_ingest_data/system_unified_log.csv:/system_unified_log.csv
 
+  servemodelapi2:
+    build:
+      context: ./servemodelfastapi
+      dockerfile: Dockerfile
+    container_name: servemodel_fast_api_2
+    ports:
+      - "8089:8088"
+    deploy:
+      resources:
+        reservations:
+          memory: 64g  
+    volumes:
+      - ./servemodelfastapi/main.py:/main.py
+      - ./servemodelfastapi/BrainParse.py:/BrainParse.py
+      - ./servemodelfastapi/GenOccurencesMatricesChrono.py:/GenOccurencesMatricesChrono.py
+      - ./servemodelfastapi/predict.py:/predict.py
+      - ./servemodelfastapi/Drain3Parse.py:/Drain3Parse.py
+      - ./servemodelfastapi/TrainAlarms.py:/TrainAlarms.py
+      - ./servemodelfastapi/PreprocessData.py:/PreprocessData.py
+      - "./servemodelfastapi/data/:/data/"
+      - "./servemodelfastapi/data_test/:/data_test/"
+      - ./logstash_ingest_data/system_unified_log.csv:/system_unified_log.csv
 
   apigateway:
     build:
@@ -625,7 +647,7 @@ volumes:
   filebeatdata01:
     driver: local
   logstashdata01:
-    driver: local
+    driver: local 
   fleetserverdata:
     driver: local
 
