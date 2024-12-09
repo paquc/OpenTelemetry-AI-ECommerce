@@ -81,9 +81,14 @@ def print_alarm_types(df_logs, suffix, node_name):
             alarm_tpes_output_file.write(f"\n\n")
 
 
-def GenMatrices(time_window_epoch, prediction_window_epoch, moving_window_epoch, prediction_window_offset_epoch, aggregated_alarms_TH, alarm_clusters):
+def GenMatrices(time_window: int, prediction_window: int, moving_window: int, prediction_window_offset: int, aggregated_alarms_TH: int , alarm_clusters):
 
-    logs_file = f"./data/system_unified_log_28.11.2024.csv" 
+    time_window_epoch = time_window*60*1000   # Convert to milliseconds
+    prediction_window_epoch = prediction_window*60*1000   # Convert to milliseconds
+    moving_window_epoch = moving_window*60*1000   # Convert to milliseconds
+    prediction_window_offset_epoch = prediction_window_offset*60*1000   # Convert to milliseconds
+
+    logs_file = f"./data/AI-ECommerce-Learn_structured.csv" 
 
     # Load the log data from the CSV file
     print(f"Processing log file: {logs_file}")
@@ -130,8 +135,8 @@ def GenMatrices(time_window_epoch, prediction_window_epoch, moving_window_epoch,
                 #print(f"Prediction box start time: {window_box_sequence_tail_time_epoch + 1}, tail time: {prediction_box_data[1]}, Total time: {prediction_df.iloc[-1]['EpochTime'] - window_box_sequence_tail_time_epoch}")
 
                 # Filter the prediction DataFrame to keep only rows where 'Severity' is 'warn' for the desired service
-                prediction_warn_service_df = prediction_df.loc[(prediction_df['Severity'] == 'warn') & (prediction_df['Service'] == service_name)]
-                prediction_errors_service_df = prediction_df.loc[(prediction_df['Severity'] == 'error') & (prediction_df['Service'] == service_name)]
+                prediction_warn_service_df = prediction_df.loc[(prediction_df['Severity'] == 'warn')]
+                prediction_errors_service_df = prediction_df.loc[(prediction_df['Severity'] == 'error')]
                 #print(f"Number of warnings alarms for node {service_name} in prediction box: {prediction_warn_service_df.shape[0]}")
 
                 # Count the number of alarms in the prediction window (shape() returns a tuple of (num_rows, num_columns))
@@ -153,10 +158,7 @@ def GenMatrices(time_window_epoch, prediction_window_epoch, moving_window_epoch,
                         search_counter = 0
 
                 # Filter out all events corresponfig to service in window box for sequence
-                window_box_sequences_events_df = window_box_sequence_data[0]
-                window_box_sequences_node_events_df = window_box_sequences_events_df.loc[window_box_sequences_events_df['Service'] == service_name]   
-                # Drop rows where 'Severity' is 'info'
-                # window_box_sequences_node_events_df = window_box_sequences_node_events_df[window_box_sequences_node_events_df['Severity'] != 'info']
+                window_box_sequences_node_events_df = window_box_sequence_data[0]
 
                 # Generate a sequence of EventIds within the sequence window box
                 sequence_events = ','.join(window_box_sequences_node_events_df['EventId'].tolist())
@@ -177,7 +179,8 @@ def GenMatrices(time_window_epoch, prediction_window_epoch, moving_window_epoch,
             
         
         print(f"Output file: {output_sequences_file}")
-        #sys.exit(0)
+        
+        # return
 
 
     output_sequences_file_dedup = output_sequences_file.replace(".csv", "_dedup.csv")
@@ -188,7 +191,7 @@ def GenMatrices(time_window_epoch, prediction_window_epoch, moving_window_epoch,
     delete_file(output_sequences_file)
     print("Deduplicated sequences saved successfully!")
 
-    #sys.exit(0)
+    # return
     
     # Charger le fichier de séquences d'événements générées précédemment
     df_sequences = pd.read_csv(output_sequences_file_dedup, header=0)
@@ -206,6 +209,8 @@ def GenMatrices(time_window_epoch, prediction_window_epoch, moving_window_epoch,
     # Trier les événements uniques pour garantir un ordre cohérent des colonnes dans la matrice d'occurrences
     unique_events = sorted(unique_events)
     print(f"Found {len(unique_events)} unique events.")
+    print(unique_events)
+    
 
     #********************************************************************************************************************
     # Écrire les données de la matrice d'occurrences ligne par ligne dans le fichier CSV
@@ -238,9 +243,10 @@ def GenMatrices(time_window_epoch, prediction_window_epoch, moving_window_epoch,
     print(f"Deduplicated occurrence matrix saved successfully at {matrix_output_file_path.replace('.csv', '_dedup.csv')}")
 
     matrix = pd.read_csv(f"./data/alarm_occurences_matrix_dedup.csv", header=0)
-    if alarm_clusters:
-        matrix.drop(columns=alarm_clusters, inplace=True)
-        matrix.to_csv(f"./data/alarm_occurences_matrix_final.csv", index=False)
+    
+    # if alarm_clusters:
+    #     matrix.drop(columns=alarm_clusters, inplace=True)
+    #     matrix.to_csv(f"./data/alarm_occurences_matrix_final.csv", index=False)
 
 
 

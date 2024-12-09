@@ -72,15 +72,14 @@ def ParseNewEvent(log_entry, events_clusters, alarm_clusters, events_stack_size)
 
     match = log_pattern_real_time.match(log_entry)
     if match:
-        log_content = match.group("Content")  # Extract the Content field
-        result = drain_parser.add_log_message(log_content)  # Add the log message to the Drain3 parser to continue training while receiving new log entries
+        log_content = match.group("Content")                    # Extract the Content field
+        result = drain_parser.add_log_message(log_content)      # Add the log message to the Drain3 parser to continue training while receiving new log entries
         result = drain_parser.match(log_content)
 
         ordered_dict[result.cluster_id] += 1
         newItemsCounter += 1
 
         event_type = "E" + str(result.cluster_id)
-        # if event_type in alarm_clusters:
           
         if newItemsCounter >= events_stack_size and event_type in alarm_clusters:
             
@@ -104,10 +103,9 @@ def ParseNewEvent(log_entry, events_clusters, alarm_clusters, events_stack_size)
             newEvent = newEvent.fillna(0)
 
             if events_clusters:
-                # Keep only columns given by alarm_clusters
+                # Keep only columns given by 
                 newDataFrame = newDataFrame[events_clusters]
                 newDataFrame.reset_index(drop=True, inplace=True)
-                # newDataFrame.drop(columns=alarm_clusters, inplace=True)
                 print(newDataFrame)
 
             return newDataFrame

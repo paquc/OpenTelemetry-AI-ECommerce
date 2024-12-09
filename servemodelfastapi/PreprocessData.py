@@ -1,6 +1,7 @@
 import pandas as pd
 import sys
 import os
+from datetime import datetime
 
 def remove_duplicates(file_path, output_path=None):
     # Load the file
@@ -224,71 +225,111 @@ def GenMatricesV3(time_interval, error_threshold, pred_index):
     # ******************************************
 
 
-def split_and_aggregate_by_clusterV4(df_full, time_interval, error_threshold, anomaly_clusters, alarm_clusters, pred_index):
-    
-    # Convert 'FullDateTime' to a usable datetime format for pandas
-    df_full['FullDateTime'] = pd.to_datetime(df_full['DateTime'], format='%Y-%m-%d %H:%M:%S.%f')
+def split_and_aggregate_by_clusterV4(df_full, window_size, step_size, error_threshold, anomaly_clusters, alarm_clusters, pred_offset):
+       
 
-    # Set 'Datetime' as index for time-based resampling
-    # df_full.set_index('FullDateTime', inplace=True)
-    # print(df_full.head())
+    start_epochtime = df_full.iloc[0]['EpochTime']
+    print(f"Start epoch time: {start_epochtime}")
+    end_epochtime = df_full.iloc[-1]['EpochTime']
+    print(f"End epoch time: {end_epochtime}")
+   
+    window_size = int(window_size)
+    step_size = int(step_size)
+    pred_offset = int(pred_offset)
 
-    index = pd.date_range(start='2024-01-01 00:00:00.000', periods=10, freq='10T')  # 10-minute intervals
-    df = pd.DataFrame(df_full, index=index)
-
-    # Sliding window parameters
-    window_size = '20T'  # Window size: 20 minutes
-    step_size = '10T'    # Step size: 10 minutes
-
-    # Get the start and end of the datetime index
-    start_time = df.index.min()
-    end_time = df.index.max()
+    window_size_ms = window_size*60*1000   # Convert to milliseconds
+    step_size_ms = step_size*60*1000  # Convert to milliseconds
+    pred_offset_ms = pred_offset*60*1000  # Convert to milliseconds
+    print(f"Window size: {window_size_ms}, Step size: {step_size_ms}, Prediction offset: {pred_offset_ms}")
 
     # Iterate over sliding windows
-    current_time = start_time
-    while current_time + pd.Timedelta(window_size) <= end_time:
-        # Define the time range for the current window
-        window_start = current_time
-        window_end = current_time + pd.Timedelta(window_size)
+    current_time_epoch = start_epochtime
+    window_start = current_time_epoch
+    window_end = window_start + window_size_ms
+    
+    pred_start = window_end + pred_offset_ms
+    pred_end = pred_start + window_size_ms
 
-        # Slice the DataFrame for the current window
-        time_box = df_full.loc[window_start:window_end]
+    # Create a DataFrame with columns E1 to E17
+    columns = [f'E{i}' for i in range(1, 18)]
+    result_df = pd.DataFrame(columns=columns)
 
+    while window_end <= end_epochtime and pred_end <= end_epochtime:
         print(f"Time box from {window_start} to {window_end}:")
+        window_interval = (window_end - window_start) / 1000 / 60
+        print(f"Window interval (mins): {window_interval}")
 
-        sequence_events_df = ','.join(time_box['EventId'].tolist())
-        print(sequence_events_df.head(10))
+        time_to_end_mins = (end_epochtime - window_end) / 1000 / 60
+        print(f"Time to end (mins): {time_to_end_mins}")
+              
+        # Slice the DataFrame for the current window
+        window_sequence_df = df_full[(df_full['EpochTime'] >= window_start) & (df_full['EpochTime'] <= window_end)]
+        if not window_sequence_df.empty:
+            pred_df = df_full[(df_full['EpochTime'] >= pred_start) & (df_full['EpochTime'] <= pred_end)]
+            if not pred_df.empty:
+                # Group by 'EventId' and count occurrences
+                grouped_counts_df = window_sequence_df.groupby('EventId').size().reset_index(name='Count')
+                print(f"Cluster counts: {grouped_counts_df.shape}")
+                print(grouped_counts_df)
 
-        return sequence_events_df
-    
+                pred_grouped_counts_df = pred_df.groupby('EventId').size().reset_index(name='Count')
+                print(f"Predictions counts: {pred_grouped_counts_df.shape}")
+                print(pred_grouped_counts_df)
+
+                # Sum the counts of anomaly clusters in the prediction window
+                anomaly_sum = pred_grouped_counts_df[pred_grouped_counts_df['EventId'].isin(anomaly_clusters)]['Count'].sum()
+                print(f"Anomaly sum: {anomaly_sum}")
+
+                if anomaly_sum >= error_threshold:
+                    print(f"Anomaly detected in the prediction window: {pred_start} to {pred_end}")
+
+                    
+                    # Append the new row to the result DataFrame
+                    result_df = result_df.append(new_row, ignore_index=True)
+
+                    # Generate a sequence of EventIds within the sequence window box
+                    # sequence_events = ','.join(grouped_counts_df['EventId'].tolist())
+                    # new_df = pd.DataFrame([sequence_events], columns=['Sequence'])
+
+                    print(f"Sequence events: {sequence_events}")
+
+                    # E1,E2,E3,E4,E5,E6,E7,E10,E17,IsAlarm
+                    # 0,0,0,0,0,0,0,1,0,0
+                    # 0,0,0,0,0,1,1,0,0,0
+                    # 0,0,0,0,0,1,0,1,0,0
+
+                # # Initialize an empty column for the anomaly label
+                # pred_grouped_counts_df['IsAlarm'] = '0'
+
+                # # # Label the chunk as 'anomaly' based on the specified threshold and specific Cluster IDs
+                # for index, row in pred_grouped_counts_df.iterrows():
+                #     if anomaly_clusters:
+                #         # Check if any of the anomaly clusters exceed the error threshold
+                #         if pred_grouped_counts_df[anomaly_clusters].sum() >= error_threshold:
+                #             print(pred_grouped_counts_df[anomaly_clusters].sum())
+                #             pred_grouped_counts_df.at[index, 'IsAlarm'] = '1'
+
+          
+            
         # Slide the window
-        current_time = current_time + pd.Timedelta(step_size)
+        current_time_epoch = current_time_epoch + step_size_ms
 
-    # Resample based on time intervals and count occurrences of each Cluster ID
-    # cluster_counts = df_full.groupby([pd.Grouper(freq=time_interval), 'EventId']).size().unstack(fill_value=0)
-    # print(f"Cluster counts: {cluster_counts.shape}")
-    # print(cluster_counts)
+        window_start = current_time_epoch
+        window_end = window_start + window_size_ms
+        
+        pred_start = window_end + pred_offset_ms
+        pred_end = pred_start + window_size_ms
 
+    return None
+
+      
     
-    # Initialize an empty column for the anomaly label
-    # cluster_counts['IsAlarm'] = '0'
-
-    # # Label the chunk as 'anomaly' based on the specified threshold and specific Cluster IDs
-    # for index, row in cluster_counts.iterrows():
-    #     if anomaly_clusters:
-    #         row_index = cluster_counts.index.get_loc(index)
-    #         if row_index + pred_index < len(cluster_counts):
-    #             pred_cluster = cluster_counts.iloc[row_index + pred_index]
-    #             # Check if any of the anomaly clusters exceed the error threshold
-    #             if pred_cluster[anomaly_clusters].sum() >= error_threshold:
-    #                 # print(row[anomaly_clusters].sum())
-    #                 cluster_counts.at[index, 'IsAlarm'] = '1'
         
     # return cluster_counts
 
-def GenMatricesV4(time_interval, error_threshold, pred_index):
+def GenMatricesV4(time_interval, step_size, error_threshold, pred_offset):
 
-    logs_file = f"./data_test/AI-ECommerce-Learn_structured.csv"  
+    logs_file = f"./data/AI-ECommerce-Learn_structured_test.csv"  
     
     # Load the parsed logs from the CSV file - STRUCTED log file
     df = pd.read_csv(logs_file)
@@ -297,8 +338,13 @@ def GenMatricesV4(time_interval, error_threshold, pred_index):
     anomaly_clusters = ['E16', 'E17']  # CPU and LATANCE errors
     alarm_clusters = []
 
+    print(f"Time interval (mins): {time_interval}, Step size (mins): {step_size}, Error threshold: {error_threshold}, Prediction offset (mins): {pred_offset}")
+
     # Split and aggregate the DataFrame into chunks based on the specified time interval
-    result_df = split_and_aggregate_by_clusterV4(df, time_interval, error_threshold, anomaly_clusters, alarm_clusters, pred_index)
+    result_df = split_and_aggregate_by_clusterV4(df, time_interval, step_size, error_threshold, anomaly_clusters, alarm_clusters, pred_offset)
+
+    if result_df is None:
+        return
 
     # Reset the index to flatten the DataFrame, with time intervals as rows
     result_df.reset_index(inplace=True)
@@ -329,10 +375,10 @@ def GenMatricesV4(time_interval, error_threshold, pred_index):
 
     # Optionally, save the result to a new CSV file
     #result_df.to_csv('./Thunderbird_Brain_results/Thunderbird.log_structured_Preprocess_Samples.csv', index=False)
-    output_file = f"./data_test/occurences_matrix_preprocessed_dups.csv"
+    output_file = f"./data/occurences_matrix_preprocessed_dups.csv"
     result_df.to_csv(output_file, index=False)
 
-    output_file_dedup = f"./data_test/occurences_matrix_preprocessed.csv"
+    output_file_dedup = f"./data/occurences_matrix_preprocessed.csv"
     remove_duplicates(output_file, output_file_dedup)
 
     # Delete the intermediate file with duplicates

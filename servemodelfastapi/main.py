@@ -47,8 +47,8 @@ def addlog():
 def addlogentry(date: str , sever: str, epoch: str, error_type: str, service: str, endpoint: str, data1: str, data2: str, message: str, uuid: str):
     log_entry = date + "," + sever + "," + epoch + "," + error_type + "," + service + "," + endpoint + "," + data1 + "," + data2 + "," + message + "," + uuid
     # E4,E5,E8,E10,E13,E14,E15,E16,IsAlarm
-    events_clusters = ['E4','E5','E8','E10','E13','E14','E15','E16']
-    alarm_clusters = ['E14','E15','E16']
+    events_clusters = ['E9','E3','E1','E5','E6','E8','E4','E2', 'E7', 'E11', 'E15']         # Events to keep in resulting data frame used for predictions.
+    alarm_clusters = ['E10','E12']                                                          # Events considered as anomalies.
     data = Drain3Parse.ParseNewEvent(log_entry, events_clusters, alarm_clusters, 125000)
     if data is not None:
         prediction = predict.RF_Prediction(data)
@@ -91,8 +91,10 @@ def GenMatrixV3(interval: str, th: int):
     return {"Gen matrices V3": "Done."}
 
 @app.post("/GenMatrixV4")
-def GenMatrixV4(interval: str, th: int):
-    gmV2.GenMatricesV4(interval, th, 2)
+def GenMatrixV4(interval: int, step_size: int, th: int, pred_offset: int):
+    alarm_clusters = ['E6','E17']
+    gm.GenMatrices(interval, interval, step_size, step_size, 10, alarm_clusters)
+    # gmV2.GenMatricesV4(interval, step_size, th, pred_offset)
     return {"Gen matrices V4": "Done."}
 
 
