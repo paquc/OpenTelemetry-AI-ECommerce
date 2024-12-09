@@ -90,11 +90,11 @@ def GenMatrixV3(interval: str, th: int):
     # gmV2.GenMatricesV3('10min', 200, 2)
     return {"Gen matrices V3": "Done."}
 
+# def GenMatrices(time_window: int, prediction_window: int, moving_window: int, prediction_window_offset: int, aggregated_alarms_TH: int , alarm_clusters):
 @app.post("/GenMatrixV4")
-def GenMatrixV4(interval: int, step_size: int, th: int, pred_offset: int):
-    alarm_clusters = ['E6','E17']
-    gm.GenMatrices(interval, interval, step_size, step_size, 10, alarm_clusters)
-    # gmV2.GenMatricesV4(interval, step_size, th, pred_offset)
+def GenMatrixV4(interval: int, prediction_window: int, step_size: int, th: int, pred_offset: int):
+    alarm_clusters = ['E9','E2']
+    gm.GenMatrices(interval, prediction_window, step_size, step_size, th, alarm_clusters)
     return {"Gen matrices V4": "Done."}
 
 

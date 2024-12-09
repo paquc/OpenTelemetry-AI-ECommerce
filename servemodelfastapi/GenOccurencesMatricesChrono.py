@@ -95,10 +95,7 @@ def GenMatrices(time_window: int, prediction_window: int, moving_window: int, pr
     df_logs = pd.read_csv(logs_file)
     print(f"Number of log entries: {df_logs.shape[0]}")
     print(f"Last epoch time: {df_logs.iloc[-1]['EpochTime']}")
-    #sys.exit(0)
 
-    # file_suffix = f"{time_window_epoch}_{prediction_window_epoch}_{moving_window_epoch}_{prediction_window_offset_epoch}"
-    
     # Open the output file in write mode
     output_sequences_file = f"./data/alarm_sequences.csv"
     with open(output_sequences_file, "w") as sequences_output_file:
@@ -106,9 +103,6 @@ def GenMatrices(time_window: int, prediction_window: int, moving_window: int, pr
         print(f"Generating sequences of events within {time_window_epoch} seconds for each entry...")
         sequences_output_file.write("EventSequence,IsAlarm\n")
        
-        # print_alarm_types(df_logs, suffix, node_name)
-        # sys.exit(0)
-        
         search_counter = 0
         
         window_box_sequence_start_time_epoch = df_logs.iloc[0]['EpochTime']
@@ -124,8 +118,6 @@ def GenMatrices(time_window: int, prediction_window: int, moving_window: int, pr
 
             # Get the prediction window
             window_box_sequence_tail_time_epoch = window_box_sequence_data[1]
-            # prediction_box_data = find_event(df_logs, window_box_sequence_tail_time_epoch, prediction_window_epoch, 'future')
-            # prediction_box_data = find_event(df_logs, window_box_sequence_tail_time_epoch - prediction_window_epoch, prediction_window_epoch, 'future')
             prediction_box_data = find_event(df_logs, window_box_sequence_tail_time_epoch + prediction_window_offset_epoch, prediction_window_epoch, 'future')
             print(f"Prediction box start time: {window_box_sequence_tail_time_epoch + prediction_window_offset_epoch}, tail time: {prediction_window_epoch}")
 
@@ -134,24 +126,22 @@ def GenMatrices(time_window: int, prediction_window: int, moving_window: int, pr
                 #print(prediction_df.head(10))
                 #print(f"Prediction box start time: {window_box_sequence_tail_time_epoch + 1}, tail time: {prediction_box_data[1]}, Total time: {prediction_df.iloc[-1]['EpochTime'] - window_box_sequence_tail_time_epoch}")
 
-                # Filter the prediction DataFrame to keep only rows where 'Severity' is 'warn' for the desired service
-                prediction_warn_service_df = prediction_df.loc[(prediction_df['Severity'] == 'warn')]
-                prediction_errors_service_df = prediction_df.loc[(prediction_df['Severity'] == 'error')]
-                #print(f"Number of warnings alarms for node {service_name} in prediction box: {prediction_warn_service_df.shape[0]}")
+                pred_grouped_counts_df = prediction_df.groupby('EventId').size().reset_index(name='Count')
+                print(f"Predictions counts: {pred_grouped_counts_df.shape}")
+                print(pred_grouped_counts_df)
 
-                # Count the number of alarms in the prediction window (shape() returns a tuple of (num_rows, num_columns))
-                num_warns_service_alarms = prediction_warn_service_df.shape[0]
-                num_errors_service_alarms = prediction_errors_service_df.shape[0]
+                # Sum the counts of anomaly clusters in the prediction window
+                anomaly_sum = pred_grouped_counts_df[pred_grouped_counts_df['EventId'].isin(alarm_clusters)]['Count'].sum()
+                print(f"Anomaly sum: {anomaly_sum}")
 
-                # There is an alarm if the number of warnings is greater than the threshold
-                if num_warns_service_alarms >= aggregated_alarms_TH or num_errors_service_alarms >= 1:
+                if anomaly_sum >= aggregated_alarms_TH:
                     is_alarm = 1
-                    print(f"ALARM: Alarms detected: {num_warns_service_alarms} alarms.")
+                    print(f"ALARM: Alarms detected: {anomaly_sum} alarms.")
                     search_counter = 0
                 else:
                     is_alarm = 0
                     if search_counter == 0:
-                        print(f"NO ALARM: alarms detected: {num_warns_service_alarms} alarms. Searching...")
+                        print(f"NO ALARM: alarms detected: {anomaly_sum} alarms. Searching...")
                     search_counter += 1
                     print(f"ALARMS searching --> {search_counter}..... ")
                     if search_counter > 10:
@@ -214,7 +204,7 @@ def GenMatrices(time_window: int, prediction_window: int, moving_window: int, pr
 
     #********************************************************************************************************************
     # Écrire les données de la matrice d'occurrences ligne par ligne dans le fichier CSV
-    matrix_output_file_path = f"./data/alarm_occurences_matrix.csv"
+    matrix_output_file_path = f"./data/occurences_matrix_preprocessed_dups.csv"
 
     # Ouvrir le fichier de sortie en mode écriture
     with open(matrix_output_file_path, 'w') as matrix_output_file:
@@ -238,15 +228,28 @@ def GenMatrices(time_window: int, prediction_window: int, moving_window: int, pr
             matrix_output_file.write(','.join(map(str, matrix_row)) + '\n')
 
     print(f"Occurrence matrix generated successfully at {matrix_output_file_path}!")
-    remove_duplicates(matrix_output_file_path, matrix_output_file_path.replace(".csv", "_dedup.csv"))
+    remove_duplicates(matrix_output_file_path, f"./data/occurences_matrix_preprocessed_dedup.csv")
     delete_file(matrix_output_file_path)
-    print(f"Deduplicated occurrence matrix saved successfully at {matrix_output_file_path.replace('.csv', '_dedup.csv')}")
 
-    matrix = pd.read_csv(f"./data/alarm_occurences_matrix_dedup.csv", header=0)
+    matrix = pd.read_csv(f"./data/occurences_matrix_preprocessed_dedup.csv", header=0)
+
+    # Sort the columns in the desired order
+    desired_order = ['E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7', 'E8', 'E9', 'E10', 'E11', 'E12', 'E13', 'E14', 'E15', 'E16', 'E17', 'IsAlarm']
+    matrix = matrix.reindex(columns=desired_order)
     
-    # if alarm_clusters:
-    #     matrix.drop(columns=alarm_clusters, inplace=True)
-    #     matrix.to_csv(f"./data/alarm_occurences_matrix_final.csv", index=False)
+    if alarm_clusters:
+        # Verify if alarm_clusters columns are in the matrix
+        missing_columns = [col for col in alarm_clusters if col not in matrix.columns]
+        if missing_columns:
+            print(f"Warning: The following columns from alarm_clusters are not in the matrix: {missing_columns}")
+        else:
+            matrix.drop(columns=alarm_clusters, inplace=True)
+        
+    matrix.to_csv(f"./data/occurences_matrix_preprocessed.csv", index=False)
+        
+    delete_file(f"./data/occurences_matrix_preprocessed_dedup.csv")
+    print(f"./data/occurences_matrix_preprocessed_dedup.csv")
+
 
 
 
