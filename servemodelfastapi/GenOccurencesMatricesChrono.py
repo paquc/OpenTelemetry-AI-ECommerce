@@ -83,6 +83,7 @@ def print_alarm_types(df_logs, suffix, node_name):
 
 def GenMatrices(time_window: int, prediction_window: int, moving_window: int, prediction_window_offset: int, aggregated_alarms_TH: int , alarm_clusters):
 
+
     time_window_epoch = time_window*60*1000   # Convert to milliseconds
     prediction_window_epoch = prediction_window*60*1000   # Convert to milliseconds
     moving_window_epoch = moving_window*60*1000   # Convert to milliseconds
@@ -251,6 +252,9 @@ def GenMatrices(time_window: int, prediction_window: int, moving_window: int, pr
     print(f"./data/occurences_matrix_preprocessed_dedup.csv")
 
 
+# def GenMatrices(time_window: int, prediction_window: int, moving_window: int, prediction_window_offset: int, aggregated_alarms_TH: int , alarm_clusters):
 
-
-
+alarm_clusters = ['E10','E12']
+GenMatrices(10, 5, 5, 0, 5, alarm_clusters)   #1
+# GenMatrices(10, 5, 1, 10, 5, alarm_clusters)    #2
+# GenMatrices(20, 5, 3, 20, 5, alarm_clusters)    #3

@@ -123,7 +123,8 @@ def Drain3ParseLearn():
     drain_parser = TemplateMiner(persistence, config=config)
 
     # Train Drain3
-    with open('system_unified_log.csv', 'r') as log_file:
+    # with open('system_unified_log.csv', 'r') as log_file:
+    with open('../logstash_ingest_data/system_unified_log.csv', 'r') as log_file:
         for line in log_file:
             # Remove any leading/trailing whitespace from the line
             line = line.strip()
@@ -138,7 +139,8 @@ def Drain3ParseLearn():
     log_data = []
 
     # Parse the log file and extract the log fields in inference mode
-    with open('system_unified_log.csv', 'r') as log_file:
+    # with open('system_unified_log.csv', 'r') as log_file:
+    with open('../logstash_ingest_data/system_unified_log.csv', 'r') as log_file:
         for log in log_file:
             match = log_pattern.match(log)
             if match:
@@ -181,5 +183,6 @@ def Drain3ParseLearn():
     df = pd.DataFrame(log_data)
     df.to_csv('./data/AI-ECommerce-Learn_structured.csv')
 
+Drain3ParseLearn()
 
 # def Drain3Append():

@@ -273,3 +273,7 @@ def TrainModels(train_LR, train_RF, use_bootstrap, n_bootstrap_samples, train_da
 
         print("End of script")
         print("************************************")
+
+
+
+TrainModels(0, 1, 0, 1, 70, 30, 0)
