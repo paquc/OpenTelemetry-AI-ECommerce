@@ -255,6 +255,13 @@ def GenMatrices(time_window: int, prediction_window: int, moving_window: int, pr
 # def GenMatrices(time_window: int, prediction_window: int, moving_window: int, prediction_window_offset: int, aggregated_alarms_TH: int , alarm_clusters):
 
 alarm_clusters = ['E10','E12']
-GenMatrices(10, 5, 5, 0, 5, alarm_clusters)   #1
-# GenMatrices(10, 5, 1, 10, 5, alarm_clusters)    #2
-# GenMatrices(20, 5, 3, 20, 5, alarm_clusters)    #3
+# GenMatrices(10, 5, 5, 0, 5, alarm_clusters)       #1
+# GenMatrices(10, 5, 1, 10, 5, alarm_clusters)      #2
+# GenMatrices(20, 5, 3, 20, 5, alarm_clusters)      #3
+# GenMatrices(5, 5, 2, 30, 5, alarm_clusters)       #4
+# GenMatrices(30, 5, 5, 45, 5, alarm_clusters)      #5
+
+
+
+
+

@@ -165,6 +165,11 @@ def TrainModels(train_LR, train_RF, use_bootstrap, n_bootstrap_samples, train_da
     
     full_data = pd.read_csv(input_file_path)
 
+    #************************************************
+    # drops_clusters = ['E14','E15','E17','E13','E16']
+    # full_data.drop(columns=drops_clusters, inplace=True)
+    #************************************************
+
     sampling_data_desc = f'{train_data_size}_{test_data_size}_{val_data_size}'
 
     RF_output_file = f"./data/training_RF_{sampling_data_desc}_Output.log"
