@@ -32,17 +32,7 @@ exporters:
     endpoint: tempo:4317
     tls:
       insecure: true
-  # otlp/bugsnap:
-  #     endpoint: https://991acf17-3cae-4771-922e-54ddd0e2636d.otlp.bugsnag.com:4317
-  
-      # headers:
-        # Authorization: 3b8f7807-14e2-4733-8253-8f2548fe3f92   # Security TOKEN for Carl
-  
-  # 991acf17-3cae-4771-922e-54ddd0e2636d
-  # "https://<PROJECT_API_KEY>.otlp.bugsnag.com:4317"
-    
-#apm_server_url: 'http://fleet-server:8200' # APM Server URL
-
+ 
 extensions:
  health_check:
  pprof:
